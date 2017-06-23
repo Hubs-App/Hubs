@@ -7,20 +7,20 @@ import android.widget.Toast;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 
-import cn.nekocode.luaj.HotLua;
+import cn.nekocode.hot.luaj.HotLuaGlobals;
 
 public class MainActivity extends AppCompatActivity {
-    private HotLua hotLua;
+    private HotLuaGlobals luaGlobals;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        hotLua = new HotLua(this);
+        luaGlobals = new HotLuaGlobals(this);
 
         try {
             final LuaValue activity = CoerceJavaToLua.coerce(this);
-            hotLua.loadfile("test.lua").call(activity);
+            luaGlobals.loadfile("test.lua").call(activity);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void f() {
-        LuaValue f = hotLua.get("test");
+        LuaValue f = luaGlobals.get("test");
         if (!f.isnil()) {
             try {
                 f.call();

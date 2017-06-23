@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package cn.nekocode.luaj;
+package cn.nekocode.hot.luaj;
 
 import android.content.Context;
 
@@ -41,9 +41,9 @@ import java.io.InputStream;
 /**
  * @author nekocode (nekocode.cn@gmail.com)
  */
-public class HotLua extends Globals {
+public class HotLuaGlobals extends Globals {
 
-    public HotLua(final String basePath) {
+    public HotLuaGlobals(final String basePath) {
         install();
 
         this.finder = new ResourceFinder() {
@@ -66,7 +66,7 @@ public class HotLua extends Globals {
         };
     }
 
-    public HotLua(Context context) {
+    public HotLuaGlobals(Context context) {
         install();
 
         final Context app = context.getApplicationContext();
