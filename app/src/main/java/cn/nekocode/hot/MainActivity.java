@@ -25,12 +25,7 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        getWindow().getDecorView().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                f();
-            }
-        }, 2000);
+        getWindow().getDecorView().postDelayed(this::f, 2000);
     }
 
     public void t(String t) {

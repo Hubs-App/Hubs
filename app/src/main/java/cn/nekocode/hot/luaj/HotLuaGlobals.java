@@ -29,14 +29,12 @@ import org.luaj.vm2.lib.CoroutineLib;
 import org.luaj.vm2.lib.MathLib;
 import org.luaj.vm2.lib.OsLib;
 import org.luaj.vm2.lib.PackageLib;
-import org.luaj.vm2.lib.ResourceFinder;
 import org.luaj.vm2.lib.StringLib;
 import org.luaj.vm2.lib.TableLib;
 import org.luaj.vm2.lib.jse.LuajavaLib;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.InputStream;
 
 /**
  * @author nekocode (nekocode.cn@gmail.com)
@@ -46,23 +44,20 @@ public class HotLuaGlobals extends Globals {
     public HotLuaGlobals(final String basePath) {
         install();
 
-        this.finder = new ResourceFinder() {
-            @Override
-            public InputStream findResource(String path) {
-                try {
-                    File file = new File(basePath, path);
-                    if (!file.exists() && !path.endsWith(".lua")) {
-                        file = new File(basePath, path + ".lua");
-                    }
-
-                    if (file.exists()) {
-                        return new FileInputStream(file);
-                    }
-                } catch (Throwable t) {
-                    throw new LuaError(t);
+        this.finder = path -> {
+            try {
+                File file = new File(basePath, path);
+                if (!file.exists() && !path.endsWith(".lua")) {
+                    file = new File(basePath, path + ".lua");
                 }
-                return null;
+
+                if (file.exists()) {
+                    return new FileInputStream(file);
+                }
+            } catch (Throwable t) {
+                throw new LuaError(t);
             }
+            return null;
         };
     }
 
@@ -70,17 +65,15 @@ public class HotLuaGlobals extends Globals {
         install();
 
         final Context app = context.getApplicationContext();
-        this.finder = new ResourceFinder() {
-            public InputStream findResource(String path) {
-                try {
-                    if (!path.endsWith(".lua")) {
-                        return app.getAssets().open(path + ".lua");
-                    } else {
-                        return app.getAssets().open(path);
-                    }
-                } catch (Throwable t) {
-                    throw new LuaError(t);
+        this.finder = path -> {
+            try {
+                if (!path.endsWith(".lua")) {
+                    return app.getAssets().open(path + ".lua");
+                } else {
+                    return app.getAssets().open(path);
                 }
+            } catch (Throwable t) {
+                throw new LuaError(t);
             }
         };
     }
