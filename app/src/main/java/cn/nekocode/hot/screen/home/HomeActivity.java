@@ -17,7 +17,6 @@
 
 package cn.nekocode.hot.screen.home;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.Toast;
 
@@ -25,12 +24,13 @@ import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 
 import cn.nekocode.hot.R;
+import cn.nekocode.hot.base.BaseActivity;
 import cn.nekocode.hot.luaj.HotLuaGlobals;
 
 /**
  * @author nekocode (nekocode.cn@gmail.com)
  */
-public class HomeActivity extends AppCompatActivity {
+public class HomeActivity extends BaseActivity {
     private HotLuaGlobals luaGlobals;
 
     @Override
