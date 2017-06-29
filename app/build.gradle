@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'io.fabric'
 apply plugin: 'me.tatarka.retrolambda'
 
 android {
@@ -11,6 +12,10 @@ android {
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
+
+        manifestPlaceholders = [
+                FABRIC_API_KEY: "ef319bcb87dd50b6283644f4e9e4c40ab0b07996"
+        ]
     }
     buildTypes {
         release {
@@ -28,6 +33,24 @@ android {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile project(':luaj')
+
+    // Android support libraries
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile "com.android.support:appcompat-v7:$SUPPORT_LIBS_VERSION"
+    compile "com.android.support:recyclerview-v7:$SUPPORT_LIBS_VERSION"
+    compile "com.android.support:support-annotations:$SUPPORT_LIBS_VERSION"
+
+    // Reactive library
+    compile "io.reactivex.rxjava2:rxjava:2.1.1"
+    compile "io.reactivex.rxjava2:rxandroid:2.0.1"
+
+    // Others
+    compile 'org.jsoup:jsoup:1.10.3'
+    compile "com.github.nekocode:Meepo:0.1.5"
+    compile "com.github.nekocode:ItemPool:0.5.4"
+
+    // Crashlytics
+    compile('com.crashlytics.sdk.android:crashlytics:2.6.8@aar') {
+        transitive = true;
+    }
 }
