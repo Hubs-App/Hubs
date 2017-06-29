@@ -17,29 +17,28 @@
 
 package cn.nekocode.hot.screen.home;
 
-import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-
-import cn.nekocode.hot.R;
-import cn.nekocode.hot.base.BaseFragment;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
 
 /**
  * @author nekocode (nekocode.cn@gmail.com)
  */
-public class ArticleListFragment extends BaseFragment {
+public class ColumnPagerAdapter extends FragmentStatePagerAdapter {
+    private Fragment[] fragments;
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public ColumnPagerAdapter(FragmentManager fm, Fragment[] fragments) {
+        super(fm);
+        this.fragments = fragments;
     }
 
-    @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        final View root = inflater.inflate(R.layout.fragment_article_list, container, false);
-        return root;
+    public Fragment getItem(int position) {
+        return fragments[position];
+    }
+
+    @Override
+    public int getCount() {
+        return fragments.length;
     }
 }
