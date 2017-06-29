@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package cn.nekocode.hot.activity;
+package cn.nekocode.hot.screen.home;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -30,13 +30,13 @@ import cn.nekocode.hot.luaj.HotLuaGlobals;
 /**
  * @author nekocode (nekocode.cn@gmail.com)
  */
-public class MainActivity extends AppCompatActivity {
+public class HomeActivity extends AppCompatActivity {
     private HotLuaGlobals luaGlobals;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_home);
         luaGlobals = new HotLuaGlobals(this);
 
         try {
