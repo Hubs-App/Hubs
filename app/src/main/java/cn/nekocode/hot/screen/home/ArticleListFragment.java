@@ -32,7 +32,8 @@ import cn.nekocode.hot.databinding.FragmentArticleListBinding;
  * @author nekocode (nekocode.cn@gmail.com)
  */
 public class ArticleListFragment extends BaseFragment {
-    private FragmentArticleListBinding binding;
+    private FragmentArticleListBinding mBinding;
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -42,7 +43,7 @@ public class ArticleListFragment extends BaseFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_article_list, container, false);
-        return binding.getRoot();
+        mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_article_list, container, false);
+        return mBinding.getRoot();
     }
 }

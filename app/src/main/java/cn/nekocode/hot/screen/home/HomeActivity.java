@@ -28,11 +28,12 @@ import cn.nekocode.hot.databinding.ActivityHomeBinding;
  * @author nekocode (nekocode.cn@gmail.com)
  */
 public class HomeActivity extends BaseActivity {
-    private ActivityHomeBinding binding;
+    private ActivityHomeBinding mBinding;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_home);
+        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_home);
     }
 }

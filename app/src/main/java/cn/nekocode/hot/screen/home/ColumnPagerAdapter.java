@@ -25,20 +25,21 @@ import android.support.v4.app.FragmentStatePagerAdapter;
  * @author nekocode (nekocode.cn@gmail.com)
  */
 public class ColumnPagerAdapter extends FragmentStatePagerAdapter {
-    private Fragment[] fragments;
+    private Fragment[] mFragments;
+
 
     public ColumnPagerAdapter(FragmentManager fm, Fragment[] fragments) {
         super(fm);
-        this.fragments = fragments;
+        this.mFragments = fragments;
     }
 
     @Override
     public Fragment getItem(int position) {
-        return fragments[position];
+        return mFragments[position];
     }
 
     @Override
     public int getCount() {
-        return fragments.length;
+        return mFragments.length;
     }
 }
