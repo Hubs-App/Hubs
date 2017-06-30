@@ -17,6 +17,7 @@
 
 package cn.nekocode.hot.screen.home;
 
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -25,11 +26,13 @@ import android.view.ViewGroup;
 
 import cn.nekocode.hot.R;
 import cn.nekocode.hot.base.BaseFragment;
+import cn.nekocode.hot.databinding.FragmentArticleListBinding;
 
 /**
  * @author nekocode (nekocode.cn@gmail.com)
  */
 public class ArticleListFragment extends BaseFragment {
+    private FragmentArticleListBinding binding;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -39,7 +42,7 @@ public class ArticleListFragment extends BaseFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        final View root = inflater.inflate(R.layout.fragment_article_list, container, false);
-        return root;
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_article_list, container, false);
+        return binding.getRoot();
     }
 }

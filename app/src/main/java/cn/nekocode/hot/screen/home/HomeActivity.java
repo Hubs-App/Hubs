@@ -17,6 +17,7 @@
 
 package cn.nekocode.hot.screen.home;
 
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.widget.Toast;
 
@@ -25,18 +26,20 @@ import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 
 import cn.nekocode.hot.R;
 import cn.nekocode.hot.base.BaseActivity;
+import cn.nekocode.hot.databinding.ActivityHomeBinding;
 import cn.nekocode.hot.luaj.HotLuaGlobals;
 
 /**
  * @author nekocode (nekocode.cn@gmail.com)
  */
 public class HomeActivity extends BaseActivity {
+    private ActivityHomeBinding binding;
     private HotLuaGlobals luaGlobals;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_home);
         luaGlobals = new HotLuaGlobals(this);
 
         try {
