@@ -19,51 +19,20 @@ package cn.nekocode.hot.screen.home;
 
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.widget.Toast;
-
-import org.luaj.vm2.LuaValue;
-import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 
 import cn.nekocode.hot.R;
 import cn.nekocode.hot.base.BaseActivity;
 import cn.nekocode.hot.databinding.ActivityHomeBinding;
-import cn.nekocode.hot.luaj.HotLuaGlobals;
 
 /**
  * @author nekocode (nekocode.cn@gmail.com)
  */
 public class HomeActivity extends BaseActivity {
     private ActivityHomeBinding binding;
-    private HotLuaGlobals luaGlobals;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_home);
-        luaGlobals = new HotLuaGlobals(this);
-
-        try {
-            final LuaValue activity = CoerceJavaToLua.coerce(this);
-            luaGlobals.loadfile("test.lua").call(activity);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        getWindow().getDecorView().postDelayed(this::f, 2000);
-    }
-
-    public void t(String t) {
-        Toast.makeText(this, t, Toast.LENGTH_SHORT).show();
-    }
-
-    public void f() {
-        LuaValue f = luaGlobals.get("test");
-        if (!f.isnil()) {
-            try {
-                f.call();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
     }
 }
