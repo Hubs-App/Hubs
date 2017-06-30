@@ -13,14 +13,14 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <activity android:name=".screen.home.HomeActivity">
+        <activity android:name=".ui.home.HomeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
 
-        <activity android:name=".screen.preference.HotPreferenceActivity"/>
+        <activity android:name=".ui.preference.HotPreferenceActivity"/>
 
         <meta-data
             android:name="io.fabric.ApiKey"

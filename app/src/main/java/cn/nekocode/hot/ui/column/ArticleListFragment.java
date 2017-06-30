@@ -15,25 +15,35 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package cn.nekocode.hot.screen.home;
+package cn.nekocode.hot.ui.column;
 
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import cn.nekocode.hot.R;
-import cn.nekocode.hot.base.BaseActivity;
-import cn.nekocode.hot.databinding.ActivityHomeBinding;
+import cn.nekocode.hot.base.BaseFragment;
+import cn.nekocode.hot.databinding.FragmentArticleListBinding;
 
 /**
  * @author nekocode (nekocode.cn@gmail.com)
  */
-public class HomeActivity extends BaseActivity {
-    private ActivityHomeBinding mBinding;
+public class ArticleListFragment extends BaseFragment {
+    private FragmentArticleListBinding mBinding;
 
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_home);
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_article_list, container, false);
+        return mBinding.getRoot();
     }
 }

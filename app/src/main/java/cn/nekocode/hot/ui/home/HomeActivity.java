@@ -15,12 +15,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package cn.nekocode.hot.screen.preference;
+package cn.nekocode.hot.ui.home;
 
-import android.preference.PreferenceActivity;
+import android.databinding.DataBindingUtil;
+import android.os.Bundle;
+
+import cn.nekocode.hot.R;
+import cn.nekocode.hot.base.BaseActivity;
+import cn.nekocode.hot.databinding.ActivityHomeBinding;
 
 /**
  * @author nekocode (nekocode.cn@gmail.com)
  */
-public class HotPreferenceActivity extends PreferenceActivity {
+public class HomeActivity extends BaseActivity {
+    private ActivityHomeBinding mBinding;
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_home);
+    }
 }
