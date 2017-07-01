@@ -25,25 +25,34 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import cn.nekocode.hot.R;
-import cn.nekocode.hot.base.BaseFragment;
-import cn.nekocode.hot.databinding.FragmentArticleListBinding;
+import cn.nekocode.hot.base.BaseColumnFragment;
+import cn.nekocode.hot.data.model.Column;
+import cn.nekocode.hot.databinding.FragmentArticleColumnBinding;
 
 /**
  * @author nekocode (nekocode.cn@gmail.com)
  */
-public class ArticleListFragment extends BaseFragment {
-    private FragmentArticleListBinding mBinding;
+public class ArticleColumnFragment extends BaseColumnFragment {
+    private FragmentArticleColumnBinding mBinding;
+    private Column mColumn;
 
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mColumn = getColumnFromBundle(getArguments());
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_article_list, container, false);
+        mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_article_column, container, false);
         return mBinding.getRoot();
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        mBinding.textView.setText(mColumn.getName());
     }
 }

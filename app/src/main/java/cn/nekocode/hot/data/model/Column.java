@@ -26,8 +26,11 @@ import java.util.UUID;
  * @author nekocode (nekocode.cn@gmail.com)
  */
 public class Column implements Parcelable {
+    public static final String TYPE_ARTICLE = "article";
+
     private UUID id;
     private String name;
+    private String type;
 
 
     public UUID getId() {
@@ -46,6 +49,14 @@ public class Column implements Parcelable {
         this.name = name;
     }
 
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
 
     @Override
     public int describeContents() {
@@ -56,6 +67,7 @@ public class Column implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeSerializable(this.id);
         dest.writeString(this.name);
+        dest.writeString(this.type);
     }
 
     public Column() {
@@ -64,9 +76,10 @@ public class Column implements Parcelable {
     protected Column(Parcel in) {
         this.id = (UUID) in.readSerializable();
         this.name = in.readString();
+        this.type = in.readString();
     }
 
-    public static final Parcelable.Creator<Column> CREATOR = new Parcelable.Creator<Column>() {
+    public static final Creator<Column> CREATOR = new Creator<Column>() {
         @Override
         public Column createFromParcel(Parcel source) {
             return new Column(source);
