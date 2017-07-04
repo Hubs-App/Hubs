@@ -87,9 +87,10 @@ public class ArticleListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     .load(article.getCoverUrl())
                     .centerCrop()
                     .fit()
-                    .into(mBinding.imageView);
+                    .into(mBinding.coverView);
 
-            mBinding.textView.setText(article.getTitle());
+            mBinding.titleView.setText(article.getTitle());
+            mBinding.descriptionView.setText(article.getDescription());
         }
     }
 }

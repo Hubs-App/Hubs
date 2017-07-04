@@ -54,6 +54,7 @@ public class ArticleColumnFragment extends BaseColumnFragment {
             final Article article = new Article();
             article.setCoverUrl("http://file25.mafengwo.net/M00/A8/DC/wKgB4lImBjiAXbFhAA1RSMu2P6s60.jpeg");
             article.setTitle(new SpannableString("Article " + i));
+            article.setDescription(new SpannableString("description " + i));
             mArticleList.add(article);
         }
         mAdapter = new ArticleListAdapter(mArticleList);
