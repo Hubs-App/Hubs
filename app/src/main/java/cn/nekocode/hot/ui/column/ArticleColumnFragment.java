@@ -33,6 +33,7 @@ import cn.nekocode.hot.base.BaseColumnFragment;
 import cn.nekocode.hot.data.model.Article;
 import cn.nekocode.hot.data.model.Column;
 import cn.nekocode.hot.databinding.FragmentArticleColumnBinding;
+import cn.nekocode.hot.util.DividerItemDecoration;
 
 /**
  * @author nekocode (nekocode.cn@gmail.com)
@@ -73,5 +74,6 @@ public class ArticleColumnFragment extends BaseColumnFragment {
         mBinding.recyclerView.setLayoutManager(
                 new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         mBinding.recyclerView.setAdapter(mAdapter);
+        mBinding.recyclerView.addItemDecoration(DividerItemDecoration.obtainDefault(getContext()));
     }
 }
