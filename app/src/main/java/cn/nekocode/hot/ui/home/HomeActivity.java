@@ -60,6 +60,8 @@ public class HomeActivity extends BaseActivity {
             }
         }
 
+        setSupportActionBar(mBinding.toolbar);
+
         mPagerAdapter = new ColumnPagerAdapter(getSupportFragmentManager(), mColumns);
         mBinding.viewPager.setAdapter(mPagerAdapter);
         mBinding.tabs.setupWithViewPager(mBinding.viewPager);
