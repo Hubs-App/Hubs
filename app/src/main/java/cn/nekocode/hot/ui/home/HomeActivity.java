@@ -19,11 +19,11 @@ package cn.nekocode.hot.ui.home;
 
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 
 import com.evernote.android.state.State;
 import com.evernote.android.state.StateSaver;
 
+import java.util.ArrayList;
 import java.util.UUID;
 
 import cn.nekocode.hot.R;
@@ -38,8 +38,7 @@ public class HomeActivity extends BaseActivity {
     private ActivityHomeBinding mBinding;
 
     @State
-    public Column[] mColumns;
-    private Fragment[] mColumnFragments;
+    public ArrayList<Column> mColumns;
     private ColumnPagerAdapter mPagerAdapter;
 
 
@@ -51,12 +50,13 @@ public class HomeActivity extends BaseActivity {
 
         // Mock data
         if (mColumns == null) {
-            mColumns = new Column[4];
+            mColumns = new ArrayList<>();
             for (int i = 0; i < 4; i++) {
-                mColumns[i] = new Column();
-                mColumns[i].setId(UUID.randomUUID());
-                mColumns[i].setName("Column" + i);
-                mColumns[i].setType(Column.TYPE_ARTICLE);
+                final Column column = new Column();
+                column.setId(UUID.randomUUID());
+                column.setName("Column" + i);
+                column.setType(Column.TYPE_ARTICLE);
+                mColumns.add(column);
             }
         }
 
