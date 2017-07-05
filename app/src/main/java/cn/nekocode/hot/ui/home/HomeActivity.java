@@ -19,6 +19,8 @@ package cn.nekocode.hot.ui.home;
 
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import com.evernote.android.state.State;
 import com.evernote.android.state.StateSaver;
@@ -71,5 +73,20 @@ public class HomeActivity extends BaseActivity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         StateSaver.saveInstanceState(this, outState);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.home, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menuSetting:
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
