@@ -22,6 +22,6 @@ import android.support.v4.app.Fragment;
 /**
  * @author nekocode (nekocode.cn@gmail.com)
  */
-public class BaseFragment extends Fragment {
+public abstract class BaseFragment extends Fragment {
 
 }

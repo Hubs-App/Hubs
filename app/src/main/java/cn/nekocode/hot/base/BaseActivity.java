@@ -22,5 +22,5 @@ import android.support.v7.app.AppCompatActivity;
 /**
  * @author nekocode (nekocode.cn@gmail.com)
  */
-public class BaseActivity extends AppCompatActivity {
+public abstract class BaseActivity extends AppCompatActivity {
 }
