@@ -28,6 +28,7 @@ import com.evernote.android.state.StateSaver;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import cn.nekocode.hot.ActivityRouter;
 import cn.nekocode.hot.R;
 import cn.nekocode.hot.base.BaseActivity;
 import cn.nekocode.hot.data.model.Column;
@@ -85,6 +86,7 @@ public class HomeActivity extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menuSetting:
+                ActivityRouter.IMPL.gotoSetting(this);
                 return true;
         }
         return super.onOptionsItemSelected(item);

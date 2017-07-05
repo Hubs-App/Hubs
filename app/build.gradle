@@ -13,8 +13,12 @@ android {
         versionCode 1
         versionName "1.0"
 
+        def SCHEME = "hot"
+        buildConfigField "String", "SCHEME", "\"$SCHEME\""
         manifestPlaceholders = [
-                FABRIC_API_KEY: "ef319bcb87dd50b6283644f4e9e4c40ab0b07996"
+                APPLICATION_ID: applicationId,
+                SCHEME: "$SCHEME",
+                FABRIC_API_KEY: "ef319bcb87dd50b6283644f4e9e4c40ab0b07996",
         ]
     }
     buildTypes {
