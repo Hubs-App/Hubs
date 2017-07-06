@@ -51,16 +51,15 @@ public class HomeActivity extends BaseActivity {
         StateSaver.restoreInstanceState(this, savedInstanceState);
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_home);
 
-        // Mock data
         if (mColumns == null) {
             mColumns = new ArrayList<>();
-            for (int i = 0; i < 4; i++) {
-                final Column column = new Column();
-                column.setId(UUID.randomUUID());
-                column.setName("Column" + i);
-                column.setType(Column.TYPE_ARTICLE);
-                mColumns.add(column);
-            }
+
+            // Mock data
+            final Column column = new Column();
+            column.setId(UUID.randomUUID());
+            column.setName("Test Column");
+            column.setType(Column.TYPE_ARTICLE);
+            mColumns.add(column);
         }
 
         setSupportActionBar(mBinding.toolbar);
