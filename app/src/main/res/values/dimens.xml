@@ -1,3 +1,4 @@
 <resources>
     <dimen name="defaultMargin">16dp</dimen>
+    <dimen name="bottomItemHeight">56dp</dimen>
 </resources>

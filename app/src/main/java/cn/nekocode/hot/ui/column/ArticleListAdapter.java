@@ -31,12 +31,14 @@ import java.util.List;
 import cn.nekocode.hot.R;
 import cn.nekocode.hot.data.model.Article;
 import cn.nekocode.hot.databinding.ItemArticleBinding;
+import cn.nekocode.hot.databinding.ItemBottomBinding;
 
 /**
  * @author nekocode (nekocode.cn@gmail.com)
  */
 public class ArticleListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private static final int TYPE_ARTICLE = 0;
+    private static final int TYPE_BOTTOMITEM = 1;
     private List<Article> mArticleList;
 
 
@@ -46,11 +48,17 @@ public class ArticleListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View itemView;
         switch (viewType) {
             case TYPE_ARTICLE:
-                final View itemView = LayoutInflater.from(parent.getContext()).inflate(
+                itemView = LayoutInflater.from(parent.getContext()).inflate(
                         R.layout.item_article, parent, false);
                 return new ArticleViewHolder(itemView);
+
+            case TYPE_BOTTOMITEM:
+                itemView = LayoutInflater.from(parent.getContext()).inflate(
+                        R.layout.item_bottom, parent, false);
+                return new BottomItemViewHolder(itemView);
         }
 
         throw new RuntimeException("Not supported viewtype: " + viewType);
@@ -58,8 +66,13 @@ public class ArticleListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        final Article article = mArticleList.get(position);
+
         if (holder instanceof ArticleViewHolder) {
-            ((ArticleViewHolder) holder).bind(mArticleList.get(position));
+            ((ArticleViewHolder) holder).bind(article);
+
+        } else if (holder instanceof BottomItemViewHolder) {
+            ((BottomItemViewHolder) holder).bind((BottomItem) article);
         }
     }
 
@@ -70,7 +83,16 @@ public class ArticleListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     @Override
     public int getItemViewType(int position) {
-        return TYPE_ARTICLE;
+        if (position == getItemCount() - 1) {
+            if (mArticleList.get(position) instanceof BottomItem) {
+                return TYPE_BOTTOMITEM;
+            } else {
+                return TYPE_ARTICLE;
+            }
+
+        } else {
+            return TYPE_ARTICLE;
+        }
     }
 
     private static class ArticleViewHolder extends RecyclerView.ViewHolder {
@@ -82,7 +104,7 @@ public class ArticleListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             mBinding = DataBindingUtil.bind(itemView);
         }
 
-        public void bind(Article article) {
+        void bind(Article article) {
             Picasso.with(itemView.getContext())
                     .load(article.getCoverUrl())
                     .centerCrop()
@@ -91,6 +113,19 @@ public class ArticleListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
             mBinding.titleView.setText(article.getTitle());
             mBinding.descriptionView.setText(article.getDescription());
+        }
+    }
+
+    private static class BottomItemViewHolder extends RecyclerView.ViewHolder {
+        private ItemBottomBinding mBinding;
+
+
+        BottomItemViewHolder(View itemView) {
+            super(itemView);
+            mBinding = DataBindingUtil.bind(itemView);
+        }
+
+        void bind(BottomItem bottomItem) {
         }
     }
 }

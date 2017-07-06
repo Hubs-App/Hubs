@@ -88,15 +88,4 @@ public class Article implements Parcelable {
         this.description = (SpannableString) TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(in);
     }
 
-    public static final Parcelable.Creator<Article> CREATOR = new Parcelable.Creator<Article>() {
-        @Override
-        public Article createFromParcel(Parcel source) {
-            return new Article(source);
-        }
-
-        @Override
-        public Article[] newArray(int size) {
-            return new Article[size];
-        }
-    };
 }

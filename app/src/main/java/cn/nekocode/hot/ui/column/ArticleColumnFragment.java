@@ -26,6 +26,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.evernote.android.state.State;
+import com.evernote.android.state.StateSaver;
+
 import java.util.ArrayList;
 
 import cn.nekocode.hot.R;
@@ -44,15 +47,18 @@ import io.reactivex.schedulers.Schedulers;
  */
 public class ArticleColumnFragment extends BaseColumnFragment implements SwipeRefreshLayout.OnRefreshListener {
     private FragmentArticleColumnBinding mBinding;
-    private Column mColumn;
-    private ArrayList<Article> mArticleList = new ArrayList<>();
+    @State
+    public ArrayList<Article> mArticleList;
     private ArticleListAdapter mAdapter;
+
+    private Column mColumn;
     private ColumnLuaBridge mLuaBridge;
 
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        StateSaver.restoreInstanceState(this, savedInstanceState);
         mColumn = getColumnFromBundle(getArguments());
         mLuaBridge = ColumnLuaBridge.load(getContext(), mColumn);
 
@@ -61,6 +67,12 @@ public class ArticleColumnFragment extends BaseColumnFragment implements SwipeRe
         }
 
         mAdapter = new ArticleListAdapter(mArticleList);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        StateSaver.saveInstanceState(this, outState);
     }
 
     @Nullable
@@ -81,8 +93,10 @@ public class ArticleColumnFragment extends BaseColumnFragment implements SwipeRe
         mBinding.recyclerView.addItemDecoration(DividerItemDecoration.obtainDefault(getContext()));
 
         mBinding.refreshLayout.setOnRefreshListener(this);
-        mBinding.refreshLayout.setRefreshing(true);
-        onRefresh();
+        if (mArticleList.size() == 0) {
+            mBinding.refreshLayout.setRefreshing(true);
+            onRefresh();
+        }
     }
 
     @Override
@@ -97,6 +111,8 @@ public class ArticleColumnFragment extends BaseColumnFragment implements SwipeRe
                 .subscribe(articles -> {
                     mArticleList.clear();
                     mArticleList.addAll(articles);
+                    mArticleList.add(new BottomItem(BottomItem.STATE_LOADMORE));
+
                     mAdapter.notifyDataSetChanged();
                     mBinding.refreshLayout.setRefreshing(false);
                 });
