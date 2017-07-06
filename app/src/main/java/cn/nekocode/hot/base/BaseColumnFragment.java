@@ -19,7 +19,6 @@ package cn.nekocode.hot.base;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
 
 import cn.nekocode.hot.data.model.Column;
 import cn.nekocode.hot.ui.column.ArticleColumnFragment;
@@ -27,7 +26,7 @@ import cn.nekocode.hot.ui.column.ArticleColumnFragment;
 /**
  * @author nekocode (nekocode.cn@gmail.com)
  */
-public abstract class BaseColumnFragment extends Fragment {
+public abstract class BaseColumnFragment extends BaseFragment {
     public static final String ARG_COLUMN = "column";
 
     @NonNull

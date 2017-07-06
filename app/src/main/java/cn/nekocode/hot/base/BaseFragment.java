@@ -17,11 +17,11 @@
 
 package cn.nekocode.hot.base;
 
-import android.support.v4.app.Fragment;
+import com.trello.rxlifecycle2.components.support.RxFragment;
 
 /**
  * @author nekocode (nekocode.cn@gmail.com)
  */
-public abstract class BaseFragment extends Fragment {
+public abstract class BaseFragment extends RxFragment {
 
 }

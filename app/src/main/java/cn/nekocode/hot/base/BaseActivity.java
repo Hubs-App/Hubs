@@ -17,10 +17,10 @@
 
 package cn.nekocode.hot.base;
 
-import android.support.v7.app.AppCompatActivity;
+import com.trello.rxlifecycle2.components.support.RxAppCompatActivity;
 
 /**
  * @author nekocode (nekocode.cn@gmail.com)
  */
-public abstract class BaseActivity extends AppCompatActivity {
+public abstract class BaseActivity extends RxAppCompatActivity {
 }
