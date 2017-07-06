@@ -20,6 +20,7 @@ package cn.nekocode.hot.ui.column;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -41,7 +42,7 @@ import io.reactivex.schedulers.Schedulers;
 /**
  * @author nekocode (nekocode.cn@gmail.com)
  */
-public class ArticleColumnFragment extends BaseColumnFragment {
+public class ArticleColumnFragment extends BaseColumnFragment implements SwipeRefreshLayout.OnRefreshListener {
     private FragmentArticleColumnBinding mBinding;
     private Column mColumn;
     private ArrayList<Article> mArticleList = new ArrayList<>();
@@ -60,19 +61,6 @@ public class ArticleColumnFragment extends BaseColumnFragment {
         }
 
         mAdapter = new ArticleListAdapter(mArticleList);
-
-        Observable.<ArrayList<Article>>create(emitter -> {
-            emitter.onNext(mLuaBridge.getArticles(0));
-            emitter.onComplete();
-        })
-                .compose(bindToLifecycle())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(articles -> {
-                    mArticleList.clear();
-                    mArticleList.addAll(articles);
-                    mAdapter.notifyDataSetChanged();
-                });
     }
 
     @Nullable
@@ -91,5 +79,26 @@ public class ArticleColumnFragment extends BaseColumnFragment {
                 new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         mBinding.recyclerView.setAdapter(mAdapter);
         mBinding.recyclerView.addItemDecoration(DividerItemDecoration.obtainDefault(getContext()));
+
+        mBinding.refreshLayout.setOnRefreshListener(this);
+        mBinding.refreshLayout.setRefreshing(true);
+        onRefresh();
+    }
+
+    @Override
+    public void onRefresh() {
+        Observable.<ArrayList<Article>>create(emitter -> {
+            emitter.onNext(mLuaBridge.getArticles(0));
+            emitter.onComplete();
+        })
+                .compose(bindToLifecycle())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(articles -> {
+                    mArticleList.clear();
+                    mArticleList.addAll(articles);
+                    mAdapter.notifyDataSetChanged();
+                    mBinding.refreshLayout.setRefreshing(false);
+                });
     }
 }
