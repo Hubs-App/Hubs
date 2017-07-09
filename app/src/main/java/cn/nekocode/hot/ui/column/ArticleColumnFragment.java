@@ -60,7 +60,6 @@ public class ArticleColumnFragment extends BaseColumnFragment implements SwipeRe
         super.onCreate(savedInstanceState);
         StateSaver.restoreInstanceState(this, savedInstanceState);
         mColumn = getColumnFromBundle(getArguments());
-        mLuaBridge = ColumnLuaBridge.load(getContext(), mColumn);
 
         if (mArticleList == null) {
             mArticleList = new ArrayList<>();
@@ -102,7 +101,7 @@ public class ArticleColumnFragment extends BaseColumnFragment implements SwipeRe
     @Override
     public void onRefresh() {
         Observable.<ArrayList<Article>>create(emitter -> {
-            emitter.onNext(mLuaBridge.getArticles(0));
+            emitter.onNext(getColumnLuaBridge().getArticles(0));
             emitter.onComplete();
         })
                 .compose(bindToLifecycle())
@@ -116,5 +115,10 @@ public class ArticleColumnFragment extends BaseColumnFragment implements SwipeRe
                     mAdapter.notifyDataSetChanged();
                     mBinding.refreshLayout.setRefreshing(false);
                 });
+    }
+
+    private ColumnLuaBridge getColumnLuaBridge() {
+        return mLuaBridge != null ?
+                mLuaBridge : ColumnLuaBridge.load(getContext(), mColumn);
     }
 }
