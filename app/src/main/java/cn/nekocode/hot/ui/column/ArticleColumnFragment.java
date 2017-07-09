@@ -50,6 +50,8 @@ public class ArticleColumnFragment extends BaseColumnFragment implements SwipeRe
     @State
     public ArrayList<Article> mArticleList;
     private ArticleListAdapter mAdapter;
+    @State
+    public int mPage;
 
     private Column mColumn;
     private ColumnLuaBridge mLuaBridge;
@@ -66,6 +68,21 @@ public class ArticleColumnFragment extends BaseColumnFragment implements SwipeRe
         }
 
         mAdapter = new ArticleListAdapter(mArticleList);
+        mAdapter.setUIEventListener(new ArticleListAdapter.UIEventListener() {
+            @Override
+            public void onItemClicked(Article article) {
+
+            }
+
+            @Override
+            public void onBottomItemButtonClicked(@BottomItem.State int state) {
+                switch (state) {
+                    case BottomItem.STATE_LOADMORE:
+                        onLoadMore(mPage + 1);
+                        break;
+                }
+            }
+        });
     }
 
     @Override
@@ -108,17 +125,55 @@ public class ArticleColumnFragment extends BaseColumnFragment implements SwipeRe
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(articles -> {
-                    mArticleList.clear();
-                    mArticleList.addAll(articles);
-                    mArticleList.add(new BottomItem(BottomItem.STATE_LOADMORE));
+                    mPage = 0;
 
-                    mAdapter.notifyDataSetChanged();
+                    if (articles.size() > 0) {
+                        mArticleList.clear();
+                        mArticleList.addAll(articles);
+                        mArticleList.add(new BottomItem(BottomItem.STATE_LOADMORE));
+                        mAdapter.notifyDataSetChanged();
+
+                    } else {
+                        // TODO
+                    }
+
                     mBinding.refreshLayout.setRefreshing(false);
                 });
     }
 
+    private void onLoadMore(final int page) {
+        // TODO 设置按钮为加载状态（不可点击）
+
+        Observable.<ArrayList<Article>>create(emitter -> {
+            emitter.onNext(getColumnLuaBridge().getArticles(page));
+            emitter.onComplete();
+        })
+                .compose(bindToLifecycle())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(articles -> {
+                    mPage = page;
+
+                    final int oldSize = mArticleList.size();
+                    if (articles.size() > 0) {
+                        final Article bottomItem = mArticleList.remove(oldSize - 1);
+                        mArticleList.addAll(articles);
+                        mArticleList.add(bottomItem);
+                        mAdapter.notifyDataSetChanged();
+
+                    } else {
+                        mArticleList.remove(oldSize - 1);
+                        mAdapter.notifyItemRemoved(oldSize - 1);
+                    }
+
+                    // TODO 重设按钮状态
+                });
+    }
+
     private ColumnLuaBridge getColumnLuaBridge() {
-        return mLuaBridge != null ?
-                mLuaBridge : ColumnLuaBridge.load(getContext(), mColumn);
+        if (mLuaBridge == null) {
+            mLuaBridge = ColumnLuaBridge.load(getContext(), mColumn);
+        }
+        return mLuaBridge;
     }
 }

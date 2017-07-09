@@ -40,10 +40,19 @@ public class ArticleListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     private static final int TYPE_ARTICLE = 0;
     private static final int TYPE_BOTTOMITEM = 1;
     private List<Article> mArticleList;
+    private UIEventListener mUIEventListener;
 
 
     public ArticleListAdapter(@NonNull List<Article> articleList) {
         this.mArticleList = articleList;
+    }
+
+    public UIEventListener getUIEventListener() {
+        return mUIEventListener;
+    }
+
+    public void setUIEventListener(UIEventListener mUIEventListener) {
+        this.mUIEventListener = mUIEventListener;
     }
 
     @Override
@@ -95,16 +104,24 @@ public class ArticleListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         }
     }
 
-    private static class ArticleViewHolder extends RecyclerView.ViewHolder {
+    private class ArticleViewHolder extends RecyclerView.ViewHolder {
         private ItemArticleBinding mBinding;
+        private Article mData;
 
 
         ArticleViewHolder(View itemView) {
             super(itemView);
             mBinding = DataBindingUtil.bind(itemView);
+            itemView.setOnClickListener(v -> {
+                if (mUIEventListener != null && mData != null) {
+                    mUIEventListener.onItemClicked(mData);
+                }
+            });
         }
 
         void bind(Article article) {
+            mData = article;
+
             Picasso.with(itemView.getContext())
                     .load(article.getCoverUrl())
                     .centerCrop()
@@ -116,16 +133,28 @@ public class ArticleListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         }
     }
 
-    private static class BottomItemViewHolder extends RecyclerView.ViewHolder {
+    private class BottomItemViewHolder extends RecyclerView.ViewHolder {
         private ItemBottomBinding mBinding;
+        private BottomItem mData;
 
 
         BottomItemViewHolder(View itemView) {
             super(itemView);
             mBinding = DataBindingUtil.bind(itemView);
+            mBinding.button.setOnClickListener(v -> {
+                if (mUIEventListener != null && mData != null) {
+                    mUIEventListener.onBottomItemButtonClicked(mData.getState());
+                }
+            });
         }
 
         void bind(BottomItem bottomItem) {
+            mData = bottomItem;
         }
+    }
+
+    public interface UIEventListener {
+        void onItemClicked(Article article);
+        void onBottomItemButtonClicked(@BottomItem.State int state);
     }
 }
