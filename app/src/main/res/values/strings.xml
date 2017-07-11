@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">Hot</string>
     <string name="setting">Setting</string>
+
+    <string name="load_more">LOAD MORE</string>
+    <string name="reload">RELOAD</string>
+    <string name="loading">LOADING…</string>
 </resources>

@@ -49,6 +49,7 @@ public class ArticleColumnFragment extends BaseColumnFragment implements SwipeRe
     private FragmentArticleColumnBinding mBinding;
     @State
     public ArrayList<Article> mArticleList;
+    private BottomItem mBottomItem;
     private ArticleListAdapter mAdapter;
     @State
     public int mPage;
@@ -63,10 +64,27 @@ public class ArticleColumnFragment extends BaseColumnFragment implements SwipeRe
         StateSaver.restoreInstanceState(this, savedInstanceState);
         mColumn = getColumnFromBundle(getArguments());
 
+        /*
+          Data initialize
+         */
         if (mArticleList == null) {
             mArticleList = new ArrayList<>();
+
+        } else {
+            // If the data is restored from savedInstanceState
+            final int size = mArticleList.size();
+            if (size > 0) {
+                final Article bottomItem = mArticleList.get(size - 1);
+                if (bottomItem instanceof BottomItem) {
+                    mBottomItem = ((BottomItem) bottomItem);
+                    mBottomItem.setLoading(false);
+                }
+            }
         }
 
+        /*
+          Adapter initialize
+         */
         mAdapter = new ArticleListAdapter(mArticleList);
         mAdapter.setUIEventListener(new ArticleListAdapter.UIEventListener() {
             @Override
@@ -79,6 +97,10 @@ public class ArticleColumnFragment extends BaseColumnFragment implements SwipeRe
                 switch (state) {
                     case BottomItem.STATE_LOADMORE:
                         onLoadMore(mPage + 1);
+                        break;
+
+                    case BottomItem.STATE_RELOAD:
+                        onLoadMore(mPage);
                         break;
                 }
             }
@@ -103,11 +125,19 @@ public class ArticleColumnFragment extends BaseColumnFragment implements SwipeRe
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        /*
+          Setup the recyclerview
+         */
         mBinding.recyclerView.setLayoutManager(
                 new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         mBinding.recyclerView.setAdapter(mAdapter);
+        mBinding.recyclerView.setItemAnimator(null);
         mBinding.recyclerView.addItemDecoration(DividerItemDecoration.obtainDefault(getContext()));
 
+        /*
+          Setup the refreshlayout
+         */
         mBinding.refreshLayout.setOnRefreshListener(this);
         if (mArticleList.size() == 0) {
             mBinding.refreshLayout.setRefreshing(true);
@@ -126,23 +156,36 @@ public class ArticleColumnFragment extends BaseColumnFragment implements SwipeRe
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(articles -> {
                     mPage = 0;
+                    mBottomItem = null;
+                    mArticleList.clear();
 
                     if (articles.size() > 0) {
-                        mArticleList.clear();
+                        // Add article items
                         mArticleList.addAll(articles);
-                        mArticleList.add(new BottomItem(BottomItem.STATE_LOADMORE));
-                        mAdapter.notifyDataSetChanged();
 
-                    } else {
-                        // TODO
+                        // Add loadmore item
+                        mBottomItem = new BottomItem(BottomItem.STATE_LOADMORE);
+                        mArticleList.add(mBottomItem);
                     }
+                    mAdapter.notifyDataSetChanged();
+
+                    mBinding.refreshLayout.setRefreshing(false);
+
+                }, throwable -> {
+                    mArticleList.clear();
+
+                    // Add reload item
+                    mBottomItem = new BottomItem(BottomItem.STATE_RELOAD);
+                    mArticleList.add(mBottomItem);
+                    mAdapter.notifyDataSetChanged();
 
                     mBinding.refreshLayout.setRefreshing(false);
                 });
     }
 
     private void onLoadMore(final int page) {
-        // TODO 设置按钮为加载状态（不可点击）
+        mBottomItem.setLoading(true);
+        mAdapter.notifyItemChanged(mArticleList.size() - 1);
 
         Observable.<ArrayList<Article>>create(emitter -> {
             emitter.onNext(getColumnLuaBridge().getArticles(page));
@@ -156,17 +199,22 @@ public class ArticleColumnFragment extends BaseColumnFragment implements SwipeRe
 
                     final int oldSize = mArticleList.size();
                     if (articles.size() > 0) {
-                        final Article bottomItem = mArticleList.remove(oldSize - 1);
+                        mBottomItem = (BottomItem) mArticleList.remove(oldSize - 1);
+                        mBottomItem.setLoading(false);
                         mArticleList.addAll(articles);
-                        mArticleList.add(bottomItem);
+                        mArticleList.add(mBottomItem);
                         mAdapter.notifyDataSetChanged();
 
                     } else {
+                        mBottomItem = null;
                         mArticleList.remove(oldSize - 1);
                         mAdapter.notifyItemRemoved(oldSize - 1);
                     }
 
-                    // TODO 重设按钮状态
+                }, throwable -> {
+                    mBottomItem.setState(BottomItem.STATE_RELOAD);
+                    mBottomItem.setLoading(false);
+                    mAdapter.notifyItemChanged(mArticleList.size() - 1);
                 });
     }
 

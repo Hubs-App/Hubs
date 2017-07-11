@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">Hot</string>
     <string name="setting">配置</string>
+
+    <string name="load_more">加载更多</string>
+    <string name="reload">重新加载</string>
+    <string name="loading">正在加载…</string>
 </resources>

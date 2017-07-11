@@ -142,6 +142,8 @@ public class ArticleListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             super(itemView);
             mBinding = DataBindingUtil.bind(itemView);
             mBinding.button.setOnClickListener(v -> {
+                v.setEnabled(false);
+
                 if (mUIEventListener != null && mData != null) {
                     mUIEventListener.onBottomItemButtonClicked(mData.getState());
                 }
@@ -150,6 +152,23 @@ public class ArticleListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
         void bind(BottomItem bottomItem) {
             mData = bottomItem;
+
+            if (bottomItem.isLoading()) {
+                mBinding.button.setEnabled(false);
+                mBinding.button.setText(R.string.loading);
+
+            } else {
+                mBinding.button.setEnabled(true);
+                switch (bottomItem.getState()) {
+                    case BottomItem.STATE_LOADMORE:
+                        mBinding.button.setText(R.string.load_more);
+                        break;
+
+                    case BottomItem.STATE_RELOAD:
+                        mBinding.button.setText(R.string.reload);
+                        break;
+                }
+            }
         }
     }
 

@@ -28,17 +28,18 @@ import cn.nekocode.hot.data.model.Article;
 public class BottomItem extends Article {
     public static final int STATE_LOADMORE = 0;
     public static final int STATE_RELOAD = 1;
-    public static final int STATE_LOADING = 2;
 
-    @IntDef({STATE_LOADMORE, STATE_RELOAD, STATE_LOADING})
+    @IntDef({STATE_LOADMORE, STATE_RELOAD})
     @interface State {}
 
     @State
     private int state;
+    private boolean isLoading;
 
 
     public BottomItem(@State int state) {
         this.state = state;
+        this.isLoading = false;
     }
 
     @State
@@ -50,6 +51,13 @@ public class BottomItem extends Article {
         this.state = state;
     }
 
+    public boolean isLoading() {
+        return isLoading;
+    }
+
+    public void setLoading(boolean loading) {
+        isLoading = loading;
+    }
 
     @Override
     public int describeContents() {
