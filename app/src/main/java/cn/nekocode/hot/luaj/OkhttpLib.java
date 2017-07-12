@@ -23,16 +23,30 @@ import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.Varargs;
 import org.luaj.vm2.lib.VarArgFunction;
 
+import java.io.IOException;
+
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
+
 /**
  * @author nekocode (nekocode.cn@gmail.com)
  */
 public class OkhttpLib extends VarArgFunction {
+    public static OkHttpClient sClient;
     private static final String LIB_NAME = "okhttp";
     private static final int INIT = 0;
-    private static final int TEST = 1;
+    private static final int GET = 1;
+    private static final int POST = 2;
+    private static final int PUT = 3;
+    private static final int DELETE = 4;
 
     private static final String[] NAMES = {
-            "test"
+            "get",
+            "post",
+            "put",
+            "delete",
     };
 
     @Override
@@ -40,16 +54,28 @@ public class OkhttpLib extends VarArgFunction {
         try {
             switch (opcode) {
                 case INIT: {
-                    LuaValue env = args.arg(2);
-                    LuaTable t = new LuaTable();
-                    bind(t, this.getClass(), NAMES, TEST);
+                    final LuaValue env = args.arg(2);
+                    final LuaTable t = new LuaTable();
+                    bind(t, this.getClass(), NAMES, GET);
                     env.set(LIB_NAME, t);
                     env.get("package").get("loaded").set(LIB_NAME, t);
                     return t;
                 }
 
-                case TEST: {
-                    return NIL;
+                case GET: {
+                    return get(args);
+                }
+
+                case POST: {
+                    return post(args);
+                }
+
+                case PUT: {
+                    return put(args);
+                }
+
+                case DELETE: {
+                    return delete(args);
                 }
 
                 default:
@@ -62,5 +88,43 @@ public class OkhttpLib extends VarArgFunction {
         } catch (Exception e) {
             throw new LuaError(e);
         }
+    }
+
+    private LuaValue get(Varargs args) throws IOException {
+        if (sClient != null) {
+            final LuaValue arg1 = args.arg1();
+            if (arg1.isstring()) {
+                final Request request = new Request.Builder()
+                        .url(arg1.checkjstring())
+                        .build();
+                final Response response = sClient.newCall(request).execute();
+                final ResponseBody body = response.body();
+
+                final LuaTable luaResponse = new LuaTable();
+                luaResponse.set("code", response.code());
+                luaResponse.set("message", response.message());
+                if (body != null) {
+                    luaResponse.set("body", body.string());
+                } else {
+                    luaResponse.set("body", NIL);
+                }
+
+                return luaResponse;
+            }
+        }
+
+        return NIL;
+    }
+
+    private LuaValue post(Varargs args) {
+        return NIL;
+    }
+
+    private LuaValue put(Varargs args) {
+        return NIL;
+    }
+
+    private LuaValue delete(Varargs args) {
+        return NIL;
     }
 }
