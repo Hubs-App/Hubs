@@ -41,6 +41,10 @@ import java.io.FileInputStream;
  */
 public class HotLuaGlobals extends Globals {
 
+    static {
+        LuajavaLib.sClassLoader = new HotClassLoader();
+    }
+
     public HotLuaGlobals(final String basePath) {
         install();
 
@@ -88,9 +92,39 @@ public class HotLuaGlobals extends Globals {
         load(new StringLib());
         load(new CoroutineLib());
         load(new LuajavaLib());
-//        load(new HotLib());
 
         LoadState.install(this);
         LuaC.install(this);
+    }
+
+    /**
+     * Custom Class Loader
+     */
+    private static class HotClassLoader extends ClassLoader {
+        static final String[] PATH_WHITELIST = new String[] {
+                "cn.nekocode.hot.data.model."
+        };
+        static final String[] PATH_BLACKLIST = new String[] {
+        };
+
+        @Override
+        public Class<?> loadClass(String name) throws ClassNotFoundException {
+            // Check black-list
+            for (String path : PATH_BLACKLIST) {
+                if (name.startsWith(path)) {
+                    throw new ClassNotFoundException(name);
+                }
+            }
+
+            // Check white-list
+            for (String path : PATH_WHITELIST) {
+                if (name.startsWith(path)) {
+                    return Class.forName(name);
+                }
+            }
+
+            // Use system default class loader
+            return ClassLoader.getSystemClassLoader().loadClass(name);
+        }
     }
 }

@@ -100,6 +100,8 @@ public class LuajavaLib extends VarArgFunction {
 	
 	static final int METHOD_MODIFIERS_VARARGS = 0x80;
 
+	public static ClassLoader sClassLoader = null;
+
 	public LuajavaLib() {
 	}
 
@@ -175,7 +177,7 @@ public class LuajavaLib extends VarArgFunction {
 
 	// load classes using app loader to allow luaj to be used as an extension
 	protected Class classForName(String name) throws ClassNotFoundException {
-		return Class.forName(name);
+		return sClassLoader != null ? sClassLoader.loadClass(name) : Class.forName(name);
 	}
 	
 	private static final class ProxyInvocationHandler implements InvocationHandler {
