@@ -92,6 +92,7 @@ public class HotLuaGlobals extends Globals {
         load(new StringLib());
         load(new CoroutineLib());
         load(new LuajavaLib());
+        load(new OkhttpLib());
 
         LoadState.install(this);
         LuaC.install(this);

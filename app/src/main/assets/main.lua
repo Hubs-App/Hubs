@@ -6,6 +6,7 @@ local ArrayList = luajava.bindClass('java.util.ArrayList')
 
 function getArticles(page)
     local articleList = ArrayList.new()
+    okhttp.test()
 
     if (page < 3) then
         for i=1, 10 do
