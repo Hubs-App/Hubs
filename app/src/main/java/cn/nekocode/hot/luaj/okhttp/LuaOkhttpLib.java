@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package cn.nekocode.hot.luaj;
+package cn.nekocode.hot.luaj.okhttp;
 
 import org.luaj.vm2.LuaError;
 import org.luaj.vm2.LuaTable;
@@ -25,7 +25,6 @@ import org.luaj.vm2.lib.VarArgFunction;
 
 import java.io.IOException;
 
-import cn.nekocode.hot.HotApplication;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;

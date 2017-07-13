@@ -36,6 +36,8 @@ import org.luaj.vm2.lib.jse.LuajavaLib;
 import java.io.File;
 import java.io.FileInputStream;
 
+import cn.nekocode.hot.luaj.jsoup.LuaJsoupLib;
+import cn.nekocode.hot.luaj.okhttp.LuaOkhttpLib;
 import okhttp3.OkHttpClient;
 
 /**
@@ -96,6 +98,7 @@ public class HotLuaGlobals extends Globals {
         load(new CoroutineLib());
         load(new LuajavaLib());
         load(new LuaOkhttpLib());
+        load(new LuaJsoupLib());
 
         LoadState.install(this);
         LuaC.install(this);
