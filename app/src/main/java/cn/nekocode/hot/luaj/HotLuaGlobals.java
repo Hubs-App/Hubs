@@ -36,6 +36,8 @@ import org.luaj.vm2.lib.jse.LuajavaLib;
 import java.io.File;
 import java.io.FileInputStream;
 
+import okhttp3.OkHttpClient;
+
 /**
  * @author nekocode (nekocode.cn@gmail.com)
  */
@@ -43,6 +45,7 @@ public class HotLuaGlobals extends Globals {
 
     static {
         LuajavaLib.sClassLoader = new HotClassLoader();
+        LuaOkhttpLib.sClient = new OkHttpClient();
     }
 
     public HotLuaGlobals(final String basePath) {
@@ -92,7 +95,7 @@ public class HotLuaGlobals extends Globals {
         load(new StringLib());
         load(new CoroutineLib());
         load(new LuajavaLib());
-        load(new OkhttpLib());
+        load(new LuaOkhttpLib());
 
         LoadState.install(this);
         LuaC.install(this);
@@ -103,7 +106,7 @@ public class HotLuaGlobals extends Globals {
      */
     private static class HotClassLoader extends ClassLoader {
         static final String[] PATH_WHITELIST = new String[] {
-                "cn.nekocode.hot.data.model."
+                "cn.nekocode.hot.data.model.",
         };
         static final String[] PATH_BLACKLIST = new String[] {
         };

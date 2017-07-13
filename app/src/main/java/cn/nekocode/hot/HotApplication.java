@@ -26,7 +26,7 @@ import io.fabric.sdk.android.Fabric;
 /**
  * @author nekocode (nekocode.cn@gmail.com)
  */
-public class HotApplication extends Application{
+public class HotApplication extends Application {
 
     @Override
     public void onCreate() {

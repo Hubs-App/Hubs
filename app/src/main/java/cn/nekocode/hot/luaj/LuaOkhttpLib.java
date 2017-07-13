@@ -25,6 +25,7 @@ import org.luaj.vm2.lib.VarArgFunction;
 
 import java.io.IOException;
 
+import cn.nekocode.hot.HotApplication;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -33,7 +34,7 @@ import okhttp3.ResponseBody;
 /**
  * @author nekocode (nekocode.cn@gmail.com)
  */
-public class OkhttpLib extends VarArgFunction {
+public class LuaOkhttpLib extends VarArgFunction {
     public static OkHttpClient sClient;
     private static final String LIB_NAME = "okhttp";
     private static final int INIT = 0;
