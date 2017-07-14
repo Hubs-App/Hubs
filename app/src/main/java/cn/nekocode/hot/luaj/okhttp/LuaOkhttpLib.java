@@ -90,6 +90,24 @@ public class LuaOkhttpLib extends VarArgFunction {
         }
     }
 
+    private static LuaTable toLuaResponse(Response response) throws IOException {
+        final ResponseBody body = response.body();
+
+        final LuaTable luaResponse = new LuaTable();
+        luaResponse.set("code", response.code());
+        luaResponse.set("message", response.message());
+        if (body != null) {
+            luaResponse.set("body", body.string());
+        } else {
+            luaResponse.set("body", NIL);
+        }
+
+        return luaResponse;
+    }
+
+    /**
+     * get(String url)
+     */
     private LuaValue get(Varargs args) throws IOException {
         if (sClient != null) {
             final LuaValue arg1 = args.arg1();
@@ -97,26 +115,30 @@ public class LuaOkhttpLib extends VarArgFunction {
                 final Request request = new Request.Builder()
                         .url(arg1.checkjstring())
                         .build();
-                final Response response = sClient.newCall(request).execute();
-                final ResponseBody body = response.body();
 
-                final LuaTable luaResponse = new LuaTable();
-                luaResponse.set("code", response.code());
-                luaResponse.set("message", response.message());
-                if (body != null) {
-                    luaResponse.set("body", body.string());
-                } else {
-                    luaResponse.set("body", NIL);
-                }
-
-                return luaResponse;
+                return toLuaResponse(sClient.newCall(request).execute());
             }
         }
 
         return NIL;
     }
 
+    /**
+     * get(String url)
+     */
     private LuaValue post(Varargs args) {
+        if (sClient != null) {
+            final LuaValue arg1 = args.arg1();
+            if (arg1.isstring()) {
+                final Request request = new Request.Builder()
+                        .url(arg1.checkjstring())
+                        .post(formBody)
+                        .build();
+
+                return toLuaResponse(sClient.newCall(request).execute());
+            }
+        }
+
         return NIL;
     }
 
