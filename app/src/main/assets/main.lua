@@ -3,18 +3,36 @@ local activity = ...
 local Article = luajava.bindClass('cn.nekocode.hot.data.model.Article')
 local SpannableString = luajava.bindClass('android.text.SpannableString')
 local ArrayList = luajava.bindClass('java.util.ArrayList')
+local OkHttpClient = luajava.bindClass('okhttp3.OkHttpClient')
+local Request = luajava.bindClass('okhttp3.Request')
+local JSONObject = luajava.bindClass('org.json.JSONObject')
+
+function get(url)
+    local client = OkHttpClient.new() -- TODO
+    local request = Request.Builder.new():url(url):build()
+    local response = client:newCall(request):execute()
+    return response:body():string()
+end
 
 function getArticles(page)
     local articleList = ArrayList.new()
+    local url = "http://i.jandan.net/?oxwlxojflwblxbsapi=get_recent_post" ..
+            "&include=url,date,tags,author,title,excerpt,comment_count,comment_status,custom_fields" ..
+            "&custom_fields=thumb_c,views&page=" .. page + 1
 
-    if (page < 3) then
-        for i=1, 10 do
-            local article = Article.new()
-            article:setCoverUrl("http://file25.mafengwo.net/M00/A8/DC/wKgB4lImBjiAXbFhAA1RSMu2P6s60.jpeg");
-            article:setTitle(SpannableString.new("Article " .. page .. "-" .. i));
-            article:setDescription(SpannableString.new("description " .. i));
-            articleList:add(article)
-        end
+    local json = JSONObject.new(get(url))
+    local count = json:getInt("count")
+    local posts = json:getJSONArray("posts")
+
+    for i = 0, count-1 do
+        local post = posts:getJSONObject(i)
+        local coverUrl = post:getJSONObject("custom_fields"):getJSONArray("thumb_c"):getString(0)
+
+        local article = Article.new()
+        article:setCoverUrl(coverUrl);
+        article:setTitle(SpannableString.new(post:getString("title")));
+        article:setDescription(SpannableString.new(post:getString("excerpt")));
+        articleList:add(article)
     end
 
     return articleList

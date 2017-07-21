@@ -102,7 +102,9 @@ public class HotLuaGlobals extends Globals {
      */
     private static class HotClassLoader extends ClassLoader {
         static final String[] PATH_WHITELIST = new String[] {
-                "cn.nekocode.hot.data.model."
+                "cn.nekocode.hot.data.model.",
+                "okhttp3.",
+                "org.jsoup.",
         };
         static final String[] PATH_BLACKLIST = new String[] {
         };
