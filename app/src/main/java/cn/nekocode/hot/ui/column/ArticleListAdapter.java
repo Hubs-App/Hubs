@@ -20,6 +20,7 @@ package cn.nekocode.hot.ui.column;
 import android.databinding.DataBindingUtil;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -122,11 +123,15 @@ public class ArticleListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         void bind(Article article) {
             mData = article;
 
-            Picasso.with(itemView.getContext())
-                    .load(article.getCoverUrl())
-                    .centerCrop()
-                    .fit()
-                    .into(mBinding.coverView);
+            if (!TextUtils.isEmpty(article.getCoverUrl())) {
+                Picasso.with(itemView.getContext())
+                        .load(article.getCoverUrl())
+                        .centerCrop()
+                        .fit()
+                        .into(mBinding.coverView);
+            } else {
+                mBinding.coverView.setImageDrawable(null);
+            }
 
             mBinding.titleView.setText(article.getTitle());
             mBinding.descriptionView.setText(article.getDescription());
