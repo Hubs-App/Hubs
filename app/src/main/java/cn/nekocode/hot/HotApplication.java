@@ -18,15 +18,27 @@
 package cn.nekocode.hot;
 
 import android.app.Application;
+import android.content.Context;
 
 import com.crashlytics.android.Crashlytics;
 
 import io.fabric.sdk.android.Fabric;
+import okhttp3.OkHttpClient;
 
 /**
  * @author nekocode (nekocode.cn@gmail.com)
  */
-public class HotApplication extends Application{
+public class HotApplication extends Application {
+    private OkHttpClient mDefaultOkHttpClient;
+
+
+    public static OkHttpClient getDefaultOkHttpClient(Context context) {
+        final Context app = context.getApplicationContext();
+        if (app instanceof HotApplication) {
+            return ((HotApplication) app).mDefaultOkHttpClient;
+        }
+        return null;
+    }
 
     @Override
     public void onCreate() {
@@ -34,5 +46,10 @@ public class HotApplication extends Application{
         if (!BuildConfig.DEBUG) {
             Fabric.with(this, new Crashlytics());
         }
+
+        /*
+          Init default vars
+         */
+        mDefaultOkHttpClient = new OkHttpClient();
     }
 }

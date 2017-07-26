@@ -1,14 +1,12 @@
-local activity = ...
+local client = ...
 
 local Article = luajava.bindClass('cn.nekocode.hot.data.model.Article')
 local SpannableString = luajava.bindClass('android.text.SpannableString')
 local ArrayList = luajava.bindClass('java.util.ArrayList')
-local OkHttpClient = luajava.bindClass('okhttp3.OkHttpClient')
 local Request = luajava.bindClass('okhttp3.Request')
 local JSONObject = luajava.bindClass('org.json.JSONObject')
 
 function get(url)
-    local client = OkHttpClient.new() -- TODO
     local request = Request.Builder.new():url(url):build()
     local response = client:newCall(request):execute()
     return response:body():string()

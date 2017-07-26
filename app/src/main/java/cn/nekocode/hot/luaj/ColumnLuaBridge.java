@@ -22,12 +22,15 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.luaj.vm2.LuaValue;
+import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 import org.luaj.vm2.lib.jse.CoerceLuaToJava;
 
 import java.util.ArrayList;
 
+import cn.nekocode.hot.HotApplication;
 import cn.nekocode.hot.data.model.Article;
 import cn.nekocode.hot.data.model.Column;
+import okhttp3.OkHttpClient;
 
 /**
  * @author nekocode (nekocode.cn@gmail.com)
@@ -38,18 +41,19 @@ public class ColumnLuaBridge {
 
 
     public static ColumnLuaBridge load(@NonNull Context context, @NonNull Column column) {
-        return new ColumnLuaBridge(new HotLuaGlobals(context), column);
+        return new ColumnLuaBridge(context, new HotLuaGlobals(context), column);
     }
 
     private ColumnLuaBridge() {
     }
 
-    private ColumnLuaBridge(HotLuaGlobals luaGlobals, Column column) {
+    private ColumnLuaBridge(Context context, HotLuaGlobals luaGlobals, Column column) {
         mLuaGlobals = luaGlobals;
         mColumn = column;
 
         try {
-            mLuaGlobals.loadfile("main.lua").call();
+            final OkHttpClient client = HotApplication.getDefaultOkHttpClient(context);
+            mLuaGlobals.loadfile("main.lua").call(CoerceJavaToLua.coerce(client));
         } catch (Exception e) {
             e.printStackTrace();
         }
