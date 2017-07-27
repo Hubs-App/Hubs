@@ -1,7 +1,6 @@
 local client = ...
 
 local Article = luajava.bindClass('cn.nekocode.hot.data.model.Article')
-local SpannableString = luajava.bindClass('android.text.SpannableString')
 local ArrayList = luajava.bindClass('java.util.ArrayList')
 local Request = luajava.bindClass('okhttp3.Request')
 local JSONObject = luajava.bindClass('org.json.JSONObject')
@@ -28,8 +27,8 @@ function getArticles(page)
 
         local article = Article.new()
         article:setCoverUrl(coverUrl);
-        article:setTitle(SpannableString.new(post:getString("title")));
-        article:setDescription(SpannableString.new(post:getString("excerpt")));
+        article:setTitleHtml(post:getString("title"));
+        article:setDescriptionHtml(post:getString("excerpt"));
         articleList:add(article)
     end
 

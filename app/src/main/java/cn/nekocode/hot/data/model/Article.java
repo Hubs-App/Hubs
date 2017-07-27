@@ -19,7 +19,8 @@ package cn.nekocode.hot.data.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.text.SpannableString;
+import android.text.Html;
+import android.text.Spanned;
 import android.text.TextUtils;
 
 /**
@@ -28,8 +29,8 @@ import android.text.TextUtils;
 public class Article implements Parcelable {
     private String id;
     private String coverUrl;
-    private SpannableString title;
-    private SpannableString description;
+    private Spanned title;
+    private Spanned description;
 
 
     public String getId() {
@@ -48,20 +49,34 @@ public class Article implements Parcelable {
         this.coverUrl = coverUrl;
     }
 
-    public SpannableString getTitle() {
+    public Spanned getTitle() {
         return title;
     }
 
-    public void setTitle(SpannableString title) {
+    public void setTitle(Spanned title) {
         this.title = title;
     }
 
-    public SpannableString getDescription() {
+    /**
+     * Set tile with html text
+     */
+    public void setTitleHtml(String titleHtml) {
+        this.title = Html.fromHtml(titleHtml);
+    }
+
+    public Spanned getDescription() {
         return description;
     }
 
-    public void setDescription(SpannableString description) {
+    public void setDescription(Spanned description) {
         this.description = description;
+    }
+
+    /**
+     * Set description with html text
+     */
+    public void setDescriptionHtml(String descriptionHtml) {
+        this.description = Html.fromHtml(descriptionHtml);
     }
 
 
@@ -84,8 +99,8 @@ public class Article implements Parcelable {
     protected Article(Parcel in) {
         this.id = in.readString();
         this.coverUrl = in.readString();
-        this.title = (SpannableString) TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(in);
-        this.description = (SpannableString) TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(in);
+        this.title = (Spanned) TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(in);
+        this.description = (Spanned) TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(in);
     }
 
     public static final Creator<Article> CREATOR = new Creator<Article>() {
