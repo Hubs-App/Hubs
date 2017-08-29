@@ -29,10 +29,12 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 import cn.nekocode.hot.ActivityRouter;
+import cn.nekocode.hot.HotApplication;
 import cn.nekocode.hot.R;
 import cn.nekocode.hot.base.BaseActivity;
 import cn.nekocode.hot.data.model.Column;
 import cn.nekocode.hot.databinding.ActivityHomeBinding;
+import cn.nekocode.hot.manager.base.BaseFileManager;
 
 /**
  * @author nekocode (nekocode.cn@gmail.com)
@@ -43,6 +45,7 @@ public class HomeActivity extends BaseActivity {
     @State
     public ArrayList<Column> mColumns;
     private ColumnPagerAdapter mPagerAdapter;
+    private BaseFileManager mFileManager;
 
 
     @Override
@@ -50,6 +53,14 @@ public class HomeActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         StateSaver.restoreInstanceState(this, savedInstanceState);
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_home);
+
+        /*
+          Create base directories
+          TODO: Do sth if create failed
+         */
+        mFileManager = HotApplication.getDefaultFileManager(this);
+        mFileManager.createBaseDirectoriesIfNotExist(this);
+
 
         if (mColumns == null) {
             mColumns = new ArrayList<>();

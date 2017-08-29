@@ -15,26 +15,43 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package cn.nekocode.hot.manager;
+package cn.nekocode.hot.manager.base;
 
-import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
-import java.util.ArrayList;
+import java.util.UUID;
 
 import cn.nekocode.hot.data.model.Column;
 
 /**
  * @author nekocode (nekocode.cn@gmail.com)
  */
-public interface IInstallManager {
+public abstract class BaseInstallManager {
+    private final BaseFileManager mFileManager;
+
+
+    public BaseInstallManager(BaseFileManager fileManager) {
+        this.mFileManager = fileManager;
+    }
+
+    public BaseFileManager getFileManager() {
+        return mFileManager;
+    }
 
     /**
      * Install package by file path
      */
-    Column install(Context context, String packagePath);
+    @Nullable
+    public abstract Column install(@NonNull String packagePath);
 
     /**
      * Uninstall column
      */
-    void uninstall(Context context, Column column);
+    public abstract boolean uninstall(@NonNull UUID columnId);
+
+    /**
+     * Check if a column is installed
+     */
+    public abstract boolean isInstalled(@NonNull UUID columnId);
 }

@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package cn.nekocode.hot.manager;
+package cn.nekocode.hot.manager.base;
 
-import android.content.Context;
+import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
 
@@ -26,15 +26,15 @@ import cn.nekocode.hot.data.model.Column;
 /**
  * @author nekocode (nekocode.cn@gmail.com)
  */
-public interface IPreferenceManager {
+public abstract class BasePreferenceManager {
 
     /**
      * Load ordered column list
      */
-    ArrayList<Column> loadOrderedColumns(Context context);
+    public abstract ArrayList<Column> loadOrderedColumns(@NonNull BaseFileManager fileManager);
 
     /**
      * Save ordered column list
      */
-    void saveOrderedColumns(ArrayList<Column> columns);
+    public abstract void saveOrderedColumns(ArrayList<Column> columns);
 }

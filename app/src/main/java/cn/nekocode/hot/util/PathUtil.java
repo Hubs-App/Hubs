@@ -15,25 +15,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package cn.nekocode.hot.manager.impl;
+package cn.nekocode.hot.util;
 
-import android.content.Context;
+import android.os.Environment;
+import android.support.annotation.Nullable;
 
-import cn.nekocode.hot.data.model.Column;
-import cn.nekocode.hot.manager.IInstallManager;
+import java.io.File;
 
 /**
  * @author nekocode (nekocode.cn@gmail.com)
  */
-public class InstallManager implements IInstallManager {
+public class PathUtil {
 
-    @Override
-    public Column install(Context context, String packagePath) {
+    @Nullable
+    public static File getExternalStorageDirectory() {
+        if(Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
+            return Environment.getExternalStorageDirectory();
+        }
         return null;
-    }
-
-    @Override
-    public void uninstall(Context context, Column column) {
-
     }
 }

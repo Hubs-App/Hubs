@@ -19,9 +19,12 @@ package cn.nekocode.hot;
 
 import android.app.Application;
 import android.content.Context;
+import android.support.annotation.NonNull;
 
 import com.crashlytics.android.Crashlytics;
 
+import cn.nekocode.hot.manager.FileManager;
+import cn.nekocode.hot.manager.base.BaseFileManager;
 import io.fabric.sdk.android.Fabric;
 import okhttp3.OkHttpClient;
 
@@ -30,14 +33,19 @@ import okhttp3.OkHttpClient;
  */
 public class HotApplication extends Application {
     private OkHttpClient mDefaultOkHttpClient;
+    private BaseFileManager mDefaultFileManager;
 
 
+    @NonNull
     public static OkHttpClient getDefaultOkHttpClient(Context context) {
-        final Context app = context.getApplicationContext();
-        if (app instanceof HotApplication) {
-            return ((HotApplication) app).mDefaultOkHttpClient;
-        }
-        return null;
+        return ((HotApplication) (context.getApplicationContext()))
+                .mDefaultOkHttpClient;
+    }
+
+    @NonNull
+    public static BaseFileManager getDefaultFileManager(Context context) {
+        return ((HotApplication) (context.getApplicationContext()))
+                .mDefaultFileManager;
     }
 
     @Override
@@ -51,5 +59,10 @@ public class HotApplication extends Application {
           Init default vars
          */
         mDefaultOkHttpClient = new OkHttpClient();
+
+        /*
+          Setup managers
+         */
+        mDefaultFileManager = new FileManager();
     }
 }
