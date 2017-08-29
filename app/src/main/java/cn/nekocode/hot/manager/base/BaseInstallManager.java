@@ -20,6 +20,7 @@ package cn.nekocode.hot.manager.base;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import java.io.File;
 import java.util.UUID;
 
 import cn.nekocode.hot.data.model.Column;
@@ -40,10 +41,10 @@ public abstract class BaseInstallManager {
     }
 
     /**
-     * Install package by file path
+     * Install package
      */
     @Nullable
-    public abstract Column install(@NonNull String packagePath);
+    public abstract Column install(@NonNull File packageFile);
 
     /**
      * Uninstall column

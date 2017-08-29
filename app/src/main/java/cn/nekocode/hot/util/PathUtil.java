@@ -18,6 +18,7 @@
 package cn.nekocode.hot.util;
 
 import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import java.io.File;
@@ -33,5 +34,13 @@ public class PathUtil {
             return Environment.getExternalStorageDirectory();
         }
         return null;
+    }
+
+    @Nullable
+    public static String getFileExtension(@NonNull String filePath) {
+        int lastPoi = filePath.lastIndexOf('.');
+        int lastSep = filePath.lastIndexOf(File.separator);
+        if (lastPoi == -1 || lastSep >= lastPoi) return null;
+        return filePath.substring(lastPoi + 1);
     }
 }
