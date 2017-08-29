@@ -23,6 +23,7 @@ import android.support.annotation.Nullable;
 import java.io.File;
 import java.util.UUID;
 
+import cn.nekocode.hot.BuildConfig;
 import cn.nekocode.hot.data.model.Column;
 import cn.nekocode.hot.manager.base.BaseFileManager;
 import cn.nekocode.hot.manager.base.BaseInstallManager;
@@ -32,7 +33,7 @@ import cn.nekocode.hot.util.PathUtil;
  * @author nekocode (nekocode.cn@gmail.com)
  */
 public class InstallManager extends BaseInstallManager {
-    private static final String COLUMN_EXTENSION = "column";
+    private static final String COLUMN_EXTENSION = BuildConfig.COLUMN_EXTENSION;
 
 
     public InstallManager(BaseFileManager fileManager) {

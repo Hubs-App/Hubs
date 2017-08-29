@@ -14,10 +14,13 @@ android {
         versionName "1.0"
 
         def SCHEME = "hot"
+        def COLUMN_EXTENSION = "column"
         buildConfigField "String", "SCHEME", "\"$SCHEME\""
+        buildConfigField "String", "COLUMN_EXTENSION", "\"$COLUMN_EXTENSION\""
         manifestPlaceholders = [
                 APPLICATION_ID: applicationId,
                 SCHEME: "$SCHEME",
+                COLUMN_EXTENSION: "$COLUMN_EXTENSION",
                 FABRIC_API_KEY: "ef319bcb87dd50b6283644f4e9e4c40ab0b07996",
         ]
     }
