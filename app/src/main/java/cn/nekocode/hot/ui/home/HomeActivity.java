@@ -21,12 +21,12 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.evernote.android.state.State;
 import com.evernote.android.state.StateSaver;
 
 import java.util.ArrayList;
-import java.util.UUID;
 
 import cn.nekocode.hot.ActivityRouter;
 import cn.nekocode.hot.HotApplication;
@@ -56,28 +56,24 @@ public class HomeActivity extends BaseActivity {
 
         /*
           Create base directories
-          TODO: Do sth if create failed
          */
         mFileManager = HotApplication.getDefaultFileManager(this);
-        mFileManager.createBaseDirectoriesIfNotExist(this);
+        if (!mFileManager.createBaseDirectoriesIfNotExist(this)) {
+            Toast.makeText(this, R.string.toast_create_directories_failed, Toast.LENGTH_SHORT).show();
 
+        } else {
+            if (mColumns == null) {
+                mColumns = new ArrayList<>();
 
-        if (mColumns == null) {
-            mColumns = new ArrayList<>();
+                // todo: load columns from files
+            }
 
-            // Mock data
-            final Column column = new Column();
-            column.setId(UUID.randomUUID());
-            column.setName("Test Column");
-            column.setType(Column.TYPE_ARTICLE);
-            mColumns.add(column);
+            setSupportActionBar(mBinding.toolbar);
+
+            mPagerAdapter = new ColumnPagerAdapter(getSupportFragmentManager(), mColumns);
+            mBinding.viewPager.setAdapter(mPagerAdapter);
+            mBinding.tabs.setupWithViewPager(mBinding.viewPager);
         }
-
-        setSupportActionBar(mBinding.toolbar);
-
-        mPagerAdapter = new ColumnPagerAdapter(getSupportFragmentManager(), mColumns);
-        mBinding.viewPager.setAdapter(mPagerAdapter);
-        mBinding.tabs.setupWithViewPager(mBinding.viewPager);
     }
 
     @Override

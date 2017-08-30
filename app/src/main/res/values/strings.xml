@@ -5,4 +5,6 @@
     <string name="load_more">LOAD MORE</string>
     <string name="reload">RELOAD</string>
     <string name="loading">LOADING…</string>
+
+    <string name="toast_create_directories_failed">Create base directories failed.</string>
 </resources>
