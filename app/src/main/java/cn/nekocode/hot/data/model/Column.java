@@ -31,6 +31,8 @@ public class Column implements Parcelable {
     private UUID id;
     private String name;
     private String type;
+    private String version;
+    private String entry;
 
 
     public UUID getId() {
@@ -57,6 +59,21 @@ public class Column implements Parcelable {
         this.type = type;
     }
 
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
+    public String getEntry() {
+        return entry;
+    }
+
+    public void setEntry(String entry) {
+        this.entry = entry;
+    }
 
     @Override
     public int describeContents() {
@@ -68,6 +85,8 @@ public class Column implements Parcelable {
         dest.writeSerializable(this.id);
         dest.writeString(this.name);
         dest.writeString(this.type);
+        dest.writeString(this.version);
+        dest.writeString(this.entry);
     }
 
     public Column() {
@@ -77,6 +96,8 @@ public class Column implements Parcelable {
         this.id = (UUID) in.readSerializable();
         this.name = in.readString();
         this.type = in.readString();
+        this.version = in.readString();
+        this.entry = in.readString();
     }
 
     public static final Creator<Column> CREATOR = new Creator<Column>() {
