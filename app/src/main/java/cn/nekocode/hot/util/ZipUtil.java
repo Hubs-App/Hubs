@@ -18,9 +18,11 @@
 package cn.nekocode.hot.util;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -38,23 +40,73 @@ import java.util.zip.ZipFile;
  */
 public class ZipUtil {
 
+    /**
+     * Read text of file in zip
+     */
+    @Nullable
+    public static String readFileFromZip(@NonNull File file, @NonNull String path) throws IOException {
+        final ZipFile zipFile = new ZipFile(file);
+        ByteArrayOutputStream resultOut = null;
+
+        final Enumeration<?> entries = zipFile.entries();
+        ZipEntry zipEntry;
+
+        while ((zipEntry = ((ZipEntry) entries.nextElement())) != null) {
+            if (zipEntry.isDirectory() || !path.equals(zipEntry.getName())) {
+                continue;
+            }
+
+            InputStream in = null;
+            OutputStream out = null;
+            resultOut = new ByteArrayOutputStream(1024);
+
+            try {
+                in = new BufferedInputStream(zipFile.getInputStream(zipEntry));
+                out = new BufferedOutputStream(resultOut);
+                byte buffer[] = new byte[1024];
+                int len;
+                while ((len = in.read(buffer)) != -1) {
+                    out.write(buffer, 0, len);
+                }
+
+            } finally {
+                close(in, out);
+            }
+
+            break;
+        }
+
+        return resultOut != null ? resultOut.toString() : null;
+    }
+
+    /**
+     * Unzip all files in zip to dest directory
+     */
     @NonNull
-    public static List<File> unzipFile(File file, File destDir) throws IOException {
+    public static List<File> unzipFile(@NonNull File file, @NonNull File destDir) throws IOException {
         final List<File> targetFiles = new ArrayList<>();
         final ZipFile zipFile = new ZipFile(file);
-        final Enumeration<?> entries = zipFile.entries();
 
-        while (entries.hasMoreElements()) {
-            final ZipEntry zipEntry = ((ZipEntry) entries.nextElement());
+        final Enumeration<?> entries = zipFile.entries();
+        ZipEntry zipEntry;
+
+        while ((zipEntry = ((ZipEntry) entries.nextElement())) != null) {
+            if (zipEntry.getName().contains("../")) {
+                // Skip the file if its path is not security
+                continue;
+            }
+
             final File targetFile = new File(destDir.getPath() + File.separator + zipEntry.getName());
 
             if (zipEntry.isDirectory()) {
-                targetFile.mkdirs();
-                targetFiles.add(targetFile);
+                if (targetFile.mkdirs()) {
+                    targetFiles.add(targetFile);
+                }
 
             } else {
                 InputStream in = null;
                 OutputStream out = null;
+
                 try {
                     in = new BufferedInputStream(zipFile.getInputStream(zipEntry));
                     out = new BufferedOutputStream(new FileOutputStream(targetFile));
@@ -70,6 +122,7 @@ public class ZipUtil {
                 }
             }
         }
+
         return targetFiles;
     }
 
