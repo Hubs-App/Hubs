@@ -19,10 +19,6 @@ package cn.nekocode.hot.manager;
 
 import android.support.annotation.NonNull;
 
-import org.luaj.vm2.Globals;
-import org.luaj.vm2.LoadState;
-import org.luaj.vm2.compiler.LuaC;
-
 import java.io.File;
 import java.util.UUID;
 
@@ -57,7 +53,7 @@ public class InstallManager extends BaseInstallManager {
 
             } else {
                 try {
-                    final Column column = readConfig(ZipUtil.readFileFromZip(packageFile, COLUMN_CONFIG_PATH));
+                    final Column column = Column.fromLua(ZipUtil.readFileFromZip(packageFile, COLUMN_CONFIG_PATH));
                     emitter.onNext(column);
                     emitter.onComplete();
 
@@ -66,25 +62,6 @@ public class InstallManager extends BaseInstallManager {
                 }
             }
         });
-    }
-
-    /**
-     * Read column config from lua script
-     */
-    private Column readConfig(String text) {
-        final Column column = new Column();
-        final Globals globals = new Globals();
-        LoadState.install(globals);
-        LuaC.install(globals);
-
-        globals.load(text).call();
-        column.setId(UUID.fromString(globals.get("uuid").checkjstring()));
-        column.setName(globals.get("name").checkjstring());
-        column.setType(globals.get("type").checkjstring());
-        column.setVersion(globals.get("version").checkjstring());
-        column.setEntry(globals.get("entry").checkjstring());
-
-        return column;
     }
 
     @Override

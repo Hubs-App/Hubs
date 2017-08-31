@@ -20,6 +20,10 @@ package cn.nekocode.hot.data.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import org.luaj.vm2.Globals;
+import org.luaj.vm2.LoadState;
+import org.luaj.vm2.compiler.LuaC;
+
 import java.util.UUID;
 
 /**
@@ -34,6 +38,27 @@ public class Column implements Parcelable {
     private String version;
     private String entry;
 
+
+    public static Column fromLua(String luaText) {
+        final Globals globals = new Globals();
+        LoadState.install(globals);
+        LuaC.install(globals);
+
+        return fromLua(luaText, globals);
+    }
+
+    public static Column fromLua(String luaText, Globals globals) {
+        globals.load(luaText).call();
+
+        final Column column = new Column();
+        column.setId(UUID.fromString(globals.get("uuid").checkjstring()));
+        column.setName(globals.get("name").checkjstring());
+        column.setType(globals.get("type").checkjstring());
+        column.setVersion(globals.get("version").checkjstring());
+        column.setEntry(globals.get("entry").checkjstring());
+
+        return column;
+    }
 
     public UUID getId() {
         return id;
