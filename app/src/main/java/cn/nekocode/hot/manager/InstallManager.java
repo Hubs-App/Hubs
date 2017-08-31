@@ -95,15 +95,14 @@ public class InstallManager extends BaseInstallManager {
     @Override
     public Observable<Boolean> uninstall(@NonNull UUID columnId) {
         return Observable.create(emitter -> {
-            final String columnPath = getColumnPath(columnId);
-            final boolean isInstelled = isColumnFilesExist(columnPath);
+            final File columnDir = getFileManager().getColumnDirectory(columnId);
 
-            if (!isInstelled) {
+            if (columnDir == null) {
                 emitter.onNext(true);
 
             } else {
                 boolean rlt[] = new boolean[] {true};
-                deleteRecursive(new File(columnPath), rlt);
+                deleteRecursive(columnDir, rlt);
                 emitter.onNext(rlt[0]);
             }
             emitter.onComplete();
@@ -123,15 +122,6 @@ public class InstallManager extends BaseInstallManager {
 
     @Override
     public boolean isInstalled(@NonNull UUID columnId) {
-        return isColumnFilesExist(getColumnPath(columnId));
-    }
-
-    private String getColumnPath(@NonNull UUID columnId) {
-        return getFileManager().getColumnDirectory() + File.separator + columnId.toString();
-    }
-
-    private boolean isColumnFilesExist(String columnPath) {
-        return new File(columnPath).exists() &&
-                new File(columnPath + File.separator + COLUMN_CONFIG_PATH).exists();
+        return getFileManager().getColumnDirectory(columnId) != null;
     }
 }

@@ -22,6 +22,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import java.io.File;
+import java.util.UUID;
 
 import cn.nekocode.hot.manager.base.BaseFileManager;
 import cn.nekocode.hot.util.PathUtil;
@@ -31,7 +32,7 @@ import cn.nekocode.hot.util.PathUtil;
  */
 public class FileManager extends BaseFileManager {
     private static final String ROOT_DIRECTORY = "HotApp";
-    private static final String COLUMN_DIRECTORY = "Column";
+    private static final String COLUMNS_DIRECTORY = "Column";
 
 
     @Override
@@ -47,7 +48,7 @@ public class FileManager extends BaseFileManager {
             return false;
         }
 
-        dir = new File(rootPath + File.separator + COLUMN_DIRECTORY);
+        dir = new File(rootPath + File.separator + COLUMNS_DIRECTORY);
         if ((!dir.exists()) && (!dir.mkdir())) {
             return false;
         }
@@ -68,10 +69,21 @@ public class FileManager extends BaseFileManager {
 
     @Override
     @Nullable
-    public File getColumnDirectory() {
-        File dir = PathUtil.getExternalStorageDirectory();
+    public File getColumnsDirectory() {
+        File dir = getRootDirectory();
         if (dir != null) {
-            dir = new File(dir.getPath() + File.separator + COLUMN_DIRECTORY);
+            dir = new File(dir.getPath() + File.separator + COLUMNS_DIRECTORY);
+            return dir.exists() ? dir : null;
+        }
+        return null;
+    }
+
+    @Override
+    @Nullable
+    public File getColumnDirectory(@NonNull UUID columnId) {
+        File dir = getColumnsDirectory();
+        if (dir != null) {
+            dir = new File(dir.getPath() + File.separator + columnId.toString());
             return dir.exists() ? dir : null;
         }
         return null;
