@@ -18,12 +18,12 @@
 package cn.nekocode.hot.manager.base;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import java.io.File;
 import java.util.UUID;
 
 import cn.nekocode.hot.data.model.Column;
+import io.reactivex.Observable;
 
 /**
  * @author nekocode (nekocode.cn@gmail.com)
@@ -43,13 +43,17 @@ public abstract class BaseInstallManager {
     /**
      * Install package
      */
-    @Nullable
-    public abstract Column install(@NonNull File packageFile);
+    public abstract Observable<Column> readConfig(@NonNull File packageFile);
+
+    /**
+     * Install package
+     */
+    public abstract Observable<Column> install(@NonNull File packageFile);
 
     /**
      * Uninstall column
      */
-    public abstract boolean uninstall(@NonNull UUID columnId);
+    public abstract Observable<Boolean> uninstall(@NonNull UUID columnId);
 
     /**
      * Check if a column is installed
