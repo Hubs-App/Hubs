@@ -39,7 +39,7 @@ import io.reactivex.Observable;
  */
 public class InstallManager extends BaseInstallManager {
     private static final String COLUMN_EXTENSION = BuildConfig.COLUMN_EXTENSION;
-    private static final String COLUMN_CONFIG_PATH = "config.lua";
+    private static final String COLUMN_CONFIG_PATH = BuildConfig.COLUMN_CONFIG_PATH;
 
 
     public InstallManager(BaseFileManager fileManager) {
