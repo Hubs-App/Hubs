@@ -17,8 +17,6 @@
 
 package cn.nekocode.hot.luaj;
 
-import android.content.Context;
-
 import org.luaj.vm2.Globals;
 import org.luaj.vm2.LoadState;
 import org.luaj.vm2.LuaError;
@@ -45,14 +43,14 @@ public class HotLuaGlobals extends Globals {
         LuajavaLib.sClassLoader = new HotClassLoader();
     }
 
-    public HotLuaGlobals(final String basePath) {
+    public HotLuaGlobals(final File baseDir) {
         install();
 
         this.finder = path -> {
             try {
-                File file = new File(basePath, path);
+                File file = new File(baseDir, path);
                 if (!file.exists() && !path.endsWith(".lua")) {
-                    file = new File(basePath, path + ".lua");
+                    file = new File(baseDir, path + ".lua");
                 }
 
                 if (file.exists()) {
@@ -62,23 +60,6 @@ public class HotLuaGlobals extends Globals {
                 throw new LuaError(t);
             }
             return null;
-        };
-    }
-
-    public HotLuaGlobals(Context context) {
-        install();
-
-        final Context app = context.getApplicationContext();
-        this.finder = path -> {
-            try {
-                if (!path.endsWith(".lua")) {
-                    return app.getAssets().open(path + ".lua");
-                } else {
-                    return app.getAssets().open(path);
-                }
-            } catch (Throwable t) {
-                throw new LuaError(t);
-            }
         };
     }
 

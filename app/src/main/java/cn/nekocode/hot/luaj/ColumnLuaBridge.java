@@ -25,6 +25,7 @@ import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 import org.luaj.vm2.lib.jse.CoerceLuaToJava;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import cn.nekocode.hot.HotApplication;
@@ -41,7 +42,9 @@ public class ColumnLuaBridge {
 
 
     public static ColumnLuaBridge load(@NonNull Context context, @NonNull Column column) {
-        return new ColumnLuaBridge(context, new HotLuaGlobals(context), column);
+        final File columnDir =
+                HotApplication.getDefaultFileManager(context).getColumnDirectory(column.getId());
+        return new ColumnLuaBridge(context, new HotLuaGlobals(columnDir), column);
     }
 
     private ColumnLuaBridge() {
@@ -53,7 +56,7 @@ public class ColumnLuaBridge {
 
         try {
             final OkHttpClient client = HotApplication.getDefaultOkHttpClient(context);
-            mLuaGlobals.loadfile("main.lua").call(CoerceJavaToLua.coerce(client));
+            mLuaGlobals.loadfile(mColumn.getEntry()).call(CoerceJavaToLua.coerce(client));
         } catch (Exception e) {
             e.printStackTrace();
         }
