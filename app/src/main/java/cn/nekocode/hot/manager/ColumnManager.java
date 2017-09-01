@@ -20,10 +20,17 @@ package cn.nekocode.hot.manager;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
+import org.luaj.vm2.Globals;
+import org.luaj.vm2.LoadState;
+import org.luaj.vm2.compiler.LuaC;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import cn.nekocode.hot.BuildConfig;
@@ -64,41 +71,47 @@ public class ColumnManager extends BaseColumnManager {
     @NonNull
     public Observable<Column> readConfig(@NonNull UUID columnId) {
         return Observable.create(emitter -> {
-            InputStream in = null;
-            ByteArrayOutputStream out = null;
-
             try {
-                final File configFile = new File(getFileManager().getColumnDirectory(columnId), COLUMN_CONFIG_PATH);
-
-                in = new FileInputStream(configFile);
-                out = new ByteArrayOutputStream(1024);
-
-                byte buffer[] = new byte[1024];
-                int len;
-                while ((len = in.read(buffer)) != -1) {
-                    out.write(buffer, 0, len);
-                }
-
-                final Column column = Column.fromLua(out.toString());
+                final Column column = Column.fromLua(readConfigToString(columnId));
                 emitter.onNext(column);
                 emitter.onComplete();
 
             } catch (Exception e) {
                 emitter.tryOnError(e);
-
-            } finally {
-                try {
-                    if (in != null) {
-                        in.close();
-                    }
-                    if (out != null) {
-                        out.close();
-                    }
-                } catch (Exception ignored) {
-
-                }
             }
         });
+    }
+
+    private String readConfigToString(UUID columnId) throws IOException {
+        InputStream in = null;
+        ByteArrayOutputStream out = null;
+
+        try {
+            final File configFile = new File(getFileManager().getColumnDirectory(columnId), COLUMN_CONFIG_PATH);
+
+            in = new FileInputStream(configFile);
+            out = new ByteArrayOutputStream(1024);
+
+            byte buffer[] = new byte[1024];
+            int len;
+            while ((len = in.read(buffer)) != -1) {
+                out.write(buffer, 0, len);
+            }
+
+            return out.toString();
+
+        } finally {
+            try {
+                if (in != null) {
+                    in.close();
+                }
+                if (out != null) {
+                    out.close();
+                }
+            } catch (Exception ignored) {
+
+            }
+        }
     }
 
     @Override
@@ -160,5 +173,44 @@ public class ColumnManager extends BaseColumnManager {
     public boolean isInstalled(@NonNull UUID columnId) {
         final File columnDir = getFileManager().getColumnDirectory(columnId);
         return columnDir.exists() && new File(columnDir, BuildConfig.COLUMN_CONFIG_PATH).exists();
+    }
+
+    @Override
+    @NonNull
+    public Observable<List<Column>> getAllInstalled() {
+        return Observable.create(emitter -> {
+            final ArrayList<Column> columns = new ArrayList<>();
+            final File columnsDir = getFileManager().getColumnsDirectory();
+
+            if (!columnsDir.exists() || !columnsDir.isDirectory()) {
+                emitter.onNext(columns);
+                emitter.onComplete();
+                return;
+            }
+
+            try {
+                final Globals globals = new Globals();
+                LoadState.install(globals);
+                LuaC.install(globals);
+
+                Column column;
+                for (File child : columnsDir.listFiles()) {
+                    if (child.isDirectory()) {
+                        try {
+                            column = Column.fromLua(readConfigToString(UUID.fromString(child.getName())), globals);
+                            columns.add(column);
+                        } catch (Exception ignored) {
+                            // Just skip this column if load failed
+                        }
+                    }
+                }
+
+                emitter.onNext(columns);
+                emitter.onComplete();
+
+            } catch (Exception e) {
+                emitter.tryOnError(e);
+            }
+        });
     }
 }

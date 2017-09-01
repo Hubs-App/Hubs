@@ -21,6 +21,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 
 import java.io.File;
+import java.util.List;
 import java.util.UUID;
 
 import cn.nekocode.hot.data.model.Column;
@@ -69,4 +70,10 @@ public abstract class BaseColumnManager {
      * Check if a column is installed
      */
     public abstract boolean isInstalled(@NonNull UUID columnId);
+
+    /**
+     * Get all installed columns
+     */
+    @NonNull
+    public abstract Observable<List<Column>> getAllInstalled();
 }
