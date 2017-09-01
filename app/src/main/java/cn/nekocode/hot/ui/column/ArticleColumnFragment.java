@@ -147,6 +147,8 @@ public class ArticleColumnFragment extends BaseColumnFragment implements SwipeRe
 
     @Override
     public void onRefresh() {
+        mPage = 0;
+
         Observable.<ArrayList<Article>>create(emitter -> {
             emitter.onNext(getColumnLuaBridge().getArticles(0));
             emitter.onComplete();
@@ -155,7 +157,6 @@ public class ArticleColumnFragment extends BaseColumnFragment implements SwipeRe
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(articles -> {
-                    mPage = 0;
                     mBottomItem = null;
                     mArticleList.clear();
 
@@ -184,6 +185,8 @@ public class ArticleColumnFragment extends BaseColumnFragment implements SwipeRe
     }
 
     private void onLoadMore(final int page) {
+        mPage = page;
+
         mBottomItem.setLoading(true);
         mAdapter.notifyItemChanged(mArticleList.size() - 1);
 
@@ -195,12 +198,11 @@ public class ArticleColumnFragment extends BaseColumnFragment implements SwipeRe
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(articles -> {
-                    mPage = page;
-
                     final int oldSize = mArticleList.size();
                     if (articles.size() > 0) {
                         mBottomItem = (BottomItem) mArticleList.remove(oldSize - 1);
                         mBottomItem.setLoading(false);
+                        mBottomItem.setState(BottomItem.STATE_LOADMORE);
                         mArticleList.addAll(articles);
                         mArticleList.add(mBottomItem);
                         mAdapter.notifyDataSetChanged();

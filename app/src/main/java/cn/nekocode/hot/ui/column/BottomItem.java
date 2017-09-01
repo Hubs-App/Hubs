@@ -72,7 +72,9 @@ public class BottomItem extends Article {
 
     protected BottomItem(Parcel in) {
         super(in);
-        this.state = in.readInt();
+        @State
+        int state = in.readInt();
+        this.state = state;
     }
 
     public static final Creator<BottomItem> CREATOR = new Creator<BottomItem>() {
