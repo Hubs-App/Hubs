@@ -29,11 +29,11 @@ import io.reactivex.Observable;
 /**
  * @author nekocode (nekocode.cn@gmail.com)
  */
-public abstract class BaseInstallManager {
+public abstract class BaseColumnManager {
     private final BaseFileManager mFileManager;
 
 
-    public BaseInstallManager(BaseFileManager fileManager) {
+    public BaseColumnManager(BaseFileManager fileManager) {
         this.mFileManager = fileManager;
     }
 
@@ -42,13 +42,19 @@ public abstract class BaseInstallManager {
     }
 
     /**
-     * Install package
+     * Read config form a column package
      */
     @NonNull
     public abstract Observable<Column> readConfig(@NonNull File packageFile);
 
     /**
-     * Install package
+     * Read config form a installed column
+     */
+    @NonNull
+    public abstract Observable<Column> readConfig(@NonNull UUID columnId);
+
+    /**
+     * Install column
      */
     @NonNull
     public abstract Observable<Column> install(@NonNull Context context, @NonNull File packageFile);

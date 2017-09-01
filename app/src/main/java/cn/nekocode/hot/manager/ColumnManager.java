@@ -20,24 +20,27 @@ package cn.nekocode.hot.manager;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.UUID;
 
 import cn.nekocode.hot.BuildConfig;
 import cn.nekocode.hot.data.model.Column;
 import cn.nekocode.hot.manager.base.BaseFileManager;
-import cn.nekocode.hot.manager.base.BaseInstallManager;
+import cn.nekocode.hot.manager.base.BaseColumnManager;
 import cn.nekocode.hot.util.ZipUtil;
 import io.reactivex.Observable;
 
 /**
  * @author nekocode (nekocode.cn@gmail.com)
  */
-public class InstallManager extends BaseInstallManager {
+public class ColumnManager extends BaseColumnManager {
     private static final String COLUMN_CONFIG_PATH = BuildConfig.COLUMN_CONFIG_PATH;
 
 
-    public InstallManager(BaseFileManager fileManager) {
+    public ColumnManager(BaseFileManager fileManager) {
         super(fileManager);
     }
 
@@ -53,6 +56,47 @@ public class InstallManager extends BaseInstallManager {
 
             } catch (Exception e) {
                 emitter.tryOnError(e);
+            }
+        });
+    }
+
+    @Override
+    @NonNull
+    public Observable<Column> readConfig(@NonNull UUID columnId) {
+        return Observable.create(emitter -> {
+            InputStream in = null;
+            ByteArrayOutputStream out = null;
+
+            try {
+                final File configFile = new File(getFileManager().getColumnDirectory(columnId), COLUMN_CONFIG_PATH);
+
+                in = new FileInputStream(configFile);
+                out = new ByteArrayOutputStream(1024);
+
+                byte buffer[] = new byte[1024];
+                int len;
+                while ((len = in.read(buffer)) != -1) {
+                    out.write(buffer, 0, len);
+                }
+
+                final Column column = Column.fromLua(out.toString());
+                emitter.onNext(column);
+                emitter.onComplete();
+
+            } catch (Exception e) {
+                emitter.tryOnError(e);
+
+            } finally {
+                try {
+                    if (in != null) {
+                        in.close();
+                    }
+                    if (out != null) {
+                        out.close();
+                    }
+                } catch (Exception ignored) {
+
+                }
             }
         });
     }

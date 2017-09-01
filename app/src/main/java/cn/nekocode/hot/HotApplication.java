@@ -24,9 +24,9 @@ import android.support.annotation.NonNull;
 import com.crashlytics.android.Crashlytics;
 
 import cn.nekocode.hot.manager.FileManager;
-import cn.nekocode.hot.manager.InstallManager;
+import cn.nekocode.hot.manager.ColumnManager;
 import cn.nekocode.hot.manager.base.BaseFileManager;
-import cn.nekocode.hot.manager.base.BaseInstallManager;
+import cn.nekocode.hot.manager.base.BaseColumnManager;
 import io.fabric.sdk.android.Fabric;
 import okhttp3.OkHttpClient;
 
@@ -36,7 +36,7 @@ import okhttp3.OkHttpClient;
 public class HotApplication extends Application {
     private OkHttpClient mDefaultOkHttpClient;
     private BaseFileManager mDefaultFileManager;
-    private BaseInstallManager mDefaultInstallManager;
+    private BaseColumnManager mDefaultColumnManager;
 
 
     @NonNull
@@ -52,9 +52,9 @@ public class HotApplication extends Application {
     }
 
     @NonNull
-    public static BaseInstallManager getDefaultInstallManager(Context context) {
+    public static BaseColumnManager getDefaultColumnManager(Context context) {
         return ((HotApplication) (context.getApplicationContext()))
-                .mDefaultInstallManager;
+                .mDefaultColumnManager;
     }
 
     @Override
@@ -73,6 +73,6 @@ public class HotApplication extends Application {
           Setup managers
          */
         mDefaultFileManager = new FileManager();
-        mDefaultInstallManager = new InstallManager(mDefaultFileManager);
+        mDefaultColumnManager = new ColumnManager(mDefaultFileManager);
     }
 }
