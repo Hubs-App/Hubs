@@ -9,6 +9,7 @@
     <string name="loading">LOADING…</string>
 
     <string name="toast_create_directories_failed">Create base directories failed</string>
+    <string name="toast_load_columns_failed">Load Columns failed</string>
     <string name="toast_install_column_failed">Install Column failed</string>
     <string name="toast_install_column_success">Install success</string>
     <string name="dialog_checking_column">Checking Column…</string>

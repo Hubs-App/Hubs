@@ -49,7 +49,6 @@ import io.reactivex.schedulers.Schedulers;
  */
 public class HomeActivity extends BaseActivity {
     private ActivityHomeBinding mBinding;
-    private ProgressDialog mProgressDialog;
 
     @State
     public ArrayList<Column> mColumns;
@@ -77,12 +76,10 @@ public class HomeActivity extends BaseActivity {
 
         if (mColumns == null) {
             mColumns = new ArrayList<>();
-
-            // todo: load columns from files
+            loadColumns();
         }
 
         setSupportActionBar(mBinding.toolbar);
-        mProgressDialog = new ProgressDialog(this);
 
         mPagerAdapter = new ColumnPagerAdapter(getSupportFragmentManager(), mColumns);
         mBinding.viewPager.setAdapter(mPagerAdapter);
@@ -97,14 +94,37 @@ public class HomeActivity extends BaseActivity {
         checkInetentData(intent);
     }
 
+    private void loadColumns() {
+        final ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage(getString(R.string.loading));
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+
+        mColumnManager.getAllInstalled()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .compose(bindToLifecycle())
+                .subscribe(columns -> {
+                    progressDialog.dismiss();
+                    mColumns.clear();
+                    mColumns.addAll(columns);
+                    mPagerAdapter.notifyDataSetChanged();
+
+                }, throwable -> {
+                    progressDialog.dismiss();
+                    Toast.makeText(HomeActivity.this, R.string.toast_load_columns_failed, Toast.LENGTH_SHORT).show();
+                });
+    }
+
     private void checkInetentData(Intent intent) {
         if (intent.getData() == null) {
             return;
         }
 
-        mProgressDialog.setMessage(getString(R.string.dialog_checking_column));
-        mProgressDialog.setCancelable(false);
-        mProgressDialog.show();
+        final ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage(getString(R.string.dialog_checking_column));
+        progressDialog.setCancelable(false);
+        progressDialog.show();
 
         mFileManager.getFile(this, intent.getData())
                 .flatMap(file ->
@@ -119,65 +139,65 @@ public class HomeActivity extends BaseActivity {
                     final Column column = pair.second;
 
                     if (!mColumnManager.isInstalled(column.getId())) {
-                        showInstallDialog(columnPackgeFile, column);
+                        showInstallDialog(columnPackgeFile, column, progressDialog);
                     } else {
-                        showReinstallDialog(columnPackgeFile, column);
+                        showReinstallDialog(columnPackgeFile, column, progressDialog);
                     }
                 }, throwable -> {
-                    mProgressDialog.dismiss();
+                    progressDialog.dismiss();
                     Toast.makeText(HomeActivity.this, R.string.toast_install_column_failed, Toast.LENGTH_SHORT).show();
                 });
     }
 
-    private void showInstallDialog(File columnPackageFile, Column column) {
-        mProgressDialog.dismiss();
+    private void showInstallDialog(File columnPackageFile, Column column, final ProgressDialog progressDialog) {
+        progressDialog.dismiss();
         new AlertDialog.Builder(HomeActivity.this)
                 .setMessage(getString(R.string.dialog_ensure_install_column,
                         column.getName(), column.getVersion()))
                 .setPositiveButton(R.string.yes, (dialog, which) -> {
-                    installColumn(columnPackageFile);
+                    installColumn(columnPackageFile, progressDialog);
                 })
                 .setNegativeButton(R.string.cancel, null)
                 .show();
     }
 
-    private void showReinstallDialog(File columnPackageFile, Column column) {
+    private void showReinstallDialog(File columnPackageFile, Column column, final ProgressDialog progressDialog) {
         mColumnManager.readConfig(column.getId())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .compose(bindToLifecycle())
                 .subscribe(installedColumn -> {
-                    mProgressDialog.dismiss();
+                    progressDialog.dismiss();
                     new AlertDialog.Builder(HomeActivity.this)
                             .setMessage(getString(R.string.dialog_ensure_reinstall_column,
                                     installedColumn.getName(), installedColumn.getVersion(), column.getVersion()))
                             .setPositiveButton(R.string.yes, (dialog, which) -> {
-                                installColumn(columnPackageFile);
+                                installColumn(columnPackageFile, progressDialog);
                             })
                             .setNegativeButton(R.string.cancel, null)
                             .show();
 
                 }, throwable -> {
-                    mProgressDialog.dismiss();
+                    progressDialog.dismiss();
                     Toast.makeText(HomeActivity.this, R.string.toast_install_column_failed, Toast.LENGTH_SHORT).show();
                 });
     }
 
-    private void installColumn(File columnPackageFile) {
-        mProgressDialog.setMessage(getString(R.string.dialog_installing_column));
-        mProgressDialog.setCancelable(false);
-        mProgressDialog.show();
+    private void installColumn(File columnPackageFile, final ProgressDialog progressDialog) {
+        progressDialog.setMessage(getString(R.string.dialog_installing_column));
+        progressDialog.setCancelable(false);
+        progressDialog.show();
 
         mColumnManager.install(this, columnPackageFile)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .compose(bindToLifecycle())
                 .subscribe(column -> {
-                    mProgressDialog.dismiss();
+                    progressDialog.dismiss();
                     Toast.makeText(HomeActivity.this, R.string.toast_install_column_success, Toast.LENGTH_SHORT).show();
 
                 }, throwable -> {
-                    mProgressDialog.dismiss();
+                    progressDialog.dismiss();
                     Toast.makeText(HomeActivity.this, R.string.toast_install_column_failed, Toast.LENGTH_SHORT).show();
                 });
     }

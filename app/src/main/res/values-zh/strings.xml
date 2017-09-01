@@ -9,10 +9,11 @@
     <string name="loading">正在加载…</string>
 
     <string name="toast_create_directories_failed">创建基础文件夹失败</string>
+    <string name="toast_load_columns_failed">加载 Columns 失败</string>
     <string name="toast_install_column_failed">安装 Column 失败</string>
     <string name="toast_install_column_success">安装成功</string>
     <string name="dialog_checking_column">正在检查 Column…</string>
     <string name="dialog_ensure_install_column">你确定要安装这个 Column [name:\"%1$s\" version \"%2$s\"] 么？</string>
-    <string name="dialog_ensure_reinstall_column">你已经安装了该 Column 的一个版本 [name:\"%1$s\" version \"%2$s\"]。你确定要用新版本 \"%3$s\" 进行覆盖么？</string>
+    <string name="dialog_ensure_reinstall_column">你已经安装了该 Column 的某个版本 [name:\"%1$s\" version \"%2$s\"]。你确定要用新版本 \"%3$s\" 进行覆盖么？</string>
     <string name="dialog_installing_column">正在安装 Column…</string>
 </resources>
