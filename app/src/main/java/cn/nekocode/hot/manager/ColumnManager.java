@@ -45,10 +45,16 @@ import io.reactivex.Observable;
  */
 public class ColumnManager extends BaseColumnManager {
     private static final String COLUMN_CONFIG_PATH = BuildConfig.COLUMN_CONFIG_PATH;
+    private final Globals mGlobals;
 
 
     public ColumnManager(BaseFileManager fileManager) {
         super(fileManager);
+
+        // Obatain a lua globals for loading configs
+        mGlobals = new Globals();
+        LoadState.install(mGlobals);
+        LuaC.install(mGlobals);
     }
 
     @Override
@@ -57,7 +63,7 @@ public class ColumnManager extends BaseColumnManager {
         return Observable.create(emitter -> {
             try {
                 final Column column = Column.fromLua(
-                        ZipUtil.readStringFromZip(packageFile, COLUMN_CONFIG_PATH));
+                        ZipUtil.readStringFromZip(packageFile, COLUMN_CONFIG_PATH), mGlobals);
                 emitter.onNext(column);
                 emitter.onComplete();
 
@@ -72,7 +78,7 @@ public class ColumnManager extends BaseColumnManager {
     public Observable<Column> readConfig(@NonNull UUID columnId) {
         return Observable.create(emitter -> {
             try {
-                final Column column = Column.fromLua(readConfigToString(columnId));
+                final Column column = Column.fromLua(readConfigToString(columnId), mGlobals);
                 emitter.onNext(column);
                 emitter.onComplete();
 
@@ -189,15 +195,11 @@ public class ColumnManager extends BaseColumnManager {
             }
 
             try {
-                final Globals globals = new Globals();
-                LoadState.install(globals);
-                LuaC.install(globals);
-
                 Column column;
                 for (File child : columnsDir.listFiles()) {
                     if (child.isDirectory()) {
                         try {
-                            column = Column.fromLua(readConfigToString(UUID.fromString(child.getName())), globals);
+                            column = Column.fromLua(readConfigToString(UUID.fromString(child.getName())), mGlobals);
                             columns.add(column);
                         } catch (Exception ignored) {
                             // Just skip this column if load failed
