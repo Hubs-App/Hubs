@@ -18,11 +18,13 @@
 package cn.nekocode.hot.manager.base;
 
 import android.content.Context;
+import android.net.Uri;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import java.io.File;
 import java.util.UUID;
+
+import io.reactivex.Observable;
 
 /**
  * @author nekocode (nekocode.cn@gmail.com)
@@ -35,20 +37,26 @@ public abstract class BaseFileManager {
     public abstract boolean createBaseDirectoriesIfNotExist(@NonNull Context context);
 
     /**
-     * Get path of root directory
+     * Get root directory
      */
-    @Nullable
+    @NonNull
     public abstract File getRootDirectory();
 
     /**
-     * Get path of columns' parent directory
+     * Get columns' parent directory
      */
-    @Nullable
+    @NonNull
     public abstract File getColumnsDirectory();
 
     /**
-     * Get path of column directory
+     * Get column directory
      */
-    @Nullable
+    @NonNull
     public abstract File getColumnDirectory(@NonNull UUID columnId);
+
+    /**
+     * Get file from a uri
+     */
+    @NonNull
+    public abstract Observable<File> getFile(@NonNull Context context, @NonNull Uri uri);
 }

@@ -17,6 +17,7 @@
 
 package cn.nekocode.hot.manager.base;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 
 import java.io.File;
@@ -43,16 +44,19 @@ public abstract class BaseInstallManager {
     /**
      * Install package
      */
+    @NonNull
     public abstract Observable<Column> readConfig(@NonNull File packageFile);
 
     /**
      * Install package
      */
-    public abstract Observable<Column> install(@NonNull File packageFile);
+    @NonNull
+    public abstract Observable<Column> install(@NonNull Context context, @NonNull File packageFile);
 
     /**
      * Uninstall column
      */
+    @NonNull
     public abstract Observable<Boolean> uninstall(@NonNull UUID columnId);
 
     /**

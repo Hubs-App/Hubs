@@ -17,6 +17,7 @@
 
 package cn.nekocode.hot.manager;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 
 import java.io.File;
@@ -26,7 +27,6 @@ import cn.nekocode.hot.BuildConfig;
 import cn.nekocode.hot.data.model.Column;
 import cn.nekocode.hot.manager.base.BaseFileManager;
 import cn.nekocode.hot.manager.base.BaseInstallManager;
-import cn.nekocode.hot.util.PathUtil;
 import cn.nekocode.hot.util.ZipUtil;
 import io.reactivex.Observable;
 
@@ -34,7 +34,6 @@ import io.reactivex.Observable;
  * @author nekocode (nekocode.cn@gmail.com)
  */
 public class InstallManager extends BaseInstallManager {
-    private static final String COLUMN_EXTENSION = BuildConfig.COLUMN_EXTENSION;
     private static final String COLUMN_CONFIG_PATH = BuildConfig.COLUMN_CONFIG_PATH;
 
 
@@ -43,42 +42,58 @@ public class InstallManager extends BaseInstallManager {
     }
 
     @Override
+    @NonNull
     public Observable<Column> readConfig(@NonNull File packageFile) {
         return Observable.create(emitter -> {
-            if (!packageFile.exists() ||
-                    !COLUMN_EXTENSION.equals(PathUtil.getFileExtension(packageFile.getPath()))) {
+            try {
+                final Column column = Column.fromLua(
+                        ZipUtil.readStringFromZip(packageFile, COLUMN_CONFIG_PATH));
+                emitter.onNext(column);
+                emitter.onComplete();
 
-                emitter.tryOnError(new IllegalStateException(
-                        "File doesn't exist or is not an available column package."));
-
-            } else {
-                try {
-                    final Column column = Column.fromLua(ZipUtil.readFileFromZip(packageFile, COLUMN_CONFIG_PATH));
-                    emitter.onNext(column);
-                    emitter.onComplete();
-
-                } catch (Exception e) {
-                    emitter.tryOnError(e);
-                }
+            } catch (Exception e) {
+                emitter.tryOnError(e);
             }
         });
     }
 
     @Override
-    public Observable<Column> install(@NonNull File packageFile) {
-        return readConfig(packageFile);
+    @NonNull
+    public Observable<Column> install(@NonNull Context context, @NonNull File packageFile) {
+        return readConfig(packageFile)
+                // Firstly, remove old directory
+                .flatMap(column ->
+                        uninstall(column.getId())
+                                .map(success -> {
+                                    if (!success) {
+                                        throw new Exception("Remove old column directory failed.");
+                                    }
+                                    return column;
+                                }))
+                // Unzip package
+                .map(column -> {
+                    final File columnDir = getFileManager().getColumnDirectory(column.getId());
+
+                    if (!columnDir.mkdirs()) {
+                        throw new Exception("Create column directory failed.");
+                    }
+
+                    ZipUtil.unzipFile(packageFile, columnDir);
+                    return column;
+                });
     }
 
     @Override
+    @NonNull
     public Observable<Boolean> uninstall(@NonNull UUID columnId) {
         return Observable.create(emitter -> {
             final File columnDir = getFileManager().getColumnDirectory(columnId);
 
-            if (columnDir == null) {
+            if (!columnDir.exists()) {
                 emitter.onNext(true);
 
             } else {
-                boolean rlt[] = new boolean[] {true};
+                boolean rlt[] = new boolean[]{true};
                 deleteRecursive(columnDir, rlt);
                 emitter.onNext(rlt[0]);
             }
@@ -99,6 +114,6 @@ public class InstallManager extends BaseInstallManager {
 
     @Override
     public boolean isInstalled(@NonNull UUID columnId) {
-        return getFileManager().getColumnDirectory(columnId) != null;
+        return getFileManager().getColumnDirectory(columnId).exists();
     }
 }

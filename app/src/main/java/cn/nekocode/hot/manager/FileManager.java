@@ -18,14 +18,24 @@
 package cn.nekocode.hot.manager;
 
 import android.content.Context;
+import android.net.Uri;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.UUID;
 
+import cn.nekocode.hot.HotApplication;
 import cn.nekocode.hot.manager.base.BaseFileManager;
 import cn.nekocode.hot.util.PathUtil;
+import io.reactivex.Observable;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 /**
  * @author nekocode (nekocode.cn@gmail.com)
@@ -33,6 +43,10 @@ import cn.nekocode.hot.util.PathUtil;
 public class FileManager extends BaseFileManager {
     private static final String ROOT_DIRECTORY = "HotApp";
     private static final String COLUMNS_DIRECTORY = "Column";
+    private static final String SCHEME_FILE = "file";
+    private static final String SCHEME_CONTENT = "content";
+    private static final String SCHEME_HTTP = "http";
+    private static final String SCHEME_HTTPS = "https";
 
 
     @Override
@@ -48,7 +62,7 @@ public class FileManager extends BaseFileManager {
             return false;
         }
 
-        dir = new File(rootPath + File.separator + COLUMNS_DIRECTORY);
+        dir = new File(dir, COLUMNS_DIRECTORY);
         if ((!dir.exists()) && (!dir.mkdir())) {
             return false;
         }
@@ -57,35 +71,100 @@ public class FileManager extends BaseFileManager {
     }
 
     @Override
-    @Nullable
+    @NonNull
     public File getRootDirectory() {
-        File dir = PathUtil.getExternalStorageDirectory();
-        if (dir != null) {
-            dir = new File(dir.getPath() + File.separator + ROOT_DIRECTORY);
-            return dir.exists() ? dir : null;
-        }
-        return null;
+        final File dir = PathUtil.getExternalStorageDirectory();
+        return new File((dir != null ? dir.getPath() : ""), ROOT_DIRECTORY);
     }
 
     @Override
-    @Nullable
+    @NonNull
     public File getColumnsDirectory() {
-        File dir = getRootDirectory();
-        if (dir != null) {
-            dir = new File(dir.getPath() + File.separator + COLUMNS_DIRECTORY);
-            return dir.exists() ? dir : null;
-        }
-        return null;
+        return new File(getRootDirectory().getPath(), COLUMNS_DIRECTORY);
     }
 
     @Override
-    @Nullable
+    @NonNull
     public File getColumnDirectory(@NonNull UUID columnId) {
-        File dir = getColumnsDirectory();
-        if (dir != null) {
-            dir = new File(dir.getPath() + File.separator + columnId.toString());
-            return dir.exists() ? dir : null;
+        return new File(getColumnsDirectory().getPath(), columnId.toString());
+    }
+
+    @Override
+    @NonNull
+    public Observable<File> getFile(@NonNull Context context, @NonNull Uri uri) {
+        final String scheme = uri.getScheme();
+        final boolean isFile = SCHEME_FILE.equals(scheme);
+        final boolean isContent = SCHEME_CONTENT.equals(scheme);
+        final boolean isHttp = SCHEME_HTTP.equals(scheme);
+        final boolean isHttps = SCHEME_HTTPS.equals(scheme);
+
+        if (isFile || isContent) {
+            /*
+              Local file
+             */
+            return Observable.create(emitter -> {
+                try {
+                    emitter.onNext(new File(isFile ?
+                            uri.getPath() : PathUtil.getRealPathFromURI(context, uri)));
+                    emitter.onComplete();
+
+                } catch (Exception e) {
+                    emitter.tryOnError(e);
+                }
+            });
+
+        } else if (isHttp || isHttps) {
+            /*
+              Remote file
+             */
+            return Observable.create(emitter -> {
+                InputStream in = null;
+                OutputStream out = null;
+
+                try {
+                    final OkHttpClient httpClient = HotApplication.getDefaultOkHttpClient(context);
+                    final Request request = new Request.Builder().url(uri.toString()).build();
+                    final Response response = httpClient.newCall(request).execute();
+
+                    if (response.isSuccessful()) {
+                        // Write to cache file
+                        final File cacheFile =
+                                new File(context.getCacheDir(), PathUtil.getFileNameFromUrl(uri.toString()));
+
+                        in = new BufferedInputStream(response.body().byteStream());
+                        out = new BufferedOutputStream(new FileOutputStream(cacheFile));
+
+                        byte buffer[] = new byte[1024];
+                        int len;
+                        while ((len = in.read(buffer)) != -1) {
+                            out.write(buffer, 0, len);
+                        }
+
+                        emitter.onNext(cacheFile);
+                        emitter.onComplete();
+
+                    } else {
+                        emitter.tryOnError(new Exception("Request is not success."));
+                    }
+
+                } catch (Exception e) {
+                    emitter.tryOnError(e);
+
+                } finally {
+                    try {
+                        if (in != null) {
+                            in.close();
+                        }
+                        if (out != null) {
+                            out.close();
+                        }
+                    } catch (Exception ignored) {
+
+                    }
+                }
+            });
         }
-        return null;
+
+        return Observable.error(new Exception("Not supported uri scheme."));
     }
 }

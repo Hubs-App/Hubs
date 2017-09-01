@@ -25,15 +25,15 @@ import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
 
 /**
  * @author nekocode (nekocode.cn@gmail.com)
@@ -41,89 +41,129 @@ import java.util.zip.ZipFile;
 public class ZipUtil {
 
     /**
-     * Read text of file in zip
+     * Read string of entry in the zip file
      */
     @Nullable
-    public static String readFileFromZip(@NonNull File file, @NonNull String path) throws IOException {
-        final ZipFile zipFile = new ZipFile(file);
-        ByteArrayOutputStream resultOut = null;
-
-        final Enumeration<?> entries = zipFile.entries();
-        ZipEntry zipEntry;
-
-        while ((zipEntry = ((ZipEntry) entries.nextElement())) != null) {
-            if (zipEntry.isDirectory() || !path.equals(zipEntry.getName())) {
-                continue;
-            }
-
-            InputStream in = null;
-            OutputStream out = null;
-            resultOut = new ByteArrayOutputStream(1024);
-
-            try {
-                in = new BufferedInputStream(zipFile.getInputStream(zipEntry));
-                out = new BufferedOutputStream(resultOut);
-                byte buffer[] = new byte[1024];
-                int len;
-                while ((len = in.read(buffer)) != -1) {
-                    out.write(buffer, 0, len);
-                }
-
-            } finally {
-                close(in, out);
-            }
-
-            break;
-        }
-
-        return resultOut != null ? resultOut.toString() : null;
+    public static String readStringFromZip(@NonNull File file, @NonNull String path) throws IOException {
+        return readStringFromZip(new FileInputStream(file), path);
     }
 
     /**
-     * Unzip all files in zip to dest directory
+     * Read string of entry in the zip input stream
+     */
+    @Nullable
+    public static String readStringFromZip(@NonNull InputStream inputStream, @NonNull String path) throws IOException {
+        final String rlt[] = new String[] {null};
+        unzipFile(inputStream, null, null, path, rlt);
+        return rlt[0];
+    }
+
+    /**
+     * Unzip all files from a zip file
      */
     @NonNull
     public static List<File> unzipFile(@NonNull File file, @NonNull File destDir) throws IOException {
-        final List<File> targetFiles = new ArrayList<>();
-        final ZipFile zipFile = new ZipFile(file);
+        return unzipFile(new FileInputStream(file), destDir);
+    }
 
-        final Enumeration<?> entries = zipFile.entries();
-        ZipEntry zipEntry;
+    /**
+     * Unzip all files from a zip input stream
+     */
+    @NonNull
+    public static List<File> unzipFile(@NonNull InputStream inputStream, @NonNull File destDir) throws IOException {
+        final ArrayList<File> rlt = new ArrayList<>();
+        unzipFile(inputStream, destDir, rlt, null, null);
+        return rlt;
+    }
 
-        while ((zipEntry = ((ZipEntry) entries.nextElement())) != null) {
-            if (zipEntry.getName().contains("../")) {
-                // Skip the file if its path is not security
-                continue;
-            }
+    public static void unzipFile(
+            @NonNull InputStream inputStream,
+            @Nullable File destDir, @Nullable List<File> targetFiles,
+            @Nullable String seekingPath, @Nullable String[] matchedEntryText) throws IOException {
 
-            final File targetFile = new File(destDir.getPath() + File.separator + zipEntry.getName());
-
-            if (zipEntry.isDirectory()) {
-                if (targetFile.mkdirs()) {
-                    targetFiles.add(targetFile);
-                }
-
-            } else {
-                InputStream in = null;
-                OutputStream out = null;
-
-                try {
-                    in = new BufferedInputStream(zipFile.getInputStream(zipEntry));
-                    out = new BufferedOutputStream(new FileOutputStream(targetFile));
-                    byte buffer[] = new byte[1024];
-                    int len;
-                    while ((len = in.read(buffer)) != -1) {
-                        out.write(buffer, 0, len);
-                    }
-                    targetFiles.add(targetFile);
-
-                } finally {
-                    close(in, out);
-                }
-            }
+        if (destDir == null && seekingPath == null) {
+            return;
         }
 
-        return targetFiles;
+        final ZipInputStream zipInputStream = new ZipInputStream(inputStream);
+        int isSeeking = (seekingPath == null ? -1 : 0);
+
+        ZipEntry zipEntry;
+        String entryName;
+        File targetFile;
+        ByteArrayOutputStream byteArrayOut;
+
+        final InputStream in = new BufferedInputStream(zipInputStream);
+        OutputStream out = null;
+        OutputStream out2 = null;
+
+        try {
+            while ((zipEntry = zipInputStream.getNextEntry()) != null) {
+                entryName = zipEntry.getName();
+                if (entryName.contains("../")) {
+                    // Skip the file if its path is not security
+                    continue;
+                }
+
+                targetFile = (destDir != null ? new File(destDir, zipEntry.getName()) : null);
+                byteArrayOut = (seekingPath != null ? new ByteArrayOutputStream(1024) : null);
+
+                if (zipEntry.isDirectory()) {
+                    if (targetFile != null) {
+                        if (targetFile.mkdirs() && targetFiles != null) {
+                            targetFiles.add(targetFile);
+                        }
+                    }
+
+                    continue;
+                }
+
+                if (isSeeking == 0) {
+                    if (seekingPath.equals(entryName)) {
+                        // Found the matched entry
+                        isSeeking = 1;
+
+                    } else if (targetFile == null) {
+                        continue;
+                    }
+                }
+
+
+                out = targetFile != null ?
+                        new BufferedOutputStream(new FileOutputStream(targetFile)) : null;
+                out2 = byteArrayOut != null ?
+                        new BufferedOutputStream(byteArrayOut) : null;
+
+                byte buffer[] = new byte[1024];
+                int len;
+                while ((len = in.read(buffer)) != -1) {
+                    if (out != null) {
+                        out.write(buffer, 0, len);
+                    }
+                    if (out2 != null) {
+                        out2.write(buffer, 0, len);
+                    }
+                }
+
+                if (targetFile != null && targetFiles != null) {
+                    targetFiles.add(targetFile);
+                }
+                if (isSeeking == 1 && matchedEntryText != null) {
+                    out2.flush();
+                    matchedEntryText[0] = byteArrayOut.toString();
+                    isSeeking = -1;
+
+                    if (destDir == null) {
+                        break;
+                    }
+                }
+
+                close(out, out2);
+            }
+
+        } finally {
+            close(in, out, out2);
+        }
     }
 
     private static void close(Closeable... closeables) throws IOException {
