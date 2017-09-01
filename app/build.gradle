@@ -20,10 +20,11 @@ android {
         buildConfigField "String", "SCHEME", "\"$SCHEME\""
         buildConfigField "String", "COLUMN_EXTENSION", "\"$COLUMN_EXTENSION\""
         buildConfigField "String", "COLUMN_CONFIG_PATH", "\"$COLUMN_CONFIG_PATH\""
+
         manifestPlaceholders = [
                 APPLICATION_ID: applicationId,
-                SCHEME: "$SCHEME",
-                COLUMN_EXTENSION: "$COLUMN_EXTENSION",
+                SCHEME: SCHEME,
+                COLUMN_EXTENSION: COLUMN_EXTENSION,
                 FABRIC_API_KEY: "ef319bcb87dd50b6283644f4e9e4c40ab0b07996",
         ]
     }
