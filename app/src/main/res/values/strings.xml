@@ -2,9 +2,17 @@
     <string name="app_name">Hot</string>
     <string name="setting">Setting</string>
 
+    <string name="yes">Yes</string>
+    <string name="cancel">Cancel</string>
     <string name="load_more">LOAD MORE</string>
     <string name="reload">RELOAD</string>
     <string name="loading">LOADING…</string>
 
-    <string name="toast_create_directories_failed">Create base directories failed.</string>
+    <string name="toast_create_directories_failed">Create base directories failed</string>
+    <string name="toast_install_column_failed">Install Column failed</string>
+    <string name="toast_install_column_success">Install success</string>
+    <string name="dialog_checking_column">Checking Column…</string>
+    <string name="dialog_ensure_install_column">Are you sure to install this Column [name:\"%1$s\" version \"%2$s\"] ?</string>
+    <string name="dialog_ensure_reinstall_column">You have already installed this Column with version [name:\"%1$s\" version \"%2$s\"]. Are you want to reinstall it with new version \"%3$s\" ?</string>
+    <string name="dialog_installing_column">Installing Column…</string>
 </resources>

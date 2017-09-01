@@ -158,6 +158,7 @@ public class ColumnManager extends BaseColumnManager {
 
     @Override
     public boolean isInstalled(@NonNull UUID columnId) {
-        return getFileManager().getColumnDirectory(columnId).exists();
+        final File columnDir = getFileManager().getColumnDirectory(columnId);
+        return columnDir.exists() && new File(columnDir, BuildConfig.COLUMN_CONFIG_PATH).exists();
     }
 }
