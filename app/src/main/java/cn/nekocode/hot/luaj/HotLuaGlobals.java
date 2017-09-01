@@ -47,15 +47,17 @@ public class HotLuaGlobals extends Globals {
         install();
 
         this.finder = path -> {
-            try {
-                File file = new File(baseDir, path);
-                if (!file.exists() && !path.endsWith(".lua")) {
-                    file = new File(baseDir, path + ".lua");
-                }
+            if (path.contains("../")) {
+                // Skip the file if its path is not security
+                return null;
+            }
 
+            try {
+                final File file = new File(baseDir, path);
                 if (file.exists()) {
                     return new FileInputStream(file);
                 }
+
             } catch (Throwable t) {
                 throw new LuaError(t);
             }
