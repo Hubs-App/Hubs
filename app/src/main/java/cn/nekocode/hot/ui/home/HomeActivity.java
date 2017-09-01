@@ -34,6 +34,7 @@ import java.io.File;
 import java.util.ArrayList;
 
 import cn.nekocode.hot.ActivityRouter;
+import cn.nekocode.hot.BuildConfig;
 import cn.nekocode.hot.HotApplication;
 import cn.nekocode.hot.R;
 import cn.nekocode.hot.base.BaseActivity;
@@ -85,13 +86,13 @@ public class HomeActivity extends BaseActivity {
         mBinding.viewPager.setAdapter(mPagerAdapter);
         mBinding.tabs.setupWithViewPager(mBinding.viewPager);
 
-        checkInetentData(getIntent());
+        checkIfNeddToInstall(getIntent());
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        checkInetentData(intent);
+        checkIfNeddToInstall(intent);
     }
 
     private void loadColumns() {
@@ -116,8 +117,10 @@ public class HomeActivity extends BaseActivity {
                 });
     }
 
-    private void checkInetentData(Intent intent) {
-        if (intent.getData() == null) {
+    private void checkIfNeddToInstall(Intent intent) {
+        if (!Intent.ACTION_VIEW.equals(intent.getAction()) ||
+                intent.getData() == null || BuildConfig.SCHEME.equals(intent.getScheme())) {
+
             return;
         }
 
