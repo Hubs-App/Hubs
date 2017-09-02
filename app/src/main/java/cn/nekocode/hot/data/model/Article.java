@@ -27,18 +27,18 @@ import android.text.TextUtils;
  * @author nekocode (nekocode.cn@gmail.com)
  */
 public class Article implements Parcelable {
-    private String id;
+    private String url;
     private String coverUrl;
     private Spanned title;
     private Spanned description;
 
 
-    public String getId() {
-        return id;
+    public String getUrl() {
+        return url;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     public String getCoverUrl() {
@@ -87,7 +87,7 @@ public class Article implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(this.id);
+        dest.writeString(this.url);
         dest.writeString(this.coverUrl);
         TextUtils.writeToParcel(this.title, dest, flags);
         TextUtils.writeToParcel(this.description, dest, flags);
@@ -97,7 +97,7 @@ public class Article implements Parcelable {
     }
 
     protected Article(Parcel in) {
-        this.id = in.readString();
+        this.url = in.readString();
         this.coverUrl = in.readString();
         this.title = (Spanned) TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(in);
         this.description = (Spanned) TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(in);
