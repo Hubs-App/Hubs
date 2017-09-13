@@ -26,9 +26,10 @@ function getArticles(page)
         local coverUrl = post:getJSONObject("custom_fields"):getJSONArray("thumb_c"):getString(0)
 
         local article = Article.new()
-        article:setCoverUrl(coverUrl);
-        article:setTitleHtml(post:getString("title"));
-        article:setDescriptionHtml(post:getString("excerpt"));
+        article:setUrl(post:getString("url"))
+        article:setCoverUrl(coverUrl)
+        article:setTitleHtml(post:getString("title"))
+        article:setDescriptionHtml(post:getString("excerpt"))
         articleList:add(article)
     end
 
