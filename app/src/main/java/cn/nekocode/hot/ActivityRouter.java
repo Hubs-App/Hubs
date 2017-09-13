@@ -20,6 +20,7 @@ package cn.nekocode.hot;
 import android.content.Context;
 
 import cn.nekocode.meepo.Meepo;
+import cn.nekocode.meepo.annotation.Query;
 import cn.nekocode.meepo.annotation.TargetPath;
 import cn.nekocode.meepo.config.UriConfig;
 
@@ -31,6 +32,8 @@ public interface ActivityRouter {
             .config(new UriConfig().scheme(BuildConfig.SCHEME).host(BuildConfig.APPLICATION_ID))
             .build().create(ActivityRouter.class);
 
+    @TargetPath("browser")
+    boolean gotoBrowser(Context context, @Query("url") String url);
 
     @TargetPath("setting")
     boolean gotoSetting(Context context);

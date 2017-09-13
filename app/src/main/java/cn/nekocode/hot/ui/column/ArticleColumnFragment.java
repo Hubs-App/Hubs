@@ -31,6 +31,7 @@ import com.evernote.android.state.StateSaver;
 
 import java.util.ArrayList;
 
+import cn.nekocode.hot.ActivityRouter;
 import cn.nekocode.hot.R;
 import cn.nekocode.hot.base.BaseColumnFragment;
 import cn.nekocode.hot.data.model.Article;
@@ -89,7 +90,7 @@ public class ArticleColumnFragment extends BaseColumnFragment implements SwipeRe
         mAdapter.setUIEventListener(new ArticleListAdapter.UIEventListener() {
             @Override
             public void onItemClicked(Article article) {
-
+                ActivityRouter.IMPL.gotoBrowser(getContext(), article.getUrl());
             }
 
             @Override

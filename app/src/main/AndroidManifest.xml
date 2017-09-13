@@ -61,6 +61,18 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".ui.browser.BrowserActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+
+                <data
+                    android:host="${APPLICATION_ID}"
+                    android:path="/browser"
+                    android:scheme="${SCHEME}"/>
+            </intent-filter>
+        </activity>
+
         <activity android:name=".ui.preference.HotPreferenceActivity">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
