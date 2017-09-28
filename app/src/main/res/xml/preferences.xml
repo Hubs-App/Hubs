@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+        android:key="setting_category_column"
+        android:title="@string/setting_category_title_column"
+        >
+
+        <Preference
+            android:key="column_manager"
+            android:title="@string/setting_column_manager"
+            >
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:targetPackage="cn.nekocode.hot"
+                android:targetClass="cn.nekocode.hot.ui.setting.ColumnManagerActivity"
+                />
+        </Preference>
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

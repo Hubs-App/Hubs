@@ -15,12 +15,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package cn.nekocode.hot.ui.preference;
+package cn.nekocode.hot.ui.setting;
 
-import android.preference.PreferenceActivity;
+import android.os.Bundle;
+import android.preference.PreferenceFragment;
+
+import cn.nekocode.hot.R;
 
 /**
  * @author nekocode (nekocode.cn@gmail.com)
  */
-public class HotPreferenceActivity extends PreferenceActivity {
+public class SettingFragment extends PreferenceFragment {
+
+    @Override
+    public void onCreate(final Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        addPreferencesFromResource(R.xml.preferences);
+    }
 }

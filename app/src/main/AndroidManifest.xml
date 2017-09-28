@@ -73,7 +73,9 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".ui.preference.HotPreferenceActivity">
+        <activity
+            android:name=".ui.setting.SettingActivity"
+            android:label="@string/setting">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
@@ -81,6 +83,20 @@
                 <data
                     android:host="${APPLICATION_ID}"
                     android:path="/setting"
+                    android:scheme="${SCHEME}"/>
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".ui.setting.ColumnManagerActivity"
+            android:label="@string/column_manager">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+
+                <data
+                    android:host="${APPLICATION_ID}"
+                    android:path="/column_manager"
                     android:scheme="${SCHEME}"/>
             </intent-filter>
         </activity>

@@ -1,12 +1,17 @@
 <resources>
     <string name="app_name">Hot</string>
     <string name="setting">Setting</string>
+    <string name="column_manager">Column Manager</string>
 
     <string name="yes">Yes</string>
     <string name="cancel">Cancel</string>
     <string name="load_more">LOAD MORE</string>
     <string name="reload">RELOAD</string>
     <string name="loading">LOADING…</string>
+
+    <string name="setting_category_title_column">Column Setting</string>
+    <string name="setting_category_title_browser">Browser Setting</string>
+    <string name="setting_column_manager">Column Manager</string>
 
     <string name="toast_create_directories_failed">Create base directories failed</string>
     <string name="toast_load_columns_failed">Load Columns failed</string>

@@ -1,12 +1,17 @@
 <resources>
     <string name="app_name">Hot</string>
     <string name="setting">配置</string>
+    <string name="column_manager">Column 管理器</string>
 
     <string name="yes">是的</string>
     <string name="cancel">取消</string>
     <string name="load_more">加载更多</string>
     <string name="reload">重新加载</string>
     <string name="loading">正在加载…</string>
+
+    <string name="setting_category_title_column">Column 配置</string>
+    <string name="setting_category_title_browser">浏览器配置</string>
+    <string name="setting_column_manager">Column 管理器</string>
 
     <string name="toast_create_directories_failed">创建基础文件夹失败</string>
     <string name="toast_load_columns_failed">加载 Columns 失败</string>

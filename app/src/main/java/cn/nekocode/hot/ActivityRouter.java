@@ -37,4 +37,7 @@ public interface ActivityRouter {
 
     @TargetPath("setting")
     boolean gotoSetting(Context context);
+
+    @TargetPath("column_manager")
+    boolean gotoColumnManager(Context context);
 }
