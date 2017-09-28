@@ -19,7 +19,7 @@
 
         <fragment
             android:id="@+id/settting_fragment"
-            android:name="cn.nekocode.hot.ui.setting.SettingFragment"
+            android:name="cn.nekocode.hot.ui.setting.SettingActivity$SettingFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             />

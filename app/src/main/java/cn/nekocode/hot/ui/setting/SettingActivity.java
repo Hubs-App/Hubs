@@ -19,6 +19,7 @@ package cn.nekocode.hot.ui.setting;
 
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.preference.PreferenceFragment;
 import android.view.MenuItem;
 
 import cn.nekocode.hot.R;
@@ -52,6 +53,15 @@ public class SettingActivity extends BaseActivity {
 
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    public static class SettingFragment extends PreferenceFragment {
+
+        @Override
+        public void onCreate(final Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            addPreferencesFromResource(R.xml.preferences);
         }
     }
 }
