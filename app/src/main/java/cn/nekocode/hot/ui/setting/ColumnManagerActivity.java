@@ -17,30 +17,79 @@
 
 package cn.nekocode.hot.ui.setting;
 
+import android.app.ProgressDialog;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
 import android.view.MenuItem;
+import android.widget.Toast;
 
+import com.evernote.android.state.State;
+import com.evernote.android.state.StateSaver;
+
+import java.util.ArrayList;
+
+import cn.nekocode.hot.HotApplication;
 import cn.nekocode.hot.R;
 import cn.nekocode.hot.base.BaseActivity;
+import cn.nekocode.hot.data.model.Column;
 import cn.nekocode.hot.databinding.ActivityColumnMangerBinding;
+import cn.nekocode.hot.manager.base.BaseColumnManager;
+import cn.nekocode.hot.util.DividerItemDecoration;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * @author nekocode (nekocode.cn@gmail.com)
  */
 public class ColumnManagerActivity extends BaseActivity {
     private ActivityColumnMangerBinding mBinding;
+    @State
+    public ArrayList<Column> mColumns;
+    private BaseColumnManager mColumnManager;
+    private ColumnListAdapter mAdapter;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        StateSaver.restoreInstanceState(this, savedInstanceState);
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_column_manger);
+        mColumnManager = HotApplication.getDefaultColumnManager(this);
 
+        /*
+          Data initialize
+         */
+        if (mColumns == null) {
+            mColumns = new ArrayList<>();
+            loadColumns();
+        }
+
+
+        /*
+          View initialize
+         */
         setSupportActionBar(mBinding.toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayShowHomeEnabled(true);
         }
+
+        // Setup the recyclerview
+        mAdapter = new ColumnListAdapter(mColumns);
+        mAdapter.setUIEventListener(new ColumnListAdapter.UIEventListener() {
+        });
+
+        mBinding.recyclerView.setLayoutManager(
+                new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        mBinding.recyclerView.setAdapter(mAdapter);
+        mBinding.recyclerView.setItemAnimator(null);
+        mBinding.recyclerView.addItemDecoration(DividerItemDecoration.obtainDefault(this));
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        StateSaver.saveInstanceState(this, outState);
     }
 
     @Override
@@ -53,5 +102,27 @@ public class ColumnManagerActivity extends BaseActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void loadColumns() {
+        final ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage(getString(R.string.loading));
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+
+        mColumnManager.getAllInstalled()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .compose(bindToLifecycle())
+                .subscribe(columns -> {
+                    progressDialog.dismiss();
+                    mColumns.clear();
+                    mColumns.addAll(columns);
+                    mAdapter.notifyDataSetChanged();
+
+                }, throwable -> {
+                    progressDialog.dismiss();
+                    Toast.makeText(this, R.string.toast_load_columns_failed, Toast.LENGTH_SHORT).show();
+                });
     }
 }

@@ -20,10 +20,13 @@ package cn.nekocode.hot.ui.setting;
 import android.databinding.DataBindingUtil;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.Collections;
 import java.util.List;
 
 import cn.nekocode.hot.R;
@@ -37,10 +40,34 @@ public class ColumnListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     private static final int TYPE_COLUMN = 0;
     private List<Column> mColumnList;
     private UIEventListener mUIEventListener;
+    private final ItemTouchHelper mItemTouchHelper;
 
 
     public ColumnListAdapter(@NonNull List<Column> columnList) {
         this.mColumnList = columnList;
+
+        mItemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.Callback() {
+            @Override
+            public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+                return makeFlag(ItemTouchHelper.ACTION_STATE_DRAG, ItemTouchHelper.UP | ItemTouchHelper.DOWN);
+            }
+
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder,
+                                  RecyclerView.ViewHolder target) {
+
+                final int oldPosition = viewHolder.getAdapterPosition();
+                final int newPosition = target.getAdapterPosition();
+
+                Collections.swap(mColumnList, oldPosition, newPosition);
+                notifyItemMoved(oldPosition, newPosition);
+                return true;
+            }
+
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+            }
+        });
     }
 
     public UIEventListener getUIEventListener() {
@@ -83,6 +110,12 @@ public class ColumnListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         return TYPE_COLUMN;
     }
 
+    @Override
+    public void onAttachedToRecyclerView(RecyclerView recyclerView) {
+        super.onAttachedToRecyclerView(recyclerView);
+        mItemTouchHelper.attachToRecyclerView(recyclerView);
+    }
+
     private class ColumnViewHolder extends RecyclerView.ViewHolder {
         private ItemColumnBinding mBinding;
 
@@ -90,9 +123,19 @@ public class ColumnListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         ColumnViewHolder(View itemView) {
             super(itemView);
             mBinding = DataBindingUtil.bind(itemView);
+            mBinding.reorderBtn.setOnTouchListener((v, event) -> {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        mItemTouchHelper.startDrag(ColumnViewHolder.this);
+                        return true;
+                }
+                return false;
+            });
         }
 
         void bind(Column column) {
+            mBinding.titleTv.setText(column.getName());
+            mBinding.descriptionTv.setText(column.getVersion());
         }
     }
 

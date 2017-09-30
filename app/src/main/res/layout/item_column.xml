@@ -6,11 +6,11 @@
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:layout_height="60dp"
         >
 
         <TextView
-            android:id="@+id/reorderBtn"
+            android:id="@+id/uninstallBtn"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:layout_marginBottom="8dp"
@@ -18,7 +18,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:gravity="center_vertical"
-            android:text="Reorder"
+            android:text="Uninstall"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent"/>
@@ -29,35 +29,33 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
-            android:layout_marginTop="10dp"
             android:ellipsize="end"
             android:maxLines="1"
             android:textColor="@color/textPrimary"
             android:textSize="16sp"
             app:layout_constraintBottom_toTopOf="@+id/descriptionTv"
             app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintLeft_toRightOf="@+id/reorderBtn"
+            app:layout_constraintLeft_toRightOf="@+id/uninstallBtn"
             app:layout_constraintRight_toLeftOf="@+id/visibilityBtn"
-            app:layout_constraintTop_toTopOf="@+id/reorderBtn"
+            app:layout_constraintTop_toTopOf="@+id/uninstallBtn"
             tools:text="Column Title"/>
 
         <TextView
             android:id="@+id/descriptionTv"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
             android:ellipsize="end"
             android:maxLines="2"
             android:textColor="@color/textLight"
             android:textSize="12sp"
-            app:layout_constraintBottom_toBottomOf="@+id/reorderBtn"
+            app:layout_constraintBottom_toBottomOf="@+id/uninstallBtn"
             app:layout_constraintLeft_toLeftOf="@+id/titleTv"
             app:layout_constraintRight_toRightOf="@+id/titleTv"
             app:layout_constraintTop_toBottomOf="@+id/titleTv"
             tools:text="Column Version"/>
 
         <TextView
-            android:id="@+id/removeBtn"
+            android:id="@+id/reorderBtn"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:layout_marginBottom="8dp"
@@ -65,7 +63,7 @@
             android:layout_marginRight="8dp"
             android:layout_marginTop="8dp"
             android:gravity="center_vertical"
-            android:text="Remove"
+            android:text="Reorder"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent"/>
@@ -81,7 +79,7 @@
             android:gravity="center_vertical"
             android:text="Visible"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintRight_toLeftOf="@+id/removeBtn"
+            app:layout_constraintRight_toLeftOf="@+id/reorderBtn"
             app:layout_constraintTop_toTopOf="parent"/>
 
     </android.support.constraint.ConstraintLayout>
