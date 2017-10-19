@@ -25,8 +25,10 @@ import com.crashlytics.android.Crashlytics;
 
 import cn.nekocode.hot.manager.FileManager;
 import cn.nekocode.hot.manager.ColumnManager;
+import cn.nekocode.hot.manager.PreferenceManager;
 import cn.nekocode.hot.manager.base.BaseFileManager;
 import cn.nekocode.hot.manager.base.BaseColumnManager;
+import cn.nekocode.hot.manager.base.BasePreferenceManager;
 import io.fabric.sdk.android.Fabric;
 import okhttp3.OkHttpClient;
 
@@ -37,6 +39,7 @@ public class HotApplication extends Application {
     private OkHttpClient mDefaultOkHttpClient;
     private BaseFileManager mDefaultFileManager;
     private BaseColumnManager mDefaultColumnManager;
+    private BasePreferenceManager mDefaultPreferenceManager;
 
 
     @NonNull
@@ -57,6 +60,12 @@ public class HotApplication extends Application {
                 .mDefaultColumnManager;
     }
 
+    @NonNull
+    public static BasePreferenceManager getDefaultPreferenceManager(Context context) {
+        return ((HotApplication) (context.getApplicationContext()))
+                .mDefaultPreferenceManager;
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -74,5 +83,6 @@ public class HotApplication extends Application {
          */
         mDefaultFileManager = new FileManager();
         mDefaultColumnManager = new ColumnManager(mDefaultFileManager);
+        mDefaultPreferenceManager = new PreferenceManager(this);
     }
 }

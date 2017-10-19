@@ -19,9 +19,11 @@ package cn.nekocode.hot.manager.base;
 
 import android.support.annotation.NonNull;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import cn.nekocode.hot.data.model.Column;
+import cn.nekocode.hot.data.model.ColumnPreference;
+import io.reactivex.Observable;
 
 /**
  * @author nekocode (nekocode.cn@gmail.com)
@@ -29,12 +31,19 @@ import cn.nekocode.hot.data.model.Column;
 public abstract class BasePreferenceManager {
 
     /**
-     * Load ordered column list
+     * Get ordered visible columns
      */
-    public abstract ArrayList<Column> loadOrderedColumns(@NonNull BaseFileManager fileManager);
+    @NonNull
+    public abstract Observable<List<Column>> getOrderedVisibleColumns(@NonNull List<Column> columns);
 
     /**
-     * Save ordered column list
+     * Load column preference objects
      */
-    public abstract void saveOrderedColumns(ArrayList<Column> columns);
+    @NonNull
+    public abstract Observable<List<ColumnPreference>> loadColumnPreferences(@NonNull List<Column> columns);
+
+    /**
+     * Save column preference objects
+     */
+    public abstract void saveColumnPreferences(@NonNull List<ColumnPreference> preferences);
 }
