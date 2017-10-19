@@ -32,9 +32,10 @@ import java.util.ArrayList;
 import cn.nekocode.hot.HotApplication;
 import cn.nekocode.hot.R;
 import cn.nekocode.hot.base.BaseActivity;
-import cn.nekocode.hot.data.model.Column;
+import cn.nekocode.hot.data.model.ColumnPreference;
 import cn.nekocode.hot.databinding.ActivityColumnMangerBinding;
 import cn.nekocode.hot.manager.base.BaseColumnManager;
+import cn.nekocode.hot.manager.base.BasePreferenceManager;
 import cn.nekocode.hot.util.DividerItemDecoration;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
@@ -45,8 +46,9 @@ import io.reactivex.schedulers.Schedulers;
 public class ColumnManagerActivity extends BaseActivity {
     private ActivityColumnMangerBinding mBinding;
     @State
-    public ArrayList<Column> mColumns;
+    public ArrayList<ColumnPreference> mPreferences;
     private BaseColumnManager mColumnManager;
+    private BasePreferenceManager mPreferenceManager;
     private ColumnListAdapter mAdapter;
 
 
@@ -56,13 +58,14 @@ public class ColumnManagerActivity extends BaseActivity {
         StateSaver.restoreInstanceState(this, savedInstanceState);
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_column_manger);
         mColumnManager = HotApplication.getDefaultColumnManager(this);
+        mPreferenceManager = HotApplication.getDefaultPreferenceManager(this);
 
         /*
           Data initialize
          */
-        if (mColumns == null) {
-            mColumns = new ArrayList<>();
-            loadColumns();
+        if (mPreferences == null) {
+            mPreferences = new ArrayList<>();
+            loadColumnPreferences();
         }
 
 
@@ -75,7 +78,7 @@ public class ColumnManagerActivity extends BaseActivity {
         }
 
         // Setup the recyclerview
-        mAdapter = new ColumnListAdapter(mColumns);
+        mAdapter = new ColumnListAdapter(mPreferences);
         mAdapter.setUIEventListener(new ColumnListAdapter.UIEventListener() {
         });
 
@@ -104,7 +107,7 @@ public class ColumnManagerActivity extends BaseActivity {
         }
     }
 
-    private void loadColumns() {
+    private void loadColumnPreferences() {
         final ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage(getString(R.string.loading));
         progressDialog.setCancelable(false);
@@ -112,12 +115,13 @@ public class ColumnManagerActivity extends BaseActivity {
 
         mColumnManager.getAllInstalled()
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
                 .compose(bindToLifecycle())
-                .subscribe(columns -> {
+                .flatMap(columns -> mPreferenceManager.loadColumnPreferences(columns))
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(preferences -> {
                     progressDialog.dismiss();
-                    mColumns.clear();
-                    mColumns.addAll(columns);
+                    mPreferences.clear();
+                    mPreferences.addAll(preferences);
                     mAdapter.notifyDataSetChanged();
 
                 }, throwable -> {

@@ -26,11 +26,10 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.util.Collections;
 import java.util.List;
 
 import cn.nekocode.hot.R;
-import cn.nekocode.hot.data.model.Column;
+import cn.nekocode.hot.data.model.ColumnPreference;
 import cn.nekocode.hot.databinding.ItemColumnBinding;
 
 /**
@@ -38,13 +37,13 @@ import cn.nekocode.hot.databinding.ItemColumnBinding;
  */
 public class ColumnListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private static final int TYPE_COLUMN = 0;
-    private List<Column> mColumnList;
+    private List<ColumnPreference> mColumnPreferenceList;
     private UIEventListener mUIEventListener;
     private final ItemTouchHelper mItemTouchHelper;
 
 
-    public ColumnListAdapter(@NonNull List<Column> columnList) {
-        this.mColumnList = columnList;
+    public ColumnListAdapter(@NonNull List<ColumnPreference> columnList) {
+        this.mColumnPreferenceList = columnList;
 
         mItemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.Callback() {
             @Override
@@ -56,11 +55,15 @@ public class ColumnListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder,
                                   RecyclerView.ViewHolder target) {
 
-                final int oldPosition = viewHolder.getAdapterPosition();
-                final int newPosition = target.getAdapterPosition();
+                final int i = viewHolder.getAdapterPosition();
+                final int j = target.getAdapterPosition();
+                final ColumnPreference l = mColumnPreferenceList.get(i);
+                final ColumnPreference r = mColumnPreferenceList.get(j);
+                mColumnPreferenceList.set(i, mColumnPreferenceList.set(j, l));
+                l.setOrder(j);
+                r.setOrder(i);
 
-                Collections.swap(mColumnList, oldPosition, newPosition);
-                notifyItemMoved(oldPosition, newPosition);
+                notifyItemMoved(i, j);
                 return true;
             }
 
@@ -93,16 +96,16 @@ public class ColumnListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        final Column column = mColumnList.get(position);
+        final ColumnPreference preference = mColumnPreferenceList.get(position);
 
         if (holder instanceof ColumnViewHolder) {
-            ((ColumnViewHolder) holder).bind(column);
+            ((ColumnViewHolder) holder).bind(preference);
         }
     }
 
     @Override
     public int getItemCount() {
-        return mColumnList.size();
+        return mColumnPreferenceList.size();
     }
 
     @Override
@@ -133,9 +136,9 @@ public class ColumnListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             });
         }
 
-        void bind(Column column) {
-            mBinding.titleTv.setText(column.getName());
-            mBinding.descriptionTv.setText(column.getVersion());
+        void bind(ColumnPreference preference) {
+            mBinding.titleTv.setText(preference.getColumn().getName());
+            mBinding.descriptionTv.setText(preference.getColumn().getVersion());
         }
     }
 
