@@ -17,8 +17,8 @@
 
 package cn.nekocode.hot.util;
 
+import android.content.ContentUris;
 import android.content.Context;
-import android.content.CursorLoader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
@@ -27,7 +27,6 @@ import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
 
 import java.io.File;
 
@@ -57,60 +56,96 @@ public class PathUtil {
         return url.replaceAll("[/:*?\"<>|]", "_");
     }
 
+    /**
+     * https://stackoverflow.com/a/27271131/5729581
+     */
     public static String getRealPathFromURI(Context context, Uri uri) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            return getRealPathFromURI_API19(context, uri);
-        } else {
-            return getRealPathFromURI_API11to18(context, uri);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT &&
+                DocumentsContract.isDocumentUri(context, uri)) {
+
+            // DocumentProvider
+            if (isExternalStorageDocument(uri)) {
+                // ExternalStorageProvider
+                final String docId = DocumentsContract.getDocumentId(uri);
+                final String[] split = docId.split(":");
+                final String type = split[0];
+
+                if ("primary".equalsIgnoreCase(type)) {
+                    return Environment.getExternalStorageDirectory() + "/" + split[1];
+                }
+
+                // TODO handle non-primary volumes
+            } else if (isDownloadsDocument(uri)) {
+                // DownloadsProvider
+                final String id = DocumentsContract.getDocumentId(uri);
+                final Uri contentUri = ContentUris.withAppendedId(
+                        Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
+
+                return getDataColumn(context, contentUri, null, null);
+
+            } else if (isMediaDocument(uri)) {
+                // MediaProvider
+                final String docId = DocumentsContract.getDocumentId(uri);
+                final String[] split = docId.split(":");
+                final String type = split[0];
+
+                Uri contentUri = null;
+                if ("image".equals(type)) {
+                    contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+                } else if ("video".equals(type)) {
+                    contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+                } else if ("audio".equals(type)) {
+                    contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+                }
+
+                final String selection = "_id=?";
+                final String[] selectionArgs = new String[] {
+                        split[1]
+                };
+
+                return getDataColumn(context, contentUri, selection, selectionArgs);
+            }
+
+        } else if ("content".equalsIgnoreCase(uri.getScheme())) {
+            // MediaStore (and general)
+            return getDataColumn(context, uri, null, null);
+
+        } else if ("file".equalsIgnoreCase(uri.getScheme())) {
+            // File
+            return uri.getPath();
         }
+
+        return null;
     }
 
-    /**
-     * https://stackoverflow.com/a/26965524
-     */
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    private static String getRealPathFromURI_API19(Context context, Uri uri) {
-        String filePath = "";
-        String wholeID = DocumentsContract.getDocumentId(uri);
+    private static String getDataColumn(Context context, Uri uri, String selection, String[] selectionArgs) {
+        final String column = "_data";
+        final String[] projection = {column};
+        Cursor cursor = null;
 
-        // Split at colon, use second item in the array
-        String id = wholeID.split(":")[1];
-
-        String[] column = {MediaStore.Images.Media.DATA};
-
-        // where id is equal to
-        String sel = MediaStore.Images.Media._ID + "=?";
-
-        Cursor cursor = context.getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                column, sel, new String[]{id}, null);
-
-        int columnIndex = cursor.getColumnIndex(column[0]);
-
-        if (cursor.moveToFirst()) {
-            filePath = cursor.getString(columnIndex);
+        try {
+            cursor = context.getContentResolver().query(uri, projection, selection, selectionArgs,
+                    null);
+            if (cursor != null && cursor.moveToFirst()) {
+                final int column_index = cursor.getColumnIndexOrThrow(column);
+                return cursor.getString(column_index);
+            }
+        } finally {
+            if (cursor != null)
+                cursor.close();
         }
-        cursor.close();
-        return filePath;
+        return null;
     }
 
-    /**
-     * https://stackoverflow.com/a/26965524
-     */
-    private static String getRealPathFromURI_API11to18(Context context, Uri contentUri) {
-        String[] proj = {MediaStore.Images.Media.DATA};
-        String result = null;
+    private static boolean isExternalStorageDocument(Uri uri) {
+        return "com.android.externalstorage.documents".equals(uri.getAuthority());
+    }
 
-        CursorLoader cursorLoader = new CursorLoader(
-                context,
-                contentUri, proj, null, null, null);
-        Cursor cursor = cursorLoader.loadInBackground();
+    private static boolean isDownloadsDocument(Uri uri) {
+        return "com.android.providers.downloads.documents".equals(uri.getAuthority());
+    }
 
-        if (cursor != null) {
-            int column_index =
-                    cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-            cursor.moveToFirst();
-            result = cursor.getString(column_index);
-        }
-        return result;
+    private static boolean isMediaDocument(Uri uri) {
+        return "com.android.providers.media.documents".equals(uri.getAuthority());
     }
 }

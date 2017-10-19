@@ -20,6 +20,7 @@ package cn.nekocode.hot.manager;
 import android.content.Context;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -104,9 +105,14 @@ public class FileManager extends BaseFileManager {
              */
             return Observable.create(emitter -> {
                 try {
-                    emitter.onNext(new File(isFile ?
-                            uri.getPath() : PathUtil.getRealPathFromURI(context, uri)));
-                    emitter.onComplete();
+                    final String path = isFile ? uri.getPath() : PathUtil.getRealPathFromURI(context, uri);
+                    if (!TextUtils.isEmpty(path)) {
+                        emitter.onNext(new File(path));
+                        emitter.onComplete();
+
+                    } else {
+                        emitter.tryOnError(new Exception("Not supported uri."));
+                    }
 
                 } catch (Exception e) {
                     emitter.tryOnError(e);
