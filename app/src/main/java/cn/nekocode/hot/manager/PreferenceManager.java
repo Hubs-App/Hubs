@@ -66,7 +66,7 @@ public class PreferenceManager extends BasePreferenceManager {
             }
 
             final SQLiteDatabase db = mDBHelper.getReadableDatabase();
-            final Cursor cursor = db.query(PreferenceDBHelper.TABLE_NAME, null, null, null, null, null, "\'order\' ASC");
+            final Cursor cursor = db.query(PreferenceDBHelper.TABLE_NAME, null, null, null, null, null, "_order ASC");
             final int indexOfColumnId = cursor.getColumnIndex("column_id");
             final int indexOfIsVisible = cursor.getColumnIndex("is_visible");
 
@@ -87,26 +87,32 @@ public class PreferenceManager extends BasePreferenceManager {
             db.close();
 
             // Add rest columns
+            final ArrayList<ColumnPreference> newPreferences = new ArrayList<>();
             for (Column column : columnHashMap.values()) {
-                preferences.add(new ColumnPreference(column, true, order ++));
+                newPreferences.add(new ColumnPreference(column, true, order ++));
+            }
+            if (newPreferences.size() > 0) {
+                // Save to db
+                final ColumnPreference[] params = new ColumnPreference[newPreferences.size()];
+                updateColumnPreferences(newPreferences.toArray(params));
             }
 
+            preferences.addAll(newPreferences);
             emitter.onNext(preferences);
             emitter.onComplete();
         });
     }
 
     @Override
-    public void saveColumnPreferences(@NonNull List<ColumnPreference> preferences) {
+    public void updateColumnPreferences(@NonNull ColumnPreference... preferences) {
         final SQLiteDatabase db = mDBHelper.getWritableDatabase();
-        db.execSQL("DELETE FROM " + PreferenceDBHelper.TABLE_NAME);
 
         for (ColumnPreference preference : preferences) {
             final ContentValues values = new ContentValues();
             values.put("column_id", preference.getColumnId());
             values.put("is_visible", preference.isVisible() ? 1 : 0);
-            values.put("order", preference.getOrder());
-            db.insert(PreferenceDBHelper.TABLE_NAME, "id", values);
+            values.put("_order", preference.getOrder());
+            db.insert(PreferenceDBHelper.TABLE_NAME, "column_id", values);
         }
 
         db.close();
@@ -116,7 +122,7 @@ public class PreferenceManager extends BasePreferenceManager {
     private class PreferenceDBHelper extends SQLiteOpenHelper {
         private static final int DB_VERSION = 1;
         private static final String DB_NAME = "preference.db";
-        private static final String TABLE_NAME = "\'preference\'";
+        private static final String TABLE_NAME = "preference";
 
 
         PreferenceDBHelper(Context context) {
@@ -126,10 +132,9 @@ public class PreferenceManager extends BasePreferenceManager {
         @Override
         public void onCreate(SQLiteDatabase sqLiteDatabase) {
             final String sql = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME +
-                    " (\'id\' INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
-                    "\'column_id\' VARCHAR NOT NULL, " +
-                    "\'is_visible\' INTEGER NOT NULL, " +
-                    "\'order\' INTEGER NOT NULL)";
+                    " (column_id VARCHAR PRIMARY KEY NOT NULL, " +
+                    "is_visible INTEGER NOT NULL, " +
+                    "_order INTEGER NOT NULL)";
             sqLiteDatabase.execSQL(sql);
         }
 

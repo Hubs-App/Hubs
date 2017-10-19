@@ -45,5 +45,5 @@ public abstract class BasePreferenceManager {
     /**
      * Save column preference objects
      */
-    public abstract void saveColumnPreferences(@NonNull List<ColumnPreference> preferences);
+    public abstract void updateColumnPreferences(@NonNull ColumnPreference... preferences);
 }
