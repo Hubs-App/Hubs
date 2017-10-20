@@ -23,7 +23,7 @@ import java.util.List;
 
 import cn.nekocode.hot.data.model.Column;
 import cn.nekocode.hot.data.model.ColumnPreference;
-import io.reactivex.Observable;
+import io.reactivex.Single;
 
 /**
  * @author nekocode (nekocode.cn@gmail.com)
@@ -34,13 +34,13 @@ public abstract class BasePreferenceManager {
      * Get ordered visible columns
      */
     @NonNull
-    public abstract Observable<List<Column>> getOrderedVisibleColumns(@NonNull List<Column> columns);
+    public abstract Single<List<Column>> getOrderedVisibleColumns(@NonNull List<Column> columns);
 
     /**
      * Load column preference objects
      */
     @NonNull
-    public abstract Observable<List<ColumnPreference>> loadColumnPreferences(@NonNull List<Column> columns);
+    public abstract Single<List<ColumnPreference>> loadColumnPreferences(@NonNull List<Column> columns);
 
     /**
      * Update column preference objects

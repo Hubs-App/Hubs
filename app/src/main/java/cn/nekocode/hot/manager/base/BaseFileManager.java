@@ -24,7 +24,7 @@ import android.support.annotation.NonNull;
 import java.io.File;
 import java.util.UUID;
 
-import io.reactivex.Observable;
+import io.reactivex.Single;
 
 /**
  * @author nekocode (nekocode.cn@gmail.com)
@@ -58,5 +58,5 @@ public abstract class BaseFileManager {
      * Get file from a uri
      */
     @NonNull
-    public abstract Observable<File> getFile(@NonNull Context context, @NonNull Uri uri);
+    public abstract Single<File> getFile(@NonNull Context context, @NonNull Uri uri);
 }

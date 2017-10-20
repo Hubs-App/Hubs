@@ -31,7 +31,7 @@ import java.util.List;
 import cn.nekocode.hot.data.model.Column;
 import cn.nekocode.hot.data.model.ColumnPreference;
 import cn.nekocode.hot.manager.base.BasePreferenceManager;
-import io.reactivex.Observable;
+import io.reactivex.Single;
 
 /**
  * @author nekocode (nekocode.cn@gmail.com)
@@ -46,19 +46,18 @@ public class PreferenceManager extends BasePreferenceManager {
 
     @Override
     @NonNull
-    public Observable<List<Column>> getOrderedVisibleColumns(@NonNull List<Column> columns) {
+    public Single<List<Column>> getOrderedVisibleColumns(@NonNull List<Column> columns) {
         return loadColumnPreferences(columns)
-                .flatMapIterable(columnPreferences -> columnPreferences)
+                .flattenAsObservable(list -> list)
                 .filter(preference -> preference.isVisible())
                 .map(preference -> preference.getColumn())
-                .toList()
-                .toObservable();
+                .toList();
     }
 
     @Override
     @NonNull
-    public Observable<List<ColumnPreference>> loadColumnPreferences(@NonNull List<Column> columns) {
-        return Observable.create(emitter -> {
+    public Single<List<ColumnPreference>> loadColumnPreferences(@NonNull List<Column> columns) {
+        return Single.create(emitter -> {
             final ArrayList<ColumnPreference> preferences = new ArrayList<>();
             final HashMap<String, Column> columnHashMap = new HashMap<>();
             for (Column column : columns) {
@@ -97,8 +96,7 @@ public class PreferenceManager extends BasePreferenceManager {
             }
 
             preferences.addAll(newPreferences);
-            emitter.onNext(preferences);
-            emitter.onComplete();
+            emitter.onSuccess(preferences);
         });
     }
 

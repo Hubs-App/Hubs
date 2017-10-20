@@ -38,7 +38,7 @@ import cn.nekocode.hot.data.model.Column;
 import cn.nekocode.hot.manager.base.BaseFileManager;
 import cn.nekocode.hot.manager.base.BaseColumnManager;
 import cn.nekocode.hot.util.ZipUtil;
-import io.reactivex.Observable;
+import io.reactivex.Single;
 
 /**
  * @author nekocode (nekocode.cn@gmail.com)
@@ -59,13 +59,12 @@ public class ColumnManager extends BaseColumnManager {
 
     @Override
     @NonNull
-    public Observable<Column> readConfig(@NonNull File packageFile) {
-        return Observable.create(emitter -> {
+    public Single<Column> readConfig(@NonNull File packageFile) {
+        return Single.create(emitter -> {
             try {
                 final Column column = Column.fromLua(
                         ZipUtil.readStringFromZip(packageFile, COLUMN_CONFIG_PATH), mGlobals);
-                emitter.onNext(column);
-                emitter.onComplete();
+                emitter.onSuccess(column);
 
             } catch (Exception e) {
                 emitter.tryOnError(e);
@@ -75,12 +74,11 @@ public class ColumnManager extends BaseColumnManager {
 
     @Override
     @NonNull
-    public Observable<Column> readConfig(@NonNull UUID columnId) {
-        return Observable.create(emitter -> {
+    public Single<Column> readConfig(@NonNull UUID columnId) {
+        return Single.create(emitter -> {
             try {
                 final Column column = Column.fromLua(readConfigToString(columnId), mGlobals);
-                emitter.onNext(column);
-                emitter.onComplete();
+                emitter.onSuccess(column);
 
             } catch (Exception e) {
                 emitter.tryOnError(e);
@@ -122,7 +120,7 @@ public class ColumnManager extends BaseColumnManager {
 
     @Override
     @NonNull
-    public Observable<Column> install(@NonNull Context context, @NonNull File packageFile) {
+    public Single<Column> install(@NonNull Context context, @NonNull File packageFile) {
         return readConfig(packageFile)
                 // Firstly, remove old directory
                 .flatMap(column ->
@@ -148,19 +146,18 @@ public class ColumnManager extends BaseColumnManager {
 
     @Override
     @NonNull
-    public Observable<Boolean> uninstall(@NonNull UUID columnId) {
-        return Observable.create(emitter -> {
+    public Single<Boolean> uninstall(@NonNull UUID columnId) {
+        return Single.create(emitter -> {
             final File columnDir = getFileManager().getColumnDirectory(columnId);
 
             if (!columnDir.exists()) {
-                emitter.onNext(true);
+                emitter.onSuccess(true);
 
             } else {
                 boolean rlt[] = new boolean[]{true};
                 deleteRecursive(columnDir, rlt);
-                emitter.onNext(rlt[0]);
+                emitter.onSuccess(rlt[0]);
             }
-            emitter.onComplete();
         });
     }
 
@@ -183,14 +180,13 @@ public class ColumnManager extends BaseColumnManager {
 
     @Override
     @NonNull
-    public Observable<List<Column>> getAllInstalled() {
-        return Observable.create(emitter -> {
+    public Single<List<Column>> getAllInstalled() {
+        return Single.create(emitter -> {
             final ArrayList<Column> columns = new ArrayList<>();
             final File columnsDir = getFileManager().getColumnsDirectory();
 
             if (!columnsDir.exists() || !columnsDir.isDirectory()) {
-                emitter.onNext(columns);
-                emitter.onComplete();
+                emitter.onSuccess(columns);
                 return;
             }
 
@@ -207,8 +203,7 @@ public class ColumnManager extends BaseColumnManager {
                     }
                 }
 
-                emitter.onNext(columns);
-                emitter.onComplete();
+                emitter.onSuccess(columns);
 
             } catch (Exception e) {
                 emitter.tryOnError(e);

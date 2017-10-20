@@ -33,7 +33,7 @@ import java.util.UUID;
 import cn.nekocode.hot.HotApplication;
 import cn.nekocode.hot.manager.base.BaseFileManager;
 import cn.nekocode.hot.util.PathUtil;
-import io.reactivex.Observable;
+import io.reactivex.Single;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -92,7 +92,7 @@ public class FileManager extends BaseFileManager {
 
     @Override
     @NonNull
-    public Observable<File> getFile(@NonNull Context context, @NonNull Uri uri) {
+    public Single<File> getFile(@NonNull Context context, @NonNull Uri uri) {
         final String scheme = uri.getScheme();
         final boolean isFile = SCHEME_FILE.equals(scheme);
         final boolean isContent = SCHEME_CONTENT.equals(scheme);
@@ -103,12 +103,11 @@ public class FileManager extends BaseFileManager {
             /*
               Local file
              */
-            return Observable.create(emitter -> {
+            return Single.create(emitter -> {
                 try {
                     final String path = isFile ? uri.getPath() : PathUtil.getRealPathFromURI(context, uri);
                     if (!TextUtils.isEmpty(path)) {
-                        emitter.onNext(new File(path));
-                        emitter.onComplete();
+                        emitter.onSuccess(new File(path));
 
                     } else {
                         emitter.tryOnError(new Exception("Not supported uri."));
@@ -123,7 +122,7 @@ public class FileManager extends BaseFileManager {
             /*
               Remote file
              */
-            return Observable.create(emitter -> {
+            return Single.create(emitter -> {
                 InputStream in = null;
                 OutputStream out = null;
 
@@ -146,8 +145,7 @@ public class FileManager extends BaseFileManager {
                             out.write(buffer, 0, len);
                         }
 
-                        emitter.onNext(cacheFile);
-                        emitter.onComplete();
+                        emitter.onSuccess(cacheFile);
 
                     } else {
                         emitter.tryOnError(new Exception("Request is not success."));
@@ -171,6 +169,6 @@ public class FileManager extends BaseFileManager {
             });
         }
 
-        return Observable.error(new Exception("Not supported uri scheme."));
+        return Single.error(new Exception("Not supported uri scheme."));
     }
 }

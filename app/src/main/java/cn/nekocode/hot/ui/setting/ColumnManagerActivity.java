@@ -168,7 +168,7 @@ public class ColumnManagerActivity extends BaseActivity implements ColumnListAda
                 .subscribeOn(Schedulers.io())
                 .flatMap(columns -> mPreferenceManager.loadColumnPreferences(columns))
                 .observeOn(AndroidSchedulers.mainThread())
-                .to(AutoDispose.with(AndroidLifecycleScopeProvider.from(this)).forObservable())
+                .to(AutoDispose.with(AndroidLifecycleScopeProvider.from(this)).forSingle())
                 .subscribe(preferences -> {
                     progressDialog.dismiss();
                     mPreferences.clear();
@@ -200,7 +200,7 @@ public class ColumnManagerActivity extends BaseActivity implements ColumnListAda
         mColumnManager.uninstall(column.getId())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .to(AutoDispose.with(AndroidLifecycleScopeProvider.from(this)).forObservable())
+                .to(AutoDispose.with(AndroidLifecycleScopeProvider.from(this)).forSingle())
                 .subscribe(isSuccess -> {
                     if (!isSuccess) {
                         progressDialog.dismiss();

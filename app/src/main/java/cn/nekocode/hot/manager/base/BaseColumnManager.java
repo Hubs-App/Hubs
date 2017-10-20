@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.UUID;
 
 import cn.nekocode.hot.data.model.Column;
-import io.reactivex.Observable;
+import io.reactivex.Single;
 
 /**
  * @author nekocode (nekocode.cn@gmail.com)
@@ -46,25 +46,25 @@ public abstract class BaseColumnManager {
      * Read config form a column package
      */
     @NonNull
-    public abstract Observable<Column> readConfig(@NonNull File packageFile);
+    public abstract Single<Column> readConfig(@NonNull File packageFile);
 
     /**
      * Read config form a installed column
      */
     @NonNull
-    public abstract Observable<Column> readConfig(@NonNull UUID columnId);
+    public abstract Single<Column> readConfig(@NonNull UUID columnId);
 
     /**
      * Install column
      */
     @NonNull
-    public abstract Observable<Column> install(@NonNull Context context, @NonNull File packageFile);
+    public abstract Single<Column> install(@NonNull Context context, @NonNull File packageFile);
 
     /**
      * Uninstall column
      */
     @NonNull
-    public abstract Observable<Boolean> uninstall(@NonNull UUID columnId);
+    public abstract Single<Boolean> uninstall(@NonNull UUID columnId);
 
     /**
      * Check if a column is installed
@@ -75,5 +75,5 @@ public abstract class BaseColumnManager {
      * Get all installed columns
      */
     @NonNull
-    public abstract Observable<List<Column>> getAllInstalled();
+    public abstract Single<List<Column>> getAllInstalled();
 }
