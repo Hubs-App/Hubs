@@ -41,7 +41,6 @@ import cn.nekocode.hot.data.model.Column;
 import cn.nekocode.hot.databinding.FragmentArticleColumnBinding;
 import cn.nekocode.hot.luaj.ColumnLuaBridge;
 import cn.nekocode.hot.util.DividerItemDecoration;
-import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
@@ -152,13 +151,10 @@ public class ArticleColumnFragment extends BaseColumnFragment implements SwipeRe
     public void onRefresh() {
         mPage = 0;
 
-        Observable.<ArrayList<Article>>create(emitter -> {
-            emitter.onNext(getColumnLuaBridge().getArticles(0));
-            emitter.onComplete();
-        })
+        getColumnLuaBridge().getArticles(0)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .to(AutoDispose.with(AndroidLifecycleScopeProvider.from(this)).forObservable())
+                .to(AutoDispose.with(AndroidLifecycleScopeProvider.from(this)).forSingle())
                 .subscribe(articles -> {
                     mBottomItem = null;
                     mArticleList.clear();
@@ -193,13 +189,10 @@ public class ArticleColumnFragment extends BaseColumnFragment implements SwipeRe
         mBottomItem.setLoading(true);
         mAdapter.notifyItemChanged(mArticleList.size() - 1);
 
-        Observable.<ArrayList<Article>>create(emitter -> {
-            emitter.onNext(getColumnLuaBridge().getArticles(page));
-            emitter.onComplete();
-        })
+        getColumnLuaBridge().getArticles(page)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .to(AutoDispose.with(AndroidLifecycleScopeProvider.from(this)).forObservable())
+                .to(AutoDispose.with(AndroidLifecycleScopeProvider.from(this)).forSingle())
                 .subscribe(articles -> {
                     final int oldSize = mArticleList.size();
                     if (articles.size() > 0) {

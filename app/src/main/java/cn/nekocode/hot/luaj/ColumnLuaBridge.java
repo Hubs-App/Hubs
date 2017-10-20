@@ -19,7 +19,6 @@ package cn.nekocode.hot.luaj;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.jse.CoerceJavaToLua;
@@ -31,6 +30,7 @@ import java.util.ArrayList;
 import cn.nekocode.hot.HotApplication;
 import cn.nekocode.hot.data.model.Article;
 import cn.nekocode.hot.data.model.Column;
+import io.reactivex.Single;
 import okhttp3.OkHttpClient;
 
 /**
@@ -62,19 +62,20 @@ public class ColumnLuaBridge {
         }
     }
 
-    @Nullable
-    public ArrayList<Article> getArticles(int page) {
-        final LuaValue func = mLuaGlobals.get("getArticles");
-        if (func.isnil()) {
-            return null;
-        }
+    public Single<ArrayList<Article>> getArticles(int page) {
+        return Single.create(emitter -> {
+            final LuaValue func = mLuaGlobals.get("getArticles");
+            if (func.isnil()) {
+                emitter.tryOnError(new Exception("getArticles return nil"));
+            }
 
-        try {
-            final LuaValue rlt = func.call(LuaValue.valueOf(page));
-            return (ArrayList<Article>) CoerceLuaToJava.coerce(rlt, ArrayList.class);
+            try {
+                final LuaValue rlt = func.call(LuaValue.valueOf(page));
+                emitter.onSuccess((ArrayList<Article>) CoerceLuaToJava.coerce(rlt, ArrayList.class));
 
-        } catch (Exception e) {
-            return null;
-        }
+            } catch (Exception e) {
+                emitter.tryOnError(e);
+            }
+        });
     }
 }
