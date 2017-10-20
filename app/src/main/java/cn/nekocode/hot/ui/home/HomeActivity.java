@@ -33,6 +33,8 @@ import android.widget.Toast;
 
 import com.evernote.android.state.State;
 import com.evernote.android.state.StateSaver;
+import com.uber.autodispose.AutoDispose;
+import com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -130,9 +132,9 @@ public class HomeActivity extends BaseActivity {
 
         mColumnManager.getAllInstalled()
                 .subscribeOn(Schedulers.io())
-                .compose(bindToLifecycle())
                 .flatMap(columns -> mPreferenceManager.getOrderedVisibleColumns(columns))
                 .observeOn(AndroidSchedulers.mainThread())
+                .to(AutoDispose.with(AndroidLifecycleScopeProvider.from(this)).forObservable())
                 .subscribe(columns -> {
                     progressDialog.dismiss();
                     mColumns.clear();
@@ -164,7 +166,7 @@ public class HomeActivity extends BaseActivity {
                 )
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .compose(bindToLifecycle())
+                .to(AutoDispose.with(AndroidLifecycleScopeProvider.from(this)).forObservable())
                 .subscribe(pair -> {
                     final File columnPackgeFile = pair.first;
                     final Column column = pair.second;
@@ -196,7 +198,7 @@ public class HomeActivity extends BaseActivity {
         mColumnManager.readConfig(column.getId())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .compose(bindToLifecycle())
+                .to(AutoDispose.with(AndroidLifecycleScopeProvider.from(this)).forObservable())
                 .subscribe(installedColumn -> {
                     progressDialog.dismiss();
                     new AlertDialog.Builder(HomeActivity.this)
@@ -222,7 +224,7 @@ public class HomeActivity extends BaseActivity {
         mColumnManager.install(this, columnPackageFile)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .compose(bindToLifecycle())
+                .to(AutoDispose.with(AndroidLifecycleScopeProvider.from(this)).forObservable())
                 .subscribe(column -> {
                     progressDialog.dismiss();
                     Toast.makeText(HomeActivity.this, R.string.toast_install_column_success, Toast.LENGTH_SHORT).show();

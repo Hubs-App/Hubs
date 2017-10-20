@@ -58,7 +58,10 @@ dependencies {
     // ReactiveX
     compile "io.reactivex.rxjava2:rxjava:2.1.1"
     compile "io.reactivex.rxjava2:rxandroid:2.0.1"
-    compile 'com.trello.rxlifecycle2:rxlifecycle-components:2.1.0'
+    def AUTO_DISPOSE_VERSION = "0.3.0"
+    compile "com.uber.autodispose:autodispose:$AUTO_DISPOSE_VERSION"
+    compile "com.uber.autodispose:autodispose-android:$AUTO_DISPOSE_VERSION"
+    compile "com.uber.autodispose:autodispose-android-archcomponents:$AUTO_DISPOSE_VERSION"
 
     // Network
     compile 'com.squareup.okhttp3:okhttp:3.8.1'

@@ -29,6 +29,8 @@ import android.widget.Toast;
 
 import com.evernote.android.state.State;
 import com.evernote.android.state.StateSaver;
+import com.uber.autodispose.AutoDispose;
+import com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider;
 
 import java.util.ArrayList;
 
@@ -164,9 +166,9 @@ public class ColumnManagerActivity extends BaseActivity implements ColumnListAda
 
         mColumnManager.getAllInstalled()
                 .subscribeOn(Schedulers.io())
-                .compose(bindToLifecycle())
                 .flatMap(columns -> mPreferenceManager.loadColumnPreferences(columns))
                 .observeOn(AndroidSchedulers.mainThread())
+                .to(AutoDispose.with(AndroidLifecycleScopeProvider.from(this)).forObservable())
                 .subscribe(preferences -> {
                     progressDialog.dismiss();
                     mPreferences.clear();
@@ -198,7 +200,7 @@ public class ColumnManagerActivity extends BaseActivity implements ColumnListAda
         mColumnManager.uninstall(column.getId())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .compose(bindToLifecycle())
+                .to(AutoDispose.with(AndroidLifecycleScopeProvider.from(this)).forObservable())
                 .subscribe(isSuccess -> {
                     if (!isSuccess) {
                         progressDialog.dismiss();

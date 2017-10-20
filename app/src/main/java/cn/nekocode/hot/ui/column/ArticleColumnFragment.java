@@ -28,6 +28,8 @@ import android.view.ViewGroup;
 
 import com.evernote.android.state.State;
 import com.evernote.android.state.StateSaver;
+import com.uber.autodispose.AutoDispose;
+import com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider;
 
 import java.util.ArrayList;
 
@@ -154,9 +156,9 @@ public class ArticleColumnFragment extends BaseColumnFragment implements SwipeRe
             emitter.onNext(getColumnLuaBridge().getArticles(0));
             emitter.onComplete();
         })
-                .compose(bindToLifecycle())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
+                .to(AutoDispose.with(AndroidLifecycleScopeProvider.from(this)).forObservable())
                 .subscribe(articles -> {
                     mBottomItem = null;
                     mArticleList.clear();
@@ -195,9 +197,9 @@ public class ArticleColumnFragment extends BaseColumnFragment implements SwipeRe
             emitter.onNext(getColumnLuaBridge().getArticles(page));
             emitter.onComplete();
         })
-                .compose(bindToLifecycle())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
+                .to(AutoDispose.with(AndroidLifecycleScopeProvider.from(this)).forObservable())
                 .subscribe(articles -> {
                     final int oldSize = mArticleList.size();
                     if (articles.size() > 0) {
