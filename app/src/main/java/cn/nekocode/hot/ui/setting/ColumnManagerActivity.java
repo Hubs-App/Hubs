@@ -80,6 +80,10 @@ public class ColumnManagerActivity extends BaseActivity {
         // Setup the recyclerview
         mAdapter = new ColumnListAdapter(mPreferences);
         mAdapter.setUIEventListener(new ColumnListAdapter.UIEventListener() {
+            @Override
+            public void onItemsSwapped() {
+                mPreferenceManager.saveColumnPreferences(mPreferences);
+            }
         });
 
         mBinding.recyclerView.setLayoutManager(

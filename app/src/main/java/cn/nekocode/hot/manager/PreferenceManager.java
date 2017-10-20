@@ -93,8 +93,7 @@ public class PreferenceManager extends BasePreferenceManager {
             }
             if (newPreferences.size() > 0) {
                 // Save to db
-                final ColumnPreference[] params = new ColumnPreference[newPreferences.size()];
-                updateColumnPreferences(newPreferences.toArray(params));
+                updateColumnPreferences(newPreferences.toArray(new ColumnPreference[newPreferences.size()]));
             }
 
             preferences.addAll(newPreferences);
@@ -112,12 +111,27 @@ public class PreferenceManager extends BasePreferenceManager {
             values.put("column_id", preference.getColumnId());
             values.put("is_visible", preference.isVisible() ? 1 : 0);
             values.put("_order", preference.getOrder());
-            db.insert(PreferenceDBHelper.TABLE_NAME, "column_id", values);
+            db.replace(PreferenceDBHelper.TABLE_NAME, "column_id", values);
         }
 
         db.close();
     }
 
+    @Override
+    public void saveColumnPreferences(@NonNull List<ColumnPreference> preferences) {
+        final SQLiteDatabase db = mDBHelper.getWritableDatabase();
+        db.execSQL("DELETE FROM " + PreferenceDBHelper.TABLE_NAME);
+
+        for (ColumnPreference preference : preferences) {
+            final ContentValues values = new ContentValues();
+            values.put("column_id", preference.getColumnId());
+            values.put("is_visible", preference.isVisible() ? 1 : 0);
+            values.put("_order", preference.getOrder());
+            db.insert(PreferenceDBHelper.TABLE_NAME, "column_id", values);
+        }
+
+        db.close();
+    }
 
     private class PreferenceDBHelper extends SQLiteOpenHelper {
         private static final int DB_VERSION = 1;

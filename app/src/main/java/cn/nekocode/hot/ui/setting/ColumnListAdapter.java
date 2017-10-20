@@ -70,6 +70,14 @@ public class ColumnListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
             }
+
+            @Override
+            public void clearView(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+                super.clearView(recyclerView, viewHolder);
+                if (mUIEventListener != null) {
+                    mUIEventListener.onItemsSwapped();
+                }
+            }
         });
     }
 
@@ -143,5 +151,6 @@ public class ColumnListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     }
 
     public interface UIEventListener {
+        void onItemsSwapped();
     }
 }

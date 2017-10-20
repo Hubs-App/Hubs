@@ -43,7 +43,12 @@ public abstract class BasePreferenceManager {
     public abstract Observable<List<ColumnPreference>> loadColumnPreferences(@NonNull List<Column> columns);
 
     /**
-     * Save column preference objects
+     * Update column preference objects
      */
     public abstract void updateColumnPreferences(@NonNull ColumnPreference... preferences);
+
+    /**
+     * Save column preference objects
+     */
+    public abstract void saveColumnPreferences(@NonNull List<ColumnPreference> preferences);
 }
