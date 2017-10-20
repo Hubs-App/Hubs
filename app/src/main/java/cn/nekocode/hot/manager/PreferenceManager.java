@@ -133,6 +133,24 @@ public class PreferenceManager extends BasePreferenceManager {
         db.close();
     }
 
+    @Override
+    public void removeColumnPreferences(@NonNull ColumnPreference... preferences) {
+        final SQLiteDatabase db = mDBHelper.getWritableDatabase();
+
+        for (ColumnPreference preference : preferences) {
+            db.delete(PreferenceDBHelper.TABLE_NAME, "column_id=?", new String[] {preference.getColumnId()});
+        }
+
+        db.close();
+    }
+
+    @Override
+    public void removeAllColumnPreferences() {
+        final SQLiteDatabase db = mDBHelper.getWritableDatabase();
+        db.execSQL("DELETE FROM " + PreferenceDBHelper.TABLE_NAME);
+        db.close();
+    }
+
     private class PreferenceDBHelper extends SQLiteOpenHelper {
         private static final int DB_VERSION = 1;
         private static final String DB_NAME = "preference.db";

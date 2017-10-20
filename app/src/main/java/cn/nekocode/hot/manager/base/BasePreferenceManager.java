@@ -51,4 +51,14 @@ public abstract class BasePreferenceManager {
      * Save column preference objects
      */
     public abstract void saveColumnPreferences(@NonNull List<ColumnPreference> preferences);
+
+    /**
+     * Remove column preference objects
+     */
+    public abstract void removeColumnPreferences(@NonNull ColumnPreference... preferences);
+
+    /**
+     * Remove all column preference objects
+     */
+    public abstract void removeAllColumnPreferences();
 }

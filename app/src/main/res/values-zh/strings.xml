@@ -17,8 +17,12 @@
     <string name="toast_load_columns_failed">加载 Columns 失败</string>
     <string name="toast_install_column_failed">安装 Column 失败</string>
     <string name="toast_install_column_success">安装成功</string>
+    <string name="toast_uninstall_column_failed">卸载 Column 失败</string>
+    <string name="toast_uninstall_column_success">卸载成功</string>
     <string name="dialog_checking_column">正在检查 Column…</string>
     <string name="dialog_ensure_install_column">你确定要安装这个 Column [name:\"%1$s\" version \"%2$s\"] 么？</string>
+    <string name="dialog_ensure_uninstall_column">你确定要卸载这个 Column [name:\"%1$s\" version \"%2$s\"] 么？</string>
     <string name="dialog_ensure_reinstall_column">你已经安装了该 Column 的某个版本 [name:\"%1$s\" version \"%2$s\"]。你确定要用新版本 \"%3$s\" 进行覆盖么？</string>
     <string name="dialog_installing_column">正在安装 Column…</string>
+    <string name="dialog_uninstalling_column">正在卸载 Column…</string>
 </resources>

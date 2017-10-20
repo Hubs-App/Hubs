@@ -17,8 +17,12 @@
     <string name="toast_load_columns_failed">Load Columns failed</string>
     <string name="toast_install_column_failed">Install Column failed</string>
     <string name="toast_install_column_success">Install success</string>
+    <string name="toast_uninstall_column_failed">Uninstall Column failed</string>
+    <string name="toast_uninstall_column_success">Uninstall success</string>
     <string name="dialog_checking_column">Checking Column…</string>
     <string name="dialog_ensure_install_column">Are you sure to install this Column [name:\"%1$s\" version \"%2$s\"] ?</string>
+    <string name="dialog_ensure_uninstall_column">Are you sure to uninstall this Column [name:\"%1$s\" version \"%2$s\"] ?</string>
     <string name="dialog_ensure_reinstall_column">You have already installed this Column with version [name:\"%1$s\" version \"%2$s\"]. Are you want to reinstall it with new version \"%3$s\" ?</string>
     <string name="dialog_installing_column">Installing Column…</string>
+    <string name="dialog_uninstalling_column">Uninstalling Column…</string>
 </resources>

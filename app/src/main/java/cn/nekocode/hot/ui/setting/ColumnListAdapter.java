@@ -129,11 +129,13 @@ public class ColumnListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     private class ColumnViewHolder extends RecyclerView.ViewHolder {
         private ItemColumnBinding mBinding;
+        private ColumnPreference mPreference;
 
 
         ColumnViewHolder(View itemView) {
             super(itemView);
             mBinding = DataBindingUtil.bind(itemView);
+
             mBinding.reorderBtn.setOnTouchListener((v, event) -> {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
@@ -142,15 +144,36 @@ public class ColumnListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                 }
                 return false;
             });
+
+            mBinding.visibilityBtn.setOnClickListener(v -> {
+                if (mPreference != null) {
+                    mPreference.setVisible(!mPreference.isVisible());
+                    mBinding.visibilityBtn.setText(mPreference.isVisible() ? "Visible" : "Invisible");
+
+                    if (mUIEventListener != null) {
+                        mUIEventListener.onItemVisibilityButtonClick(getAdapterPosition(), mPreference);
+                    }
+                }
+            });
+
+            mBinding.uninstallBtn.setOnClickListener(v -> {
+                if (mPreference != null && mUIEventListener != null) {
+                    mUIEventListener.onItemUninstallButtonClick(getAdapterPosition(), mPreference);
+                }
+            });
         }
 
         void bind(ColumnPreference preference) {
+            mPreference = preference;
             mBinding.titleTv.setText(preference.getColumn().getName());
             mBinding.descriptionTv.setText(preference.getColumn().getVersion());
+            mBinding.visibilityBtn.setText(mPreference.isVisible() ? "Visible" : "Invisible"); // TODO
         }
     }
 
     public interface UIEventListener {
         void onItemsSwapped();
+        void onItemVisibilityButtonClick(int position, ColumnPreference preference);
+        void onItemUninstallButtonClick(int position, ColumnPreference preference);
     }
 }
