@@ -136,4 +136,17 @@ public class Column implements Parcelable {
             return new Column[size];
         }
     };
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Column) {
+            return id.equals(((Column) obj).getId());
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
 }

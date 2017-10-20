@@ -19,8 +19,10 @@ package cn.nekocode.hot.ui.setting;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -30,6 +32,7 @@ import com.evernote.android.state.StateSaver;
 
 import java.util.ArrayList;
 
+import cn.nekocode.hot.Constants;
 import cn.nekocode.hot.HotApplication;
 import cn.nekocode.hot.R;
 import cn.nekocode.hot.base.BaseActivity;
@@ -38,6 +41,7 @@ import cn.nekocode.hot.data.model.ColumnPreference;
 import cn.nekocode.hot.databinding.ActivityColumnMangerBinding;
 import cn.nekocode.hot.manager.base.BaseColumnManager;
 import cn.nekocode.hot.manager.base.BasePreferenceManager;
+import cn.nekocode.hot.util.CommonUtil;
 import cn.nekocode.hot.util.DividerItemDecoration;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
@@ -52,6 +56,8 @@ public class ColumnManagerActivity extends BaseActivity implements ColumnListAda
     private BaseColumnManager mColumnManager;
     private BasePreferenceManager mPreferenceManager;
     private ColumnListAdapter mAdapter;
+    @State
+    public boolean mIsPreferenceChanged = false;
 
 
     @Override
@@ -109,13 +115,34 @@ public class ColumnManagerActivity extends BaseActivity implements ColumnListAda
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        if (mIsPreferenceChanged) {
+            final ArrayList<Column> orderedColumn = new ArrayList<>();
+            for (ColumnPreference preference : mPreferences) {
+                if (preference.isVisible()) {
+                    orderedColumn.add(preference.getColumn());
+                }
+            }
+
+            // Send local broadcast
+            final Intent intent = new Intent(Constants.ACTION_NOTIFY_COLUMN_PREFERENCE_CHANGED);
+            intent.putParcelableArrayListExtra(Constants.ARG_COLUMNS, orderedColumn);
+            LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        }
+    }
+
+    @Override
     public void onItemsSwapped() {
         mPreferenceManager.saveColumnPreferences(mPreferences);
+        mIsPreferenceChanged = true;
     }
 
     @Override
     public void onItemVisibilityButtonClick(int position, ColumnPreference preference) {
         mPreferenceManager.updateColumnPreferences(preference);
+        mIsPreferenceChanged = true;
     }
 
     @Override
@@ -125,6 +152,7 @@ public class ColumnManagerActivity extends BaseActivity implements ColumnListAda
             mPreferences.remove(position);
             mPreferenceManager.removeColumnPreferences(preference);
             mAdapter.notifyItemRemoved(position);
+            mIsPreferenceChanged = true;
         });
     }
 
@@ -161,7 +189,7 @@ public class ColumnManagerActivity extends BaseActivity implements ColumnListAda
                 .show();
     }
 
-    private void uninstallColumn(Column column, final Runnable successCallback) {
+    private void uninstallColumn(final Column column, final Runnable successCallback) {
         final ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage(getString(R.string.dialog_uninstalling_column));
         progressDialog.setCancelable(false);
@@ -171,16 +199,25 @@ public class ColumnManagerActivity extends BaseActivity implements ColumnListAda
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .compose(bindToLifecycle())
-                .subscribe(column2 -> {
+                .subscribe(isSuccess -> {
+                    if (!isSuccess) {
+                        progressDialog.dismiss();
+                        Toast.makeText(this, R.string.toast_uninstall_column_failed, Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
                     successCallback.run();
                     progressDialog.dismiss();
-                    Toast.makeText(ColumnManagerActivity.this,
-                            R.string.toast_uninstall_column_success, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.toast_uninstall_column_success, Toast.LENGTH_SHORT).show();
+
+                    // Send local broadcast
+                    final Intent intent = new Intent(Constants.ACTION_NOTIFY_COLUMN_UNINSTALLED);
+                    intent.putParcelableArrayListExtra(Constants.ARG_COLUMNS, CommonUtil.toArrayList(column));
+                    LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
 
                 }, throwable -> {
                     progressDialog.dismiss();
-                    Toast.makeText(ColumnManagerActivity.this,
-                            R.string.toast_uninstall_column_failed, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.toast_uninstall_column_failed, Toast.LENGTH_SHORT).show();
                 });
     }
 }

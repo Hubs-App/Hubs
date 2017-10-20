@@ -19,9 +19,13 @@ package cn.nekocode.hot.ui.home;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -35,6 +39,7 @@ import java.util.ArrayList;
 
 import cn.nekocode.hot.ActivityRouter;
 import cn.nekocode.hot.BuildConfig;
+import cn.nekocode.hot.Constants;
 import cn.nekocode.hot.HotApplication;
 import cn.nekocode.hot.R;
 import cn.nekocode.hot.base.BaseActivity;
@@ -43,6 +48,7 @@ import cn.nekocode.hot.databinding.ActivityHomeBinding;
 import cn.nekocode.hot.manager.base.BaseFileManager;
 import cn.nekocode.hot.manager.base.BaseColumnManager;
 import cn.nekocode.hot.manager.base.BasePreferenceManager;
+import cn.nekocode.hot.util.CommonUtil;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
@@ -58,6 +64,7 @@ public class HomeActivity extends BaseActivity {
     private BaseFileManager mFileManager;
     private BaseColumnManager mColumnManager;
     private BasePreferenceManager mPreferenceManager;
+    private final BroadcastReceiver mBroadcastReceiver = new LocalBroadcastReceiver();
 
 
     @Override
@@ -90,12 +97,29 @@ public class HomeActivity extends BaseActivity {
         mBinding.tabs.setupWithViewPager(mBinding.viewPager);
 
         checkIfNeddToInstall(getIntent());
+
+        /*
+          Register local broadcast receiver
+         */
+        final IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(Constants.ACTION_NOTIFY_COLUMN_INSTALLED);
+        intentFilter.addAction(Constants.ACTION_NOTIFY_COLUMN_UNINSTALLED);
+        intentFilter.addAction(Constants.ACTION_NOTIFY_COLUMN_PREFERENCE_CHANGED);
+        LocalBroadcastManager.getInstance(this)
+                .registerReceiver(mBroadcastReceiver, intentFilter);
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         checkIfNeddToInstall(intent);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        LocalBroadcastManager.getInstance(this)
+                .unregisterReceiver(mBroadcastReceiver);
     }
 
     private void loadColumns() {
@@ -203,6 +227,11 @@ public class HomeActivity extends BaseActivity {
                     progressDialog.dismiss();
                     Toast.makeText(HomeActivity.this, R.string.toast_install_column_success, Toast.LENGTH_SHORT).show();
 
+                    // Send local broadcast
+                    final Intent intent = new Intent(Constants.ACTION_NOTIFY_COLUMN_INSTALLED);
+                    intent.putParcelableArrayListExtra(Constants.ARG_COLUMNS, CommonUtil.toArrayList(column));
+                    LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+
                 }, throwable -> {
                     progressDialog.dismiss();
                     Toast.makeText(HomeActivity.this, R.string.toast_install_column_failed, Toast.LENGTH_SHORT).show();
@@ -229,5 +258,37 @@ public class HomeActivity extends BaseActivity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+
+    private class LocalBroadcastReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            final String action = intent.getAction();
+            if (action == null) return;
+
+            ArrayList<Column> columns;
+            switch (action) {
+                case Constants.ACTION_NOTIFY_COLUMN_INSTALLED:
+                    columns = intent.getParcelableArrayListExtra(Constants.ARG_COLUMNS);
+                    mColumns.addAll(columns);
+                    mPagerAdapter.notifyDataSetChanged();
+                    break;
+
+                case Constants.ACTION_NOTIFY_COLUMN_UNINSTALLED:
+                    columns = intent.getParcelableArrayListExtra(Constants.ARG_COLUMNS);
+                    mColumns.removeAll(columns);
+                    mPagerAdapter.notifyDataSetChanged();
+                    break;
+
+                case Constants.ACTION_NOTIFY_COLUMN_PREFERENCE_CHANGED:
+                    columns = intent.getParcelableArrayListExtra(Constants.ARG_COLUMNS);
+                    mColumns.clear();
+                    mColumns.addAll(columns);
+                    mPagerAdapter.notifyDataSetChanged();
+                    break;
+            }
+        }
     }
 }
