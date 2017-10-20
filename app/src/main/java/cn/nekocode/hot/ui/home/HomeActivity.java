@@ -42,6 +42,7 @@ import cn.nekocode.hot.data.model.Column;
 import cn.nekocode.hot.databinding.ActivityHomeBinding;
 import cn.nekocode.hot.manager.base.BaseFileManager;
 import cn.nekocode.hot.manager.base.BaseColumnManager;
+import cn.nekocode.hot.manager.base.BasePreferenceManager;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
@@ -56,6 +57,7 @@ public class HomeActivity extends BaseActivity {
     private ColumnPagerAdapter mPagerAdapter;
     private BaseFileManager mFileManager;
     private BaseColumnManager mColumnManager;
+    private BasePreferenceManager mPreferenceManager;
 
 
     @Override
@@ -65,6 +67,7 @@ public class HomeActivity extends BaseActivity {
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_home);
         mFileManager = HotApplication.getDefaultFileManager(this);
         mColumnManager = HotApplication.getDefaultColumnManager(this);
+        mPreferenceManager = HotApplication.getDefaultPreferenceManager(this);
 
         /*
           Create base directories
@@ -103,8 +106,9 @@ public class HomeActivity extends BaseActivity {
 
         mColumnManager.getAllInstalled()
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
                 .compose(bindToLifecycle())
+                .flatMap(columns -> mPreferenceManager.getOrderedVisibleColumns(columns))
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(columns -> {
                     progressDialog.dismiss();
                     mColumns.clear();
