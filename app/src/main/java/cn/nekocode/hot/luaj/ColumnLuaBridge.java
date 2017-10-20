@@ -64,9 +64,9 @@ public class ColumnLuaBridge {
 
     public Single<ArrayList<Article>> getArticles(int page) {
         return Single.create(emitter -> {
-            final LuaValue func = mLuaGlobals.get("getArticles");
+            final LuaValue func = mLuaGlobals.get("getItems");
             if (func.isnil()) {
-                emitter.tryOnError(new Exception("getArticles return nil"));
+                emitter.tryOnError(new Exception("getItems return nil"));
             }
 
             try {

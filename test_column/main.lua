@@ -11,7 +11,7 @@ function get(url)
     return response:body():string()
 end
 
-function getArticles(page)
+function getItems(page)
     local articleList = ArrayList.new()
     local url = "http://i.jandan.net/?oxwlxojflwblxbsapi=get_recent_post" ..
             "&include=url,date,tags,author,title,excerpt,comment_count,comment_status,custom_fields" ..
