@@ -119,12 +119,12 @@ public abstract class ExFragmentPagerAdapter<T> extends FragmentPagerAdapter {
             int position = 0;
             for (T data : mList) {
                 if (tag.equals(makeFragmentTag(mContainerId, getItemIdByData(data)))) {
-                    break;
+                    return position;
                 }
                 position++;
             }
 
-            return position;
+            return POSITION_NONE;
         }
 
         return super.getItemPosition(object);
