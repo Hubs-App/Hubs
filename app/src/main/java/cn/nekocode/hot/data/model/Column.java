@@ -31,6 +31,7 @@ import java.util.UUID;
  */
 public class Column implements Parcelable {
     public static final String TYPE_ARTICLE = "article";
+    public static final String[] SUPPORTED_TYPES = new String[]{TYPE_ARTICLE};
 
     private UUID id;
     private String name;
