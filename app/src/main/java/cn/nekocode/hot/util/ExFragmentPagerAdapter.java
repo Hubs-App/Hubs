@@ -115,10 +115,13 @@ public abstract class ExFragmentPagerAdapter<T> extends FragmentPagerAdapter {
         if (object instanceof Fragment) {
             final Fragment fragment = (Fragment) object;
             final String tag = fragment.getTag();
+            if (fragment.isDetached() || tag == null) {
+                return POSITION_NONE;
+            }
 
             int position = 0;
             for (T data : mList) {
-                if (tag.equals(makeFragmentTag(mContainerId, getItemIdByData(data)))) {
+                if (tag.equals(makeFragmentTag(mContainerId, getItemId(data)))) {
                     return position;
                 }
                 position++;
@@ -130,12 +133,12 @@ public abstract class ExFragmentPagerAdapter<T> extends FragmentPagerAdapter {
         return super.getItemPosition(object);
     }
 
+    public abstract long getItemId(T data);
+
     @Override
     public final long getItemId(int position) {
-        return getItemIdByData(mList.get(position));
+        return getItemId(mList.get(position));
     }
-
-    public abstract long getItemIdByData(T data);
 
     @Override
     public final int getCount() {
@@ -144,5 +147,32 @@ public abstract class ExFragmentPagerAdapter<T> extends FragmentPagerAdapter {
 
     private static String makeFragmentTag(int viewId, long id) {
         return viewId + ":" + id;
+    }
+
+    /**
+     * Trick:
+     * Manually recreate fragment when corresponding data changed
+     */
+    public void hackRecreateFragment(int position) {
+        final FragmentTransaction transaction = mFragmentManager.beginTransaction();
+
+        final String tag = makeFragmentTag(mContainerId, getItemId(position));
+        final Fragment oldFrg = mFragmentManager.findFragmentByTag(tag);
+        if (oldFrg != null) {
+            final Fragment newFrg = getItem(position);
+            transaction.remove(oldFrg);
+            transaction.add(mContainerId, newFrg, tag);
+
+            if (oldFrg != mCurrentPrimaryItem) {
+                newFrg.setMenuVisibility(false);
+                newFrg.setUserVisibleHint(false);
+
+            } else {
+                newFrg.setMenuVisibility(true);
+                newFrg.setUserVisibleHint(true);
+            }
+        }
+
+        transaction.commitNowAllowingStateLoss();
     }
 }

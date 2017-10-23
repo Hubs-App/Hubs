@@ -49,8 +49,8 @@ public class ColumnPagerAdapter extends ExFragmentPagerAdapter<Column> {
     }
 
     @Override
-    public long getItemIdByData(Column data) {
-        return data.getId().hashCode();
+    public long getItemId(Column data) {
+        return data.hashCode();
     }
 
     @Override

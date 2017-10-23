@@ -281,6 +281,7 @@ public class HomeActivity extends BaseActivity {
                             mColumns.add(column);
                         } else {
                             mColumns.set(index, column);
+                            mPagerAdapter.hackRecreateFragment(index);
                         }
                     }
                     mPagerAdapter.notifyDataSetChanged();
