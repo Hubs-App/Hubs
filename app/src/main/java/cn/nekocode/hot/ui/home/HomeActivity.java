@@ -38,6 +38,7 @@ import com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.UUID;
 
 import cn.nekocode.hot.ActivityRouter;
 import cn.nekocode.hot.BuildConfig;
@@ -47,8 +48,8 @@ import cn.nekocode.hot.R;
 import cn.nekocode.hot.base.BaseActivity;
 import cn.nekocode.hot.data.model.Column;
 import cn.nekocode.hot.databinding.ActivityHomeBinding;
-import cn.nekocode.hot.manager.base.BaseFileManager;
 import cn.nekocode.hot.manager.base.BaseColumnManager;
+import cn.nekocode.hot.manager.base.BaseFileManager;
 import cn.nekocode.hot.manager.base.BasePreferenceManager;
 import cn.nekocode.hot.util.CommonUtil;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -66,7 +67,7 @@ public class HomeActivity extends BaseActivity {
     private BaseFileManager mFileManager;
     private BaseColumnManager mColumnManager;
     private BasePreferenceManager mPreferenceManager;
-    private final BroadcastReceiver mBroadcastReceiver = new LocalBroadcastReceiver();
+    private final BroadcastReceiver mBroadcastReceiver = new HomeBroadcastReceiver();
 
 
     @Override
@@ -107,8 +108,10 @@ public class HomeActivity extends BaseActivity {
         intentFilter.addAction(Constants.ACTION_NOTIFY_COLUMN_INSTALLED);
         intentFilter.addAction(Constants.ACTION_NOTIFY_COLUMN_UNINSTALLED);
         intentFilter.addAction(Constants.ACTION_NOTIFY_COLUMN_PREFERENCE_CHANGED);
+        intentFilter.addAction(Constants.ACTION_DEBUG_REFRESH_COLUMN);
         LocalBroadcastManager.getInstance(this)
                 .registerReceiver(mBroadcastReceiver, intentFilter);
+        registerReceiver(mBroadcastReceiver, intentFilter);
     }
 
     @Override
@@ -122,6 +125,7 @@ public class HomeActivity extends BaseActivity {
         super.onDestroy();
         LocalBroadcastManager.getInstance(this)
                 .unregisterReceiver(mBroadcastReceiver);
+        unregisterReceiver(mBroadcastReceiver);
     }
 
     private void loadColumns() {
@@ -263,7 +267,7 @@ public class HomeActivity extends BaseActivity {
     }
 
 
-    private class LocalBroadcastReceiver extends BroadcastReceiver {
+    private class HomeBroadcastReceiver extends BroadcastReceiver {
 
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -271,10 +275,13 @@ public class HomeActivity extends BaseActivity {
             if (action == null) return;
 
             ArrayList<Column> columns;
+            String columnId;
+            int index;
             switch (action) {
                 case Constants.ACTION_NOTIFY_COLUMN_INSTALLED:
                     columns = intent.getParcelableArrayListExtra(Constants.ARG_COLUMNS);
-                    int index;
+                    if (columns == null) return;
+
                     for (Column column : columns) {
                         index = mColumns.indexOf(column);
                         if (index < 0) {
@@ -289,15 +296,49 @@ public class HomeActivity extends BaseActivity {
 
                 case Constants.ACTION_NOTIFY_COLUMN_UNINSTALLED:
                     columns = intent.getParcelableArrayListExtra(Constants.ARG_COLUMNS);
+                    if (columns == null) return;
+
                     mColumns.removeAll(columns);
                     mPagerAdapter.notifyDataSetChanged();
                     break;
 
                 case Constants.ACTION_NOTIFY_COLUMN_PREFERENCE_CHANGED:
                     columns = intent.getParcelableArrayListExtra(Constants.ARG_COLUMNS);
+                    if (columns == null) return;
+
                     mColumns.clear();
                     mColumns.addAll(columns);
                     mPagerAdapter.notifyDataSetChanged();
+                    break;
+
+                case Constants.ACTION_DEBUG_REFRESH_COLUMN:
+                    columnId = intent.getStringExtra(Constants.ARG_COLUMNID);
+                    if (columnId == null) return;
+
+                    index = 0;
+                    boolean finded = false;
+                    for (Column column : mColumns) {
+                        if (column.getId().toString().equals(columnId)) {
+                            finded = true;
+                            break;
+                        }
+                        index++;
+                    }
+
+                    // Not founded
+                    if (!finded) break;
+
+                    // Refresh column object and recreate page
+                    final int fIndex = index;
+                    mColumnManager.readConfig(UUID.fromString(columnId))
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(column -> {
+                                mColumns.set(fIndex, column);
+                                mPagerAdapter.hackRecreateFragment(fIndex);
+                                mPagerAdapter.notifyDataSetChanged();
+
+                            }, throwable -> {});
                     break;
             }
         }
