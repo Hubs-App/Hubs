@@ -26,7 +26,7 @@ import cn.nekocode.hot.ui.column.ArticleColumnFragment;
 /**
  * @author nekocode (nekocode.cn@gmail.com)
  */
-public abstract class BaseColumnFragment extends BaseFragment {
+public abstract class BaseColumnFragment extends BaseLazyLoadFragment {
     public static final String ARG_COLUMN = "column";
 
     @NonNull

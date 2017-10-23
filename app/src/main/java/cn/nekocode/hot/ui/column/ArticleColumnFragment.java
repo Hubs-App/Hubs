@@ -141,10 +141,15 @@ public class ArticleColumnFragment extends BaseColumnFragment implements SwipeRe
           Setup the refreshlayout
          */
         mBinding.refreshLayout.setOnRefreshListener(this);
-        if (mArticleList.size() == 0) {
-            mBinding.refreshLayout.setRefreshing(true);
-            onRefresh();
-        }
+        mBinding.refreshLayout.setRefreshing(true);
+        doFirstLoad(() -> {
+            if (mArticleList.size() == 0) {
+                mBinding.refreshLayout.setRefreshing(true);
+                onRefresh();
+            } else {
+                mBinding.refreshLayout.setRefreshing(false);
+            }
+        });
     }
 
     @Override

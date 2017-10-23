@@ -20,6 +20,7 @@ package cn.nekocode.hot.ui.home;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.view.ViewGroup;
 
 import java.util.ArrayList;
 
@@ -50,5 +51,13 @@ public class ColumnPagerAdapter extends ExFragmentPagerAdapter<Column> {
     @Override
     public long getItemIdByData(Column data) {
         return data.getId().hashCode();
+    }
+
+    @Override
+    public void setPrimaryItem(ViewGroup container, int position, Object object) {
+        super.setPrimaryItem(container, position, object);
+        if (object instanceof BaseColumnFragment) {
+            ((BaseColumnFragment) object).tryFirstLoad();
+        }
     }
 }
