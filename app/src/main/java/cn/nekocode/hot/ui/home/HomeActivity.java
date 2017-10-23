@@ -274,7 +274,15 @@ public class HomeActivity extends BaseActivity {
             switch (action) {
                 case Constants.ACTION_NOTIFY_COLUMN_INSTALLED:
                     columns = intent.getParcelableArrayListExtra(Constants.ARG_COLUMNS);
-                    mColumns.addAll(columns);
+                    int index;
+                    for (Column column : columns) {
+                        index = mColumns.indexOf(column);
+                        if (index < 0) {
+                            mColumns.add(column);
+                        } else {
+                            mColumns.set(index, column);
+                        }
+                    }
                     mPagerAdapter.notifyDataSetChanged();
                     break;
 
