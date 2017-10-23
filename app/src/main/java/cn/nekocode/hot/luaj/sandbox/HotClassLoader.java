@@ -21,27 +21,41 @@ package cn.nekocode.hot.luaj.sandbox;
  * @author nekocode (nekocode.cn@gmail.com)
  */
 public class HotClassLoader extends ClassLoader {
-    static final String[] PATH_WHITELIST = new String[] {
-            "cn.nekocode.hot.data.model.",
-            "okhttp3.",
-            "org.jsoup.",
+    private static final String[] WHITE_LIST = new String[] {
+            "cn\\.nekocode\\.hot\\.data\\.model\\..*",
+            "okhttp3\\..*",
+            "org\\.jsoup\\..*",
     };
-    static final String[] PATH_BLACKLIST = new String[] {
+    private static final String[] BLACK_LIST = new String[] {
+            "java\\.lang\\.Class",
+            "java\\.lang\\.ClassLoader",
+            "java\\.lang\\.reflect\\..*",
     };
+    private static final String[][] REPLACE_LIST = new String[][] {
+            new String[] {"java\\.io\\.File", "cn.nekocode.hot.luaj.sandbox.ShadowFile"}
+    };
+
 
     @Override
     public Class<?> loadClass(String name) throws ClassNotFoundException {
         // Check black-list
-        for (String path : PATH_BLACKLIST) {
-            if (name.startsWith(path)) {
+        for (String pattern : BLACK_LIST) {
+            if (name.matches(pattern)) {
                 throw new ClassNotFoundException(name);
             }
         }
 
         // Check white-list
-        for (String path : PATH_WHITELIST) {
-            if (name.startsWith(path)) {
+        for (String pattern : WHITE_LIST) {
+            if (name.matches(pattern)) {
                 return Class.forName(name);
+            }
+        }
+
+        // Check replace-list
+        for (String[] pair : REPLACE_LIST) {
+            if (name.matches(pair[0])) {
+                return Class.forName(pair[1]);
             }
         }
 
