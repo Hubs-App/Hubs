@@ -325,17 +325,19 @@ public class HomeActivity extends BaseActivity {
                         index++;
                     }
 
-                    // Not founded
-                    if (!finded) break;
-
                     // Refresh column object and recreate page
                     final int fIndex = index;
+                    final boolean fFinded = finded;
                     mColumnManager.readConfig(UUID.fromString(columnId))
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(column -> {
-                                mColumns.set(fIndex, column);
-                                mPagerAdapter.hackRecreateFragment(fIndex);
+                                if (!fFinded) {
+                                    mColumns.add(column);
+                                } else {
+                                    mColumns.set(fIndex, column);
+                                    mPagerAdapter.hackRecreateFragment(fIndex);
+                                }
                                 mPagerAdapter.notifyDataSetChanged();
 
                             }, throwable -> {});
