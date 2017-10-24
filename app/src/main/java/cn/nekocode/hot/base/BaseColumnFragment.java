@@ -19,6 +19,8 @@ package cn.nekocode.hot.base;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.widget.Toast;
 
 import cn.nekocode.hot.data.model.Column;
 import cn.nekocode.hot.ui.column.ArticleColumnFragment;
@@ -28,6 +30,9 @@ import cn.nekocode.hot.ui.column.ArticleColumnFragment;
  */
 public abstract class BaseColumnFragment extends BaseLazyLoadFragment {
     public static final String ARG_COLUMN = "column";
+
+    private Column mColumn;
+
 
     @NonNull
     public static BaseColumnFragment newInstance(@NonNull Column column) {
@@ -47,10 +52,20 @@ public abstract class BaseColumnFragment extends BaseLazyLoadFragment {
         return fragment;
     }
 
-    @NonNull
-    public static Column getColumnFromBundle(@NonNull Bundle bundle) {
-        final Column column = bundle.getParcelable(ARG_COLUMN);
-        if (column == null) throw new RuntimeException("getColumnFromBundle() failed.");
-        return column;
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mColumn = getArguments().getParcelable(ARG_COLUMN);
+        if (mColumn == null) throw new RuntimeException("Get column from arguments failed.");
+    }
+
+    public Column getColumn() {
+        return mColumn;
+    }
+
+    public void showMessageIfInDebug(@NonNull String message) {
+        if (mColumn.isDebug()) {
+            Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+        }
     }
 }
