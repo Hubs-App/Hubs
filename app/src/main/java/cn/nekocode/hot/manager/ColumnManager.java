@@ -62,14 +62,8 @@ public class ColumnManager extends BaseColumnManager {
     public Single<Column> readConfig(@NonNull File packageFile) {
         return Single.create(emitter -> {
             try {
-                final Column column = Column.fromLua(
-                        ZipUtil.readStringFromZip(packageFile, COLUMN_CONFIG_PATH), mGlobals);
-
-                if (checkIsTypeSupported(column.getType())) {
-                    emitter.onSuccess(column);
-                } else {
-                    emitter.tryOnError(new Exception("Not supported column type."));
-                }
+                emitter.onSuccess(
+                        Column.fromLua(ZipUtil.readStringFromZip(packageFile, COLUMN_CONFIG_PATH), mGlobals));
 
             } catch (Exception e) {
                 emitter.tryOnError(e);
@@ -82,13 +76,8 @@ public class ColumnManager extends BaseColumnManager {
     public Single<Column> readConfig(@NonNull UUID columnId) {
         return Single.create(emitter -> {
             try {
-                final Column column = Column.fromLua(readConfigToString(columnId), mGlobals);
-
-                if (checkIsTypeSupported(column.getType())) {
-                    emitter.onSuccess(column);
-                } else {
-                    emitter.tryOnError(new Exception("Not supported column type."));
-                }
+                emitter.onSuccess(
+                        Column.fromLua(readConfigToString(columnId), mGlobals));
 
             } catch (Exception e) {
                 emitter.tryOnError(e);
@@ -126,16 +115,6 @@ public class ColumnManager extends BaseColumnManager {
 
             }
         }
-    }
-
-    private boolean checkIsTypeSupported(String columnType) {
-        for (String supportedType : Column.SUPPORTED_TYPES) {
-            if (supportedType.equals(columnType)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     @Override

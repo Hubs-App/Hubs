@@ -22,6 +22,7 @@ import android.os.Parcelable;
 
 import org.luaj.vm2.Globals;
 import org.luaj.vm2.LoadState;
+import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.compiler.LuaC;
 
 import java.util.UUID;
@@ -38,27 +39,39 @@ public class Column implements Parcelable {
     private String type;
     private String version;
     private String entry;
+    private boolean debug;
 
 
-    public static Column fromLua(String luaText) {
-        final Globals globals = new Globals();
-        LoadState.install(globals);
-        LuaC.install(globals);
-
-        return fromLua(luaText, globals);
-    }
-
-    public static Column fromLua(String luaText, Globals globals) {
+    public static Column fromLua(String luaText, Globals globals) throws Exception {
         globals.load(luaText).call();
 
         final Column column = new Column();
         column.setId(UUID.fromString(globals.get("uuid").checkjstring()));
         column.setName(globals.get("name").checkjstring());
-        column.setType(globals.get("type").checkjstring());
+
+        final String type = globals.get("type").checkjstring();
+        if (checkIsTypeSupported(type)) {
+            column.setType(type);
+        } else {
+            throw new Exception("Not supported column type.");
+        }
+
         column.setVersion(globals.get("version").checkjstring());
         column.setEntry(globals.get("entry").checkjstring());
 
+        final LuaValue debug = globals.get("debug");
+        column.setDebug(!debug.isnil() && debug.checkboolean());
+
         return column;
+    }
+
+    private static boolean checkIsTypeSupported(String columnType) {
+        for (String supportedType : SUPPORTED_TYPES) {
+            if (supportedType.equals(columnType)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public UUID getId() {
@@ -101,6 +114,14 @@ public class Column implements Parcelable {
         this.entry = entry;
     }
 
+    public boolean isDebug() {
+        return debug;
+    }
+
+    public void setDebug(boolean debug) {
+        this.debug = debug;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -113,6 +134,7 @@ public class Column implements Parcelable {
         dest.writeString(this.type);
         dest.writeString(this.version);
         dest.writeString(this.entry);
+        dest.writeByte(this.debug ? (byte) 1 : 0);
     }
 
     public Column() {
@@ -124,6 +146,7 @@ public class Column implements Parcelable {
         this.type = in.readString();
         this.version = in.readString();
         this.entry = in.readString();
+        this.debug = (in.readByte() == 1);
     }
 
     public static final Creator<Column> CREATOR = new Creator<Column>() {
