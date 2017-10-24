@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package cn.nekocode.hot.luaj;
+package cn.nekocode.hot.luaj.sandbox;
 
 import org.luaj.vm2.Globals;
 import org.luaj.vm2.LoadState;
@@ -34,28 +34,52 @@ import org.luaj.vm2.lib.jse.LuajavaLib;
 import java.io.File;
 import java.io.FileInputStream;
 
-import cn.nekocode.hot.luaj.sandbox.HotClassLoader;
 
 /**
  * @author nekocode (nekocode.cn@gmail.com)
  */
 public class HotLuaGlobals extends Globals {
 
-    static {
-        LuajavaLib.sClassLoader = new HotClassLoader();
-    }
-
     public HotLuaGlobals(final File baseDir) {
-        install();
+        final PathValidator validator = path -> {
+            final File file = new File(path);
+
+            if (file.isAbsolute()) {
+                // Skip absolute path
+                return null;
+            }
+            if (path.contains("../")) {
+                // Skip insecurity path
+                return null;
+            }
+
+            return new File(baseDir, path).getAbsolutePath();
+        };
+
+        load(new BaseLib());
+        load(new PackageLib());
+        load(new Bit32Lib());
+        load(new OsLib());
+        load(new MathLib());
+        load(new TableLib());
+        load(new StringLib());
+        load(new CoroutineLib());
+        load(new LuajavaLib(new HotClassLoader()));
+        load(new HotIoLib(validator));
+
+        LoadState.install(this);
+        LuaC.install(this);
+
 
         this.finder = path -> {
-            if (path.contains("../")) {
-                // Skip the file if its path is not security
+            final String absolutePath = validator.validate(path);
+            if (absolutePath == null) {
+                // Not a legal path
                 return null;
             }
 
             try {
-                final File file = new File(baseDir, path);
+                final File file = new File(absolutePath);
                 if (file.exists()) {
                     return new FileInputStream(file);
                 }
@@ -65,20 +89,5 @@ public class HotLuaGlobals extends Globals {
             }
             return null;
         };
-    }
-
-    private void install() {
-        load(new BaseLib());
-        load(new PackageLib());
-        load(new Bit32Lib());
-        load(new OsLib());
-        load(new MathLib());
-        load(new TableLib());
-        load(new StringLib());
-        load(new CoroutineLib());
-        load(new LuajavaLib());
-
-        LoadState.install(this);
-        LuaC.install(this);
     }
 }

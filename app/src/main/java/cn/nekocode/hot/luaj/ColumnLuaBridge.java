@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import cn.nekocode.hot.HotApplication;
 import cn.nekocode.hot.data.model.Article;
 import cn.nekocode.hot.data.model.Column;
+import cn.nekocode.hot.luaj.sandbox.HotLuaGlobals;
 import io.reactivex.Single;
 import okhttp3.OkHttpClient;
 

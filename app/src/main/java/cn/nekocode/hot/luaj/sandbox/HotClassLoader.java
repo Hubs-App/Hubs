@@ -30,9 +30,9 @@ public class HotClassLoader extends ClassLoader {
             "java\\.lang\\.Class",
             "java\\.lang\\.ClassLoader",
             "java\\.lang\\.reflect\\..*",
+            "java\\.io\\.File",
     };
     private static final String[][] REPLACE_LIST = new String[][] {
-            new String[] {"java\\.io\\.File", "cn.nekocode.hot.luaj.sandbox.ShadowFile"}
     };
 
 

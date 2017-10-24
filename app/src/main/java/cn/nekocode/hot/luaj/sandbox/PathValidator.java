@@ -17,16 +17,9 @@
 
 package cn.nekocode.hot.luaj.sandbox;
 
-import android.support.annotation.NonNull;
-
-import java.io.File;
-
 /**
  * @author nekocode (nekocode.cn@gmail.com)
  */
-public class ShadowFile extends File {
-
-    public ShadowFile(@NonNull String pathname) {
-        super(pathname);
-    }
+public interface PathValidator {
+    String validate(String path);
 }
