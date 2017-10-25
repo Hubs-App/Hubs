@@ -15,7 +15,7 @@ def get_column_id():
     with open('config.lua', 'r') as src_file:
         for line in src_file.readlines():
             pair = line.split('=')
-            if pair[0] == 'uuid':
+            if pair[0] == 'UUID':
                 return line.split('=')[1].strip()[1:-1]
 
     return None
