@@ -39,6 +39,7 @@ public class Column implements Parcelable {
     private String type;
     private String version;
     private String entry;
+    private String browser;
     private boolean debug = false;
     private ColumnExtra extra = new ColumnExtra();
 
@@ -55,7 +56,7 @@ public class Column implements Parcelable {
         LuaValue key = LuaValue.NIL;
         LuaValue value;
         String keyStr;
-        for (int i = 0; true; i ++) {
+        while (true) {
             pair = table.next(key);
             if ((key = pair.arg1()).isnil())
                 break;
@@ -96,6 +97,10 @@ public class Column implements Parcelable {
                     column.setEntry(value.checkjstring());
                     break;
 
+                case "BROWSER":
+                    column.setBrowser(value.checkjstring());
+                    break;
+
                 case "DEBUG":
                     column.setDebug(value.checkboolean());
                     break;
@@ -118,6 +123,7 @@ public class Column implements Parcelable {
         globals.set("TYPE", type);
         globals.set("VERSION", version);
         globals.set("ENTRY", entry);
+        if (browser != null) globals.set("BROWSER", browser);
         globals.set("DEBUG", debug ? LuaValue.TRUE : LuaValue.FALSE);
         extra.setAllTo(globals);
     }
@@ -162,6 +168,14 @@ public class Column implements Parcelable {
         this.entry = entry;
     }
 
+    public String getBrowser() {
+        return browser;
+    }
+
+    public void setBrowser(String browser) {
+        this.browser = browser;
+    }
+
     public boolean isDebug() {
         return debug;
     }
@@ -186,6 +200,7 @@ public class Column implements Parcelable {
         dest.writeString(this.type);
         dest.writeString(this.version);
         dest.writeString(this.entry);
+        dest.writeString(this.browser);
         dest.writeByte(this.debug ? (byte) 1 : 0);
         dest.writeParcelable(this.extra, flags);
     }
@@ -199,6 +214,7 @@ public class Column implements Parcelable {
         this.type = in.readString();
         this.version = in.readString();
         this.entry = in.readString();
+        this.browser = in.readString();
         this.debug = (in.readByte() == 1);
         this.extra.clear();
         this.extra.putAll(in.readParcelable(ColumnExtra.class.getClassLoader()));
