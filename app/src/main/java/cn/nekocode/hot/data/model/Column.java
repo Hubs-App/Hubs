@@ -22,10 +22,20 @@ import android.os.Parcelable;
 
 import org.luaj.vm2.Globals;
 import org.luaj.vm2.LoadState;
+import org.luaj.vm2.LuaBoolean;
+import org.luaj.vm2.LuaDouble;
+import org.luaj.vm2.LuaInteger;
+import org.luaj.vm2.LuaNumber;
+import org.luaj.vm2.LuaString;
+import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
+import org.luaj.vm2.Varargs;
 import org.luaj.vm2.compiler.LuaC;
 
+import java.util.HashMap;
 import java.util.UUID;
+
+import cn.nekocode.hot.util.CommonUtil;
 
 /**
  * @author nekocode (nekocode.cn@gmail.com)
@@ -39,28 +49,69 @@ public class Column implements Parcelable {
     private String type;
     private String version;
     private String entry;
-    private boolean debug;
+    private boolean debug = false;
+    private HashMap<String, Object> extra = new HashMap<>();
 
 
     public static Column fromLua(String luaText, Globals globals) throws Exception {
+        final Column column = new Column();
         globals.load(luaText).call();
 
-        final Column column = new Column();
-        column.setId(UUID.fromString(globals.get("uuid").checkjstring()));
-        column.setName(globals.get("name").checkjstring());
+        final LuaTable table = globals.checktable();
+        Varargs pair;
+        LuaValue key = LuaValue.NIL;
+        LuaValue value;
+        String keyStr;
+        for (int i = 0; true; i ++) {
+            pair = table.next(key);
+            if ((key = pair.arg1()).isnil())
+                break;
 
-        final String type = globals.get("type").checkjstring();
-        if (checkIsTypeSupported(type)) {
-            column.setType(type);
-        } else {
-            throw new Exception("Not supported column type.");
+            value = pair.arg(2);
+            keyStr = key.checkjstring();
+            switch (keyStr) {
+                case "uuid":
+                    column.setId(UUID.fromString(value.checkjstring()));
+                    break;
+
+                case "name":
+                    column.setName(value.checkjstring());
+                    break;
+
+                case "type":
+                    final String type = value.checkjstring();
+                    if (checkIsTypeSupported(type)) {
+                        column.setType(type);
+                    } else {
+                        throw new Exception("Not supported column type.");
+                    }
+                    break;
+
+                case "version":
+                    column.setVersion(value.checkjstring());
+                    break;
+
+                case "entry":
+                    column.setEntry(value.checkjstring());
+                    break;
+
+                case "debug":
+                    column.setDebug(value.checkboolean());
+                    break;
+
+                default:
+                    if (value instanceof LuaDouble) {
+                        column.extra.put(keyStr, value.todouble());
+                    } else if (value instanceof LuaInteger) {
+                        column.extra.put(keyStr, value.toint());
+                    } else if (value instanceof LuaString) {
+                        column.extra.put(keyStr, value.tojstring());
+                    } else if (value instanceof LuaBoolean) {
+                        column.extra.put(keyStr, value.toboolean());
+                    }
+                    break;
+            }
         }
-
-        column.setVersion(globals.get("version").checkjstring());
-        column.setEntry(globals.get("entry").checkjstring());
-
-        final LuaValue debug = globals.get("debug");
-        column.setDebug(!debug.isnil() && debug.checkboolean());
 
         return column;
     }
@@ -122,6 +173,10 @@ public class Column implements Parcelable {
         this.debug = debug;
     }
 
+    public HashMap<String, Object> getExtra() {
+        return extra;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -135,6 +190,7 @@ public class Column implements Parcelable {
         dest.writeString(this.version);
         dest.writeString(this.entry);
         dest.writeByte(this.debug ? (byte) 1 : 0);
+        CommonUtil.writeToParcel(this.extra, dest, flags);
     }
 
     public Column() {
@@ -147,6 +203,8 @@ public class Column implements Parcelable {
         this.version = in.readString();
         this.entry = in.readString();
         this.debug = (in.readByte() == 1);
+        this.extra.clear();
+        this.extra.putAll(CommonUtil.createFromParcel(in));
     }
 
     public static final Creator<Column> CREATOR = new Creator<Column>() {
