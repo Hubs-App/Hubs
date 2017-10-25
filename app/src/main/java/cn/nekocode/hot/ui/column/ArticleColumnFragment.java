@@ -38,7 +38,7 @@ import cn.nekocode.hot.R;
 import cn.nekocode.hot.base.BaseColumnFragment;
 import cn.nekocode.hot.data.model.Article;
 import cn.nekocode.hot.databinding.FragmentArticleColumnBinding;
-import cn.nekocode.hot.luaj.ColumnLuaBridge;
+import cn.nekocode.hot.luaj.EntryLuaBridge;
 import cn.nekocode.hot.util.DividerItemDecoration;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
@@ -55,13 +55,14 @@ public class ArticleColumnFragment extends BaseColumnFragment implements SwipeRe
     @State
     public int mPage;
 
-    private ColumnLuaBridge mLuaBridge;
+    private EntryLuaBridge mLuaBridge;
 
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         StateSaver.restoreInstanceState(this, savedInstanceState);
+        mLuaBridge = EntryLuaBridge.create(getContext(), getColumn());
 
         /*
           Data initialize
@@ -154,7 +155,7 @@ public class ArticleColumnFragment extends BaseColumnFragment implements SwipeRe
     public void onRefresh() {
         mPage = 0;
 
-        getColumnLuaBridge().getArticles(0)
+        mLuaBridge.getArticles(0)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .to(AutoDispose.with(AndroidLifecycleScopeProvider.from(this)).forSingle())
@@ -194,7 +195,7 @@ public class ArticleColumnFragment extends BaseColumnFragment implements SwipeRe
         mBottomItem.setLoading(true);
         mAdapter.notifyItemChanged(mArticleList.size() - 1);
 
-        getColumnLuaBridge().getArticles(page)
+        mLuaBridge.getArticles(page)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .to(AutoDispose.with(AndroidLifecycleScopeProvider.from(this)).forSingle())
@@ -221,12 +222,5 @@ public class ArticleColumnFragment extends BaseColumnFragment implements SwipeRe
 
                     showMessageIfInDebug(throwable.getMessage());
                 });
-    }
-
-    private ColumnLuaBridge getColumnLuaBridge() {
-        if (mLuaBridge == null) {
-            mLuaBridge = ColumnLuaBridge.load(getContext(), getColumn());
-        }
-        return mLuaBridge;
     }
 }

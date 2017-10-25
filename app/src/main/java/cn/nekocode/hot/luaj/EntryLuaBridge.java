@@ -19,7 +19,9 @@ package cn.nekocode.hot.luaj;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
+import org.luaj.vm2.Globals;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 import org.luaj.vm2.lib.jse.CoerceLuaToJava;
@@ -37,38 +39,43 @@ import okhttp3.OkHttpClient;
 /**
  * @author nekocode (nekocode.cn@gmail.com)
  */
-public class ColumnLuaBridge {
-    private HotLuaGlobals mLuaGlobals;
+public class EntryLuaBridge {
+    private Context mContext;
     private Column mColumn;
+    @Nullable
+    private Globals mLuaGlobals;
 
 
-    public static ColumnLuaBridge load(@NonNull Context context, @NonNull Column column) {
-        final File columnDir =
-                HotApplication.getDefaultFileManager(context).getColumnDirectory(column.getId());
-        return new ColumnLuaBridge(context, new HotLuaGlobals(columnDir), column);
+    public static EntryLuaBridge create(@NonNull Context context, @NonNull Column column) {
+        final EntryLuaBridge bridge = new EntryLuaBridge();
+        bridge.mContext = context;
+        bridge.mColumn = column;
+        return bridge;
     }
 
-    private ColumnLuaBridge() {
+    private EntryLuaBridge() {
     }
 
-    private ColumnLuaBridge(Context context, HotLuaGlobals luaGlobals, Column column) {
-        mLuaGlobals = luaGlobals;
-        mColumn = column;
+    @NonNull
+    private Globals getGlobals() {
+        if (mLuaGlobals == null) {
+            final File columnDir =
+                    HotApplication.getDefaultFileManager(mContext).getColumnDirectory(mColumn.getId());
+            mLuaGlobals = new HotLuaGlobals(columnDir);
 
-        try {
-            column.setAllTo(luaGlobals);
+            mColumn.setAllTo(mLuaGlobals);
 
-            final OkHttpClient client = HotApplication.getDefaultOkHttpClient(context);
-            luaGlobals.loadfile(column.getEntry()).call(CoerceJavaToLua.coerce(client));
-
-        } catch (Exception e) {
-            e.printStackTrace();
+            final OkHttpClient client = HotApplication.getDefaultOkHttpClient(mContext);
+            mLuaGlobals.loadfile(mColumn.getEntry()).call(CoerceJavaToLua.coerce(client));
         }
+
+        return mLuaGlobals;
     }
 
+    @NonNull
     public Single<ArrayList<Article>> getArticles(int page) {
         return Single.create(emitter -> {
-            final LuaValue func = mLuaGlobals.get("getItems");
+            final LuaValue func = getGlobals().get("getItems");
             if (func.isnil()) {
                 emitter.tryOnError(new Exception("getItems return nil"));
             }
