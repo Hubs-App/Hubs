@@ -22,6 +22,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.luaj.vm2.Globals;
+import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 import org.luaj.vm2.lib.jse.CoerceLuaToJava;
@@ -76,8 +77,8 @@ public class EntryLuaBridge {
     public Single<ArrayList<Article>> getArticles(int page) {
         return Single.create(emitter -> {
             final LuaValue func = getGlobals().get("getItems");
-            if (func.isnil()) {
-                emitter.tryOnError(new Exception("getItems return nil"));
+            if (func.isnil() || !func.isfunction()) {
+                emitter.tryOnError(new Exception("Function getItems not found."));
             }
 
             try {
