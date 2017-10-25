@@ -88,7 +88,7 @@ public class ArticleColumnFragment extends BaseColumnFragment implements SwipeRe
         mAdapter.setUIEventListener(new ArticleListAdapter.UIEventListener() {
             @Override
             public void onItemClicked(Article article) {
-                ActivityRouter.IMPL.gotoBrowser(getContext(), article.getUrl());
+                ActivityRouter.IMPL.gotoBrowser(getContext(), getColumn(), article.getUrl());
             }
 
             @Override

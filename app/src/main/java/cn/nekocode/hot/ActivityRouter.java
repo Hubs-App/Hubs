@@ -19,8 +19,12 @@ package cn.nekocode.hot;
 
 import android.content.Context;
 
+import cn.nekocode.hot.data.model.Column;
+import cn.nekocode.hot.ui.browser.BrowserActivity;
 import cn.nekocode.meepo.Meepo;
+import cn.nekocode.meepo.annotation.Bundle;
 import cn.nekocode.meepo.annotation.Query;
+import cn.nekocode.meepo.annotation.TargetClass;
 import cn.nekocode.meepo.annotation.TargetPath;
 import cn.nekocode.meepo.config.UriConfig;
 
@@ -33,7 +37,10 @@ public interface ActivityRouter {
             .build().create(ActivityRouter.class);
 
     @TargetPath("browser")
-    boolean gotoBrowser(Context context, @Query("url") String url);
+    boolean gotoBrowser(Context context, @Query("column_id") String columnId, @Query("url") String url);
+
+    @TargetClass(BrowserActivity.class)
+    boolean gotoBrowser(Context context, @Bundle("column") Column column, @Bundle("url") String url);
 
     @TargetPath("setting")
     boolean gotoSetting(Context context);
