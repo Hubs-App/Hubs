@@ -56,8 +56,11 @@ public class ColumnLuaBridge {
         mColumn = column;
 
         try {
+            column.setAllTo(luaGlobals);
+
             final OkHttpClient client = HotApplication.getDefaultOkHttpClient(context);
-            mLuaGlobals.loadfile(mColumn.getEntry()).call(CoerceJavaToLua.coerce(client));
+            luaGlobals.loadfile(column.getEntry()).call(CoerceJavaToLua.coerce(client));
+
         } catch (Exception e) {
             e.printStackTrace();
         }
