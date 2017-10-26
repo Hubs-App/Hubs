@@ -31,6 +31,7 @@
                 app:tabIndicatorHeight="6dp"
                 app:tabMode="scrollable"
                 app:tabSelectedTextColor="@android:color/darker_gray"
+                app:tabTextAppearance="@style/CustomTabLayoutTextAppearance"
                 app:tabTextColor="@android:color/white"
                 />
 
