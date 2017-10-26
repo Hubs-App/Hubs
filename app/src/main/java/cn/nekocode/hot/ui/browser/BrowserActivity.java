@@ -249,7 +249,7 @@ public class BrowserActivity extends BaseActivity {
                     columnId = intent.getStringExtra(Constants.ARG_COLUMNID);
                     if (columnId == null) return;
 
-                    if (!mColumn.getId().toString().equals(columnId)) {
+                    if (!mColumn.getId().toString().equalsIgnoreCase(columnId)) {
                         break;
                     }
 

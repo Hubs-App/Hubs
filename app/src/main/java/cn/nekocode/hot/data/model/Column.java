@@ -81,7 +81,7 @@ public class Column implements Parcelable {
                     final String type = value.checkjstring();
                     boolean isTypeSupported = false;
                     for (String supportedType : SUPPORTED_TYPES) {
-                        if (supportedType.equals(type)) {
+                        if (supportedType.equalsIgnoreCase(type)) {
                             isTypeSupported = true;
                             break;
                         }

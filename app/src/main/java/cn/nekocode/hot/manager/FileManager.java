@@ -94,10 +94,10 @@ public class FileManager extends BaseFileManager {
     @NonNull
     public Single<File> getFile(@NonNull Context context, @NonNull Uri uri) {
         final String scheme = uri.getScheme();
-        final boolean isFile = SCHEME_FILE.equals(scheme);
-        final boolean isContent = SCHEME_CONTENT.equals(scheme);
-        final boolean isHttp = SCHEME_HTTP.equals(scheme);
-        final boolean isHttps = SCHEME_HTTPS.equals(scheme);
+        final boolean isFile = SCHEME_FILE.equalsIgnoreCase(scheme);
+        final boolean isContent = SCHEME_CONTENT.equalsIgnoreCase(scheme);
+        final boolean isHttp = SCHEME_HTTP.equalsIgnoreCase(scheme);
+        final boolean isHttps = SCHEME_HTTPS.equalsIgnoreCase(scheme);
 
         if (isFile || isContent) {
             /*

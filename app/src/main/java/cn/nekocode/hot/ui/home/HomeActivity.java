@@ -153,7 +153,7 @@ public class HomeActivity extends BaseActivity {
 
     private void checkIfNeddToInstall(Intent intent) {
         if (!Intent.ACTION_VIEW.equals(intent.getAction()) ||
-                intent.getData() == null || BuildConfig.SCHEME.equals(intent.getScheme())) {
+                intent.getData() == null || BuildConfig.SCHEME.equalsIgnoreCase(intent.getScheme())) {
 
             return;
         }
@@ -318,7 +318,7 @@ public class HomeActivity extends BaseActivity {
                     index = 0;
                     boolean finded = false;
                     for (Column column : mColumns) {
-                        if (column.getId().toString().equals(columnId)) {
+                        if (column.getId().toString().equalsIgnoreCase(columnId)) {
                             finded = true;
                             break;
                         }
