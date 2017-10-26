@@ -124,13 +124,14 @@ public class ArticleListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             mData = article;
 
             if (!TextUtils.isEmpty(article.getCoverUrl())) {
+                mBinding.coverView.setVisibility(View.VISIBLE);
                 Picasso.with(itemView.getContext())
                         .load(article.getCoverUrl())
                         .centerCrop()
                         .fit()
                         .into(mBinding.coverView);
             } else {
-                mBinding.coverView.setImageDrawable(null);
+                mBinding.coverView.setVisibility(View.GONE);
             }
 
             mBinding.titleView.setText(article.getTitle());
