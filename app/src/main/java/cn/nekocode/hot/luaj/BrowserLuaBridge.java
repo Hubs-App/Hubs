@@ -44,6 +44,8 @@ public class BrowserLuaBridge {
 
 
     public static BrowserLuaBridge create(@NonNull Context context, @NonNull Column column) {
+        if (column.getBrowser() == null) return null;
+
         final BrowserLuaBridge bridge = new BrowserLuaBridge();
         bridge.mContext = context;
         bridge.mColumn = column;

@@ -31,6 +31,7 @@ public class HotWebViewClient extends WebViewClient {
     private static final String SCHEME_APP = BuildConfig.SCHEME;
     private static final String SCHEME_HTTP = "http";
     private static final String SCHEME_HTTPS = "https";
+    private WebViewCallback mCallback;
 
 
     @Override
@@ -38,21 +39,28 @@ public class HotWebViewClient extends WebViewClient {
         final Uri uri = Uri.parse(url);
         final String scheme = uri.getScheme();
 
-        if (SCHEME_HTTP.equals(scheme) || SCHEME_HTTPS.equals(scheme)) {
-            return false;
+        if (SCHEME_HTTP.equalsIgnoreCase(scheme) || SCHEME_HTTPS.equalsIgnoreCase(scheme)) {
+            return mCallback != null ?
+                    mCallback.shouldOverrideUrlLoading(view, url) : super.shouldOverrideUrlLoading(view, url);
 
-        } else if (SCHEME_APP.equals(scheme)) {
+        } else if (SCHEME_APP.equalsIgnoreCase(scheme)) {
             try {
                 final Intent intent = new Intent(Intent.ACTION_VIEW, uri);
                 view.getContext().startActivity(intent);
                 return true;
 
             } catch (Exception e) {
-                return false;
+                return mCallback != null ?
+                        mCallback.shouldOverrideUrlLoading(view, url) : super.shouldOverrideUrlLoading(view, url);
             }
 
         } else {
-            return super.shouldOverrideUrlLoading(view, url);
+            return mCallback != null ?
+                    mCallback.shouldOverrideUrlLoading(view, url) : super.shouldOverrideUrlLoading(view, url);
         }
+    }
+
+    public void setCallback(WebViewCallback callback) {
+        this.mCallback = callback;
     }
 }

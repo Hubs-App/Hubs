@@ -29,6 +29,9 @@ import android.webkit.WebView;
  * @author nekocode (nekocode.cn@gmail.com)
  */
 public class HotWebView extends WebView {
+    private HotWebViewClient mWebViewClient;
+    private WebViewCallback mCallback;
+
 
     public HotWebView(Context context) {
         super(context);
@@ -63,6 +66,23 @@ public class HotWebView extends WebView {
             settings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
         }
 
-        setWebViewClient(new HotWebViewClient());
+        mWebViewClient = new HotWebViewClient();
+        setWebViewClient(mWebViewClient);
+    }
+
+    public void setCallback(WebViewCallback callback) {
+        this.mCallback = callback;
+        mWebViewClient.setCallback(callback);
+    }
+
+    /**
+     * This method will call shouldOverrideUrlLoading() before loadUrl()
+     */
+    public void loadUrl2(String url) {
+        if (mWebViewClient.shouldOverrideUrlLoading(this, url)) {
+            return;
+        }
+
+        loadUrl(url);
     }
 }

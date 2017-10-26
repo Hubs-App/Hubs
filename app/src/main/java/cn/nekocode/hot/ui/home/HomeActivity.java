@@ -102,7 +102,7 @@ public class HomeActivity extends BaseActivity {
         checkIfNeddToInstall(getIntent());
 
         /*
-          Register local broadcast receiver
+          Register broadcast receiver
          */
         final IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(Constants.ACTION_NOTIFY_COLUMN_INSTALLED);
@@ -331,6 +331,7 @@ public class HomeActivity extends BaseActivity {
                     mColumnManager.readConfig(UUID.fromString(columnId))
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
+                            .to(AutoDispose.with(AndroidLifecycleScopeProvider.from(HomeActivity.this)).forSingle())
                             .subscribe(column -> {
                                 if (!fFinded) {
                                     mColumns.add(column);

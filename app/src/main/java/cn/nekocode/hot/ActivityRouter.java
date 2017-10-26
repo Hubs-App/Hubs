@@ -37,6 +37,9 @@ public interface ActivityRouter {
             .build().create(ActivityRouter.class);
 
     @TargetPath("browser")
+    boolean gotoBrowser(Context context, @Query("url") String url);
+
+    @TargetPath("browser")
     boolean gotoBrowser(Context context, @Query("column_id") String columnId, @Query("url") String url);
 
     @TargetClass(BrowserActivity.class)
