@@ -110,7 +110,7 @@ public class BrowserActivity extends BaseActivity {
         final IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(Constants.ACTION_NOTIFY_COLUMN_UNINSTALLED);
         intentFilter.addAction(Constants.ACTION_NOTIFY_COLUMN_PREFERENCE_CHANGED);
-        intentFilter.addAction(Constants.ACTION_DEBUG_REFRESH_COLUMN);
+        intentFilter.addAction(Constants.ACTION_NOTIFY_COLUMN_CONFIG_CHANGED);
         LocalBroadcastManager.getInstance(this)
                 .registerReceiver(mBroadcastReceiver, intentFilter);
         registerReceiver(mBroadcastReceiver, intentFilter);
@@ -245,7 +245,7 @@ public class BrowserActivity extends BaseActivity {
 
                     break;
 
-                case Constants.ACTION_DEBUG_REFRESH_COLUMN:
+                case Constants.ACTION_NOTIFY_COLUMN_CONFIG_CHANGED:
                     columnId = intent.getStringExtra(Constants.ARG_COLUMNID);
                     if (columnId == null) return;
 

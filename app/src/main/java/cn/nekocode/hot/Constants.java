@@ -27,10 +27,10 @@ public interface Constants {
     String ACTION_NOTIFY_COLUMN_PREFERENCE_CHANGED = ACTION_PREFIX + "NOTIFY_COLUMN_PREFERENCE_CHANGED";
 
     /**
-     * For debug. You can run the following command to refresh a column page immediately.
-     * adb shell "am broadcast -a cn.nekocode.hot.action.DEBUG_REFRESH_COLUMN -e column_id '$column_id'"
+     * You can run the following command to refresh a column page immediately.
+     * adb shell "am broadcast -a cn.nekocode.hot.action.NOTIFY_COLUMN_CONFIG_CHANGED -e column_id '$column_id'"
      */
-    String ACTION_DEBUG_REFRESH_COLUMN = ACTION_PREFIX + "DEBUG_REFRESH_COLUMN";
+    String ACTION_NOTIFY_COLUMN_CONFIG_CHANGED = ACTION_PREFIX + "NOTIFY_COLUMN_CONFIG_CHANGED";
 
 
     String ARG_COLUMNS = "columns";

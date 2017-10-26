@@ -27,7 +27,7 @@ def sync_files(column_id):
 
 
 def broadcast(column_id):
-    run_cmd('adb shell "am broadcast -a cn.nekocode.hot.action.DEBUG_REFRESH_COLUMN -e column_id \'%s\'"' % column_id)
+    run_cmd('adb shell "am broadcast -a cn.nekocode.hot.action.NOTIFY_COLUMN_CONFIG_CHANGED -e column_id \'%s\'"' % column_id)
 
 
 def main():
