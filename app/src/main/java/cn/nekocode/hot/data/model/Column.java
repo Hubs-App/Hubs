@@ -21,9 +21,10 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import org.luaj.vm2.Globals;
-import org.luaj.vm2.LuaTable;
+import org.luaj.vm2.LoadState;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.Varargs;
+import org.luaj.vm2.compiler.LuaC;
 
 import java.util.UUID;
 
@@ -47,17 +48,21 @@ public class Column implements Parcelable {
     /**
      * Create column from a lua script text
      */
-    public static Column fromLua(String luaText, Globals globals) throws Exception {
+    public static Column fromLua(String luaText) throws Exception {
+        // Obatain a lua globals for loading configs
+        final Globals globals = new Globals();
+        LoadState.install(globals);
+        LuaC.install(globals);
+
         final Column column = new Column();
         globals.load(luaText).call();
 
-        final LuaTable table = globals.checktable();
         Varargs pair;
         LuaValue key = LuaValue.NIL;
         LuaValue value;
         String keyStr;
         while (true) {
-            pair = table.next(key);
+            pair = globals.next(key);
             if ((key = pair.arg1()).isnil())
                 break;
 

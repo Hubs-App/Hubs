@@ -63,7 +63,7 @@ public class ColumnManager extends BaseColumnManager {
         return Single.create(emitter -> {
             try {
                 emitter.onSuccess(
-                        Column.fromLua(ZipUtil.readStringFromZip(packageFile, COLUMN_CONFIG_PATH), mGlobals));
+                        Column.fromLua(ZipUtil.readStringFromZip(packageFile, COLUMN_CONFIG_PATH)));
 
             } catch (Exception e) {
                 emitter.tryOnError(e);
@@ -77,7 +77,7 @@ public class ColumnManager extends BaseColumnManager {
         return Single.create(emitter -> {
             try {
                 emitter.onSuccess(
-                        Column.fromLua(readConfigToString(columnId), mGlobals));
+                        Column.fromLua(readConfigToString(columnId)));
 
             } catch (Exception e) {
                 emitter.tryOnError(e);
@@ -194,7 +194,8 @@ public class ColumnManager extends BaseColumnManager {
                 for (File child : columnsDir.listFiles()) {
                     if (child.isDirectory()) {
                         try {
-                            column = Column.fromLua(readConfigToString(UUID.fromString(child.getName())), mGlobals);
+                            column = Column.fromLua(
+                                    readConfigToString(UUID.fromString(child.getName())));
                             columns.add(column);
                         } catch (Exception ignored) {
                             // Just skip this column if load failed
