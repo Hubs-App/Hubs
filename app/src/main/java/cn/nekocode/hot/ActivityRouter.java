@@ -21,6 +21,7 @@ import android.content.Context;
 
 import cn.nekocode.hot.data.model.Column;
 import cn.nekocode.hot.ui.browser.BrowserActivity;
+import cn.nekocode.hot.ui.setting.ColumnConfigActivity;
 import cn.nekocode.meepo.Meepo;
 import cn.nekocode.meepo.annotation.Bundle;
 import cn.nekocode.meepo.annotation.Query;
@@ -50,4 +51,7 @@ public interface ActivityRouter {
 
     @TargetPath("column_manager")
     boolean gotoColumnManager(Context context);
+
+    @TargetClass(ColumnConfigActivity.class)
+    boolean gotoColumnConfig(Context context, @Bundle("column") Column column);
 }

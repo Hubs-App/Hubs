@@ -34,6 +34,7 @@ import com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider;
 
 import java.util.ArrayList;
 
+import cn.nekocode.hot.ActivityRouter;
 import cn.nekocode.hot.Constants;
 import cn.nekocode.hot.HotApplication;
 import cn.nekocode.hot.R;
@@ -139,6 +140,11 @@ public class ColumnManagerActivity extends BaseActivity implements ColumnListAda
     public void onItemsSwapped() {
         mPreferenceManager.saveColumnPreferences(mPreferences);
         mIsPreferenceChanged = true;
+    }
+
+    @Override
+    public void onItemConfigButtonClick(int position, ColumnPreference preference) {
+        ActivityRouter.IMPL.gotoColumnConfig(this, preference.getColumn());
     }
 
     @Override

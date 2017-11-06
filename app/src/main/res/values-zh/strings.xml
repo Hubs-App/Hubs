@@ -2,6 +2,7 @@
     <string name="app_name">Hot</string>
     <string name="setting">配置</string>
     <string name="column_manager">Column 管理器</string>
+    <string name="column_config">Column 配置</string>
 
     <string name="yes">是的</string>
     <string name="cancel">取消</string>

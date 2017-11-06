@@ -17,6 +17,7 @@
 
 package cn.nekocode.hot.ui.setting;
 
+import android.annotation.SuppressLint;
 import android.databinding.DataBindingUtil;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -132,6 +133,7 @@ public class ColumnListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         private ColumnPreference mPreference;
 
 
+        @SuppressLint("ClickableViewAccessibility")
         ColumnViewHolder(View itemView) {
             super(itemView);
             mBinding = DataBindingUtil.bind(itemView);
@@ -143,6 +145,12 @@ public class ColumnListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                         return true;
                 }
                 return false;
+            });
+
+            mBinding.configBtn.setOnClickListener(v -> {
+                if (mPreference != null && mUIEventListener != null) {
+                    mUIEventListener.onItemConfigButtonClick(getAdapterPosition(), mPreference);
+                }
             });
 
             mBinding.visibilityBtn.setOnClickListener(v -> {
@@ -173,6 +181,7 @@ public class ColumnListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     public interface UIEventListener {
         void onItemsSwapped();
+        void onItemConfigButtonClick(int position, ColumnPreference preference);
         void onItemVisibilityButtonClick(int position, ColumnPreference preference);
         void onItemUninstallButtonClick(int position, ColumnPreference preference);
     }

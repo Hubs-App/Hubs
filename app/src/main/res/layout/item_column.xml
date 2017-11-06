@@ -21,7 +21,8 @@
             android:text="Uninstall"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent"
+            />
 
         <TextView
             android:id="@+id/titleTv"
@@ -36,9 +37,10 @@
             app:layout_constraintBottom_toTopOf="@+id/descriptionTv"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintLeft_toRightOf="@+id/uninstallBtn"
-            app:layout_constraintRight_toLeftOf="@+id/visibilityBtn"
+            app:layout_constraintRight_toLeftOf="@+id/configBtn"
             app:layout_constraintTop_toTopOf="@+id/uninstallBtn"
-            tools:text="Column Title"/>
+            tools:text="Column Title"
+            />
 
         <TextView
             android:id="@+id/descriptionTv"
@@ -52,7 +54,8 @@
             app:layout_constraintLeft_toLeftOf="@+id/titleTv"
             app:layout_constraintRight_toRightOf="@+id/titleTv"
             app:layout_constraintTop_toBottomOf="@+id/titleTv"
-            tools:text="Column Version"/>
+            tools:text="Column Version"
+            />
 
         <TextView
             android:id="@+id/reorderBtn"
@@ -66,7 +69,8 @@
             android:text="Reorder"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent"
+            />
 
         <TextView
             android:id="@+id/visibilityBtn"
@@ -80,7 +84,23 @@
             android:text="Visible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toLeftOf="@+id/reorderBtn"
-            app:layout_constraintTop_toTopOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent"
+            />
+
+        <TextView
+            android:id="@+id/configBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="8dp"
+            android:gravity="center_vertical"
+            android:text="Config"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toLeftOf="@+id/visibilityBtn"
+            app:layout_constraintTop_toTopOf="parent"
+            />
 
     </android.support.constraint.ConstraintLayout>
 
