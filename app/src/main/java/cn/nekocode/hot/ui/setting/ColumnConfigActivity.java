@@ -49,6 +49,7 @@ public class ColumnConfigActivity extends BaseActivity implements ConfigProperty
         super.onCreate(savedInstanceState);
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_column_config);
         mColumn = getIntent().getParcelableExtra("column");
+        mColumn.getUserConfig().put("NAME", mColumn.getName());
 
         /*
           View initialize
@@ -74,7 +75,6 @@ public class ColumnConfigActivity extends BaseActivity implements ConfigProperty
      */
     private static ArrayList<Pair<String, Object>> listOf(Column column) {
         final ArrayList<Pair<String, Object>> list = new ArrayList<>();
-        list.add(Pair.create("NAME", column.getName()));
         for (Map.Entry<String, Object> entry : column.getUserConfig().entrySet()) {
             list.add(Pair.create(entry.getKey(), entry.getValue()));
         }
