@@ -75,7 +75,7 @@ public class ColumnConfigActivity extends BaseActivity implements ConfigProperty
     private static ArrayList<Pair<String, Object>> listOf(Column column) {
         final ArrayList<Pair<String, Object>> list = new ArrayList<>();
         list.add(Pair.create("NAME", column.getName()));
-        for (Map.Entry<String, Object> entry : column.getExtra().entrySet()) {
+        for (Map.Entry<String, Object> entry : column.getUserConfig().entrySet()) {
             list.add(Pair.create(entry.getKey(), entry.getValue()));
         }
         Collections.sort(list, (o1, o2) -> o1.first.compareTo(o2.first));

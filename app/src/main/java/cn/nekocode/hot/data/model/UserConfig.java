@@ -33,7 +33,7 @@ import java.util.Map;
 /**
  * @author nekocode (nekocode.cn@gmail.com)
  */
-public class ColumnExtra extends HashMap<String, Object> implements Parcelable {
+public class UserConfig extends HashMap<String, Object> implements Parcelable {
 
     /**
      * Put LuaValue to map
@@ -121,10 +121,10 @@ public class ColumnExtra extends HashMap<String, Object> implements Parcelable {
         }
     }
 
-    public ColumnExtra() {
+    public UserConfig() {
     }
 
-    protected ColumnExtra(Parcel in) {
+    protected UserConfig(Parcel in) {
         final int size = in.readInt();
 
         for (int i = 0; i < size; i++) {
@@ -156,15 +156,15 @@ public class ColumnExtra extends HashMap<String, Object> implements Parcelable {
         }
     }
 
-    public static final Creator<ColumnExtra> CREATOR = new Creator<ColumnExtra>() {
+    public static final Creator<UserConfig> CREATOR = new Creator<UserConfig>() {
         @Override
-        public ColumnExtra createFromParcel(Parcel source) {
-            return new ColumnExtra(source);
+        public UserConfig createFromParcel(Parcel source) {
+            return new UserConfig(source);
         }
 
         @Override
-        public ColumnExtra[] newArray(int size) {
-            return new ColumnExtra[size];
+        public UserConfig[] newArray(int size) {
+            return new UserConfig[size];
         }
     };
 }

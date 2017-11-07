@@ -42,7 +42,7 @@ public class Column implements Parcelable {
     private String entry;
     private String browser;
     private boolean debug = false;
-    private ColumnExtra extra = new ColumnExtra();
+    private UserConfig userConfig = new UserConfig();
 
 
     /**
@@ -111,7 +111,7 @@ public class Column implements Parcelable {
                     break;
 
                 default:
-                    column.extra.put(keyStr, value);
+                    column.userConfig.put(keyStr, value);
                     break;
             }
         }
@@ -130,7 +130,7 @@ public class Column implements Parcelable {
         globals.set("ENTRY", entry);
         if (browser != null) globals.set("BROWSER", browser);
         globals.set("DEBUG", debug ? LuaValue.TRUE : LuaValue.FALSE);
-        extra.setAllTo(globals);
+        userConfig.setAllTo(globals);
     }
 
     public UUID getId() {
@@ -189,8 +189,8 @@ public class Column implements Parcelable {
         this.debug = debug;
     }
 
-    public ColumnExtra getExtra() {
-        return extra;
+    public UserConfig getUserConfig() {
+        return userConfig;
     }
 
     @Override
@@ -207,7 +207,7 @@ public class Column implements Parcelable {
         dest.writeString(this.entry);
         dest.writeString(this.browser);
         dest.writeByte(this.debug ? (byte) 1 : 0);
-        dest.writeParcelable(this.extra, flags);
+        dest.writeParcelable(this.userConfig, flags);
     }
 
     public Column() {
@@ -221,8 +221,8 @@ public class Column implements Parcelable {
         this.entry = in.readString();
         this.browser = in.readString();
         this.debug = (in.readByte() == 1);
-        this.extra.clear();
-        this.extra.putAll(in.readParcelable(ColumnExtra.class.getClassLoader()));
+        this.userConfig.clear();
+        this.userConfig.putAll(in.readParcelable(UserConfig.class.getClassLoader()));
     }
 
     public static final Creator<Column> CREATOR = new Creator<Column>() {
