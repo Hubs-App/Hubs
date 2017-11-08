@@ -15,10 +15,12 @@ android {
         def SCHEME = "hot"
         def COLUMN_EXTENSION = "column"
         def COLUMN_CONFIG_PATH = "config.lua"
+        def COLUMN_USER_CONFIG_PATH = "user_config.lua"
 
         buildConfigField "String", "SCHEME", "\"$SCHEME\""
         buildConfigField "String", "COLUMN_EXTENSION", "\"$COLUMN_EXTENSION\""
         buildConfigField "String", "COLUMN_CONFIG_PATH", "\"$COLUMN_CONFIG_PATH\""
+        buildConfigField "String", "COLUMN_USER_CONFIG_PATH", "\"$COLUMN_USER_CONFIG_PATH\""
 
         manifestPlaceholders = [
                 APPLICATION_ID: applicationId,

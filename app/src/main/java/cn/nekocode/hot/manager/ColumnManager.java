@@ -45,6 +45,7 @@ import io.reactivex.Single;
  */
 public class ColumnManager extends BaseColumnManager {
     private static final String COLUMN_CONFIG_PATH = BuildConfig.COLUMN_CONFIG_PATH;
+    private static final String COLUMN_USER_CONFIG_PATH = BuildConfig.COLUMN_USER_CONFIG_PATH;
     private final Globals mGlobals;
 
 
@@ -85,14 +86,12 @@ public class ColumnManager extends BaseColumnManager {
         });
     }
 
-    private String readConfigToString(UUID columnId) throws IOException {
+    private String readFileToString(File file) throws IOException {
         InputStream in = null;
         ByteArrayOutputStream out = null;
 
         try {
-            final File configFile = new File(getFileManager().getColumnDirectory(columnId), COLUMN_CONFIG_PATH);
-
-            in = new FileInputStream(configFile);
+            in = new FileInputStream(file);
             out = new ByteArrayOutputStream(1024);
 
             byte buffer[] = new byte[1024];
@@ -115,6 +114,20 @@ public class ColumnManager extends BaseColumnManager {
 
             }
         }
+    }
+
+    private String readConfigToString(UUID columnId) throws IOException {
+        final File columnDirectory = getFileManager().getColumnDirectory(columnId);
+        // Read default config
+        String configStr = readFileToString(new File(columnDirectory, COLUMN_CONFIG_PATH));
+
+        final File userConfig = new File(columnDirectory, COLUMN_USER_CONFIG_PATH);
+        if (userConfig.exists()) {
+            // Read user config if exists
+            configStr += "\n\n" + readFileToString(userConfig);
+        }
+
+        return configStr;
     }
 
     @Override
