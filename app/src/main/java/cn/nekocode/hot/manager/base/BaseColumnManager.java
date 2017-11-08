@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.UUID;
 
 import cn.nekocode.hot.data.model.Column;
+import cn.nekocode.hot.data.model.UserConfig;
+import io.reactivex.Completable;
 import io.reactivex.Single;
 
 /**
@@ -53,6 +55,11 @@ public abstract class BaseColumnManager {
      */
     @NonNull
     public abstract Single<Column> readConfig(@NonNull UUID columnId);
+
+    /**
+     * Write user config to file
+     */
+    public abstract Completable writeUserConfig(@NonNull UUID columnId, @NonNull UserConfig config);
 
     /**
      * Install column

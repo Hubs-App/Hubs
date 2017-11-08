@@ -29,15 +29,19 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import cn.nekocode.hot.BuildConfig;
 import cn.nekocode.hot.data.model.Column;
+import cn.nekocode.hot.data.model.UserConfig;
 import cn.nekocode.hot.manager.base.BaseFileManager;
 import cn.nekocode.hot.manager.base.BaseColumnManager;
 import cn.nekocode.hot.util.ZipUtil;
+import io.reactivex.Completable;
 import io.reactivex.Single;
 
 /**
@@ -128,6 +132,54 @@ public class ColumnManager extends BaseColumnManager {
         }
 
         return configStr;
+    }
+
+    @Override
+    public Completable writeUserConfig(@NonNull UUID columnId, @NonNull UserConfig config) {
+        return Completable.create(emitter -> {
+            PrintWriter writer = null;
+
+            try {
+                final File userConfig = new File(
+                        getFileManager().getColumnDirectory(columnId), COLUMN_USER_CONFIG_PATH);
+
+                // Recreate new user config file
+                do {
+                    userConfig.deleteOnExit();
+                } while (!userConfig.createNewFile());
+
+                // Write to file
+                writer = new PrintWriter(userConfig);
+                Object value;
+                String line;
+                for (Map.Entry<String, Object> entry : config.entrySet()) {
+                    value = entry.getValue();
+                    line = entry.getKey() + "=";
+
+                    if (value instanceof String) {
+                        line += "\"" + value + "\"";
+
+                    } else if (value instanceof Integer || value instanceof Long ||
+                            value instanceof Float || value instanceof Double || value instanceof Byte) {
+                        line += String.valueOf(value);
+
+                    } else if (value instanceof Boolean) {
+                        line += ((Boolean) value) ? "true" : "false";
+                    }
+
+                    writer.println(line);
+                }
+                emitter.onComplete();
+
+            } catch (Exception e) {
+                emitter.tryOnError(e);
+
+            } finally {
+                if (writer != null) {
+                    writer.close();
+                }
+            }
+        });
     }
 
     @Override
