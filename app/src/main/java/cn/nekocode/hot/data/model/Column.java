@@ -116,6 +116,8 @@ public class Column implements Parcelable {
             }
         }
 
+        column.checkProperties();
+
         return column;
     }
 
@@ -131,6 +133,15 @@ public class Column implements Parcelable {
         if (browser != null) globals.set("BROWSER", browser);
         globals.set("DEBUG", debug ? LuaValue.TRUE : LuaValue.FALSE);
         userConfig.setAllTo(globals);
+    }
+
+    /**
+     * Check if all necessary properties is assigned
+     */
+    public void checkProperties() throws Exception {
+        if (id == null || name == null ||type == null || version == null || entry == null) {
+            throw new Exception("Not all necessary properties in the column have been assigned.");
+        }
     }
 
     public UUID getId() {
