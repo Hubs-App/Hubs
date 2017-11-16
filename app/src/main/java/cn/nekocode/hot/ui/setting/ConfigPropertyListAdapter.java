@@ -25,6 +25,7 @@ import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 
 import java.util.List;
 
@@ -98,19 +99,63 @@ public class ConfigPropertyListAdapter extends RecyclerView.Adapter<RecyclerView
         void bind(String key, Object value) {
             mBinding.keyTv.setText(key + " = ");
 
+            final EditText valueEt = mBinding.valueEt;
+            String valueStr = "";
             if (value instanceof String) {
-                mBinding.valueEt.setText("\"" + value + "\"");
+                valueStr = "\"" + value + "\"";
 
             } else if (value instanceof Integer || value instanceof Long ||
                     value instanceof Float || value instanceof Double || value instanceof Byte) {
-                mBinding.valueEt.setText(String.valueOf(value));
+                valueStr = String.valueOf(value);
 
             } else if (value instanceof Boolean) {
-                mBinding.valueEt.setText(((Boolean) value) ? "true" : "false");
+                valueStr = ((Boolean) value) ? "true" : "false";
             }
+
+            // Save the value to tag
+            valueEt.setTag(R.id.tag_property_old_value, valueStr);
+
+            valueEt.setText(valueStr);
+            valueEt.setOnFocusChangeListener((v, hasFocus) -> {
+                final String oldValue = (String) valueEt.getTag(R.id.tag_property_old_value);
+                final String newValue = valueEt.getText().toString();
+
+                if (!hasFocus && mUIEventListener != null && !oldValue.equals(newValue)) {
+                    // If the value is changed
+                    mUIEventListener.onValueEdited(key, new RevertibleEditText() {
+                        @Override
+                        public String getText() {
+                            return valueEt.getText().toString();
+                        }
+
+                        @Override
+                        public void setText(String text) {
+                            valueEt.setText(text);
+                        }
+
+                        @Override
+                        public void revert() {
+                            // Revert to the old value
+                            final String oldValue = (String) valueEt.getTag(R.id.tag_property_old_value);
+                            valueEt.setText(oldValue);
+                        }
+                    });
+
+                    // Save current value to tag
+                    valueEt.setTag(R.id.tag_property_old_value, valueEt.getText().toString());
+                }
+            });
         }
     }
 
+
     public interface UIEventListener {
+        void onValueEdited(String key, RevertibleEditText valueEt);
+    }
+
+    public interface RevertibleEditText {
+        String getText();
+        void setText(String text);
+        void revert();
     }
 }

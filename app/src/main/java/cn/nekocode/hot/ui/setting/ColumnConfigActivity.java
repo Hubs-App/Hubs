@@ -22,6 +22,16 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.Pair;
 import android.view.MenuItem;
+import android.widget.EditText;
+
+import org.luaj.vm2.Globals;
+import org.luaj.vm2.LoadState;
+import org.luaj.vm2.LuaBoolean;
+import org.luaj.vm2.LuaDouble;
+import org.luaj.vm2.LuaInteger;
+import org.luaj.vm2.LuaString;
+import org.luaj.vm2.LuaValue;
+import org.luaj.vm2.compiler.LuaC;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,6 +48,7 @@ import cn.nekocode.hot.util.DividerItemDecoration;
  * @author nekocode (nekocode.cn@gmail.com)
  */
 public class ColumnConfigActivity extends BaseActivity implements ConfigPropertyListAdapter.UIEventListener {
+    private Globals mGlobals = new Globals();
     private ActivityColumnConfigBinding mBinding;
     public Column mColumn;
     public List<Pair<String, Object>> mProperties;
@@ -50,6 +61,11 @@ public class ColumnConfigActivity extends BaseActivity implements ConfigProperty
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_column_config);
         mColumn = getIntent().getParcelableExtra("column");
         mColumn.getUserConfig().put("NAME", mColumn.getName());
+
+        // Setup lua globals
+        LoadState.install(mGlobals);
+        LuaC.install(mGlobals);
+        mColumn.setAllTo(mGlobals);
 
         /*
           View initialize
@@ -68,6 +84,7 @@ public class ColumnConfigActivity extends BaseActivity implements ConfigProperty
         mBinding.recyclerView.setAdapter(mAdapter);
         mBinding.recyclerView.setItemAnimator(null);
         mBinding.recyclerView.addItemDecoration(DividerItemDecoration.obtainDefault(this));
+        mBinding.getRoot().setFocusableInTouchMode(true);
     }
 
     /**
@@ -91,6 +108,45 @@ public class ColumnConfigActivity extends BaseActivity implements ConfigProperty
 
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public void onValueEdited(String key, ConfigPropertyListAdapter.RevertibleEditText valueEt) {
+        /*
+          Check if the value is legal
+         */
+        boolean failed = false;
+        try {
+            mGlobals.load("rlt=" + valueEt.getText()).call();
+            final LuaValue rlt = mGlobals.get("rlt");
+            if (!rlt.isnil()) {
+                // Legal
+                if (rlt instanceof LuaDouble) {
+                    valueEt.setText(String.valueOf(rlt.todouble()));
+                } else if (rlt instanceof LuaInteger) {
+                    valueEt.setText(String.valueOf(rlt.toint()));
+                } else if (rlt instanceof LuaString) {
+                    valueEt.setText("\"" + rlt.tojstring() + "\"");
+                } else if (rlt instanceof LuaBoolean) {
+                    valueEt.setText(rlt.toboolean() ? "true" : "false");
+                } else {
+                    // Not primitive type
+                    failed = true;
+                }
+
+            } else {
+                // Ilegal
+                failed = true;
+            }
+
+        } catch (Exception e) {
+            // Ilegal
+            failed = true;
+        }
+
+        if (failed) {
+            valueEt.revert();
         }
     }
 }
