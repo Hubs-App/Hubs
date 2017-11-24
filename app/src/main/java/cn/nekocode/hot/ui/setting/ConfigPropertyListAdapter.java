@@ -21,11 +21,9 @@ import android.annotation.SuppressLint;
 import android.databinding.DataBindingUtil;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 
 import java.util.List;
 
@@ -37,12 +35,12 @@ import cn.nekocode.hot.databinding.ItemConfigPropertyBinding;
  */
 public class ConfigPropertyListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private static final int TYPE_PROPERTY = 0;
-    private List<Pair<String, Object>> mProperties;
+    private List<PropertyVO> mList;
     private UIEventListener mUIEventListener;
 
 
-    public ConfigPropertyListAdapter(@NonNull List<Pair<String, Object>> properties) {
-        this.mProperties = properties;
+    public ConfigPropertyListAdapter(@NonNull List<PropertyVO> list) {
+        this.mList = list;
     }
 
     public UIEventListener getUIEventListener() {
@@ -68,16 +66,14 @@ public class ConfigPropertyListAdapter extends RecyclerView.Adapter<RecyclerView
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        final Pair<String, Object> entry = mProperties.get(position);
-
         if (holder instanceof ColumnViewHolder) {
-            ((ColumnViewHolder) holder).bind(entry.first, entry.second);
+            ((ColumnViewHolder) holder).bind(mList.get(position));
         }
     }
 
     @Override
     public int getItemCount() {
-        return mProperties.size();
+        return mList.size();
     }
 
     @Override
@@ -96,53 +92,19 @@ public class ConfigPropertyListAdapter extends RecyclerView.Adapter<RecyclerView
         }
 
         @SuppressLint("SetTextI18n")
-        void bind(String key, Object value) {
-            mBinding.keyTv.setText(key + " = ");
+        void bind(PropertyVO vo) {
+            mBinding.keyTv.setText(vo.getKey() + " = ");
 
-            final EditText valueEt = mBinding.valueEt;
-            String valueStr = "";
-            if (value instanceof String) {
-                valueStr = "\"" + value + "\"";
-
-            } else if (value instanceof Integer || value instanceof Long ||
-                    value instanceof Float || value instanceof Double || value instanceof Byte) {
-                valueStr = String.valueOf(value);
-
-            } else if (value instanceof Boolean) {
-                valueStr = ((Boolean) value) ? "true" : "false";
-            }
-
-            // Save the value to tag
-            valueEt.setTag(R.id.tag_property_old_value, valueStr);
-
-            valueEt.setText(valueStr);
+            final PropertyEditText valueEt = mBinding.valueEt;
+            valueEt.setVO(vo);
             valueEt.setOnFocusChangeListener((v, hasFocus) -> {
-                final String oldValue = (String) valueEt.getTag(R.id.tag_property_old_value);
-                final String newValue = valueEt.getText().toString();
+                if (!hasFocus && mUIEventListener != null &&
+                        !vo.getOldValue().equals(valueEt.getText().toString())) {
 
-                if (!hasFocus && mUIEventListener != null && !oldValue.equals(newValue)) {
-                    // If the value is changed
-                    mUIEventListener.onValueEdited(key, new RevertibleEditText() {
-                        @Override
-                        public String getText() {
-                            return valueEt.getText().toString();
-                        }
-
-                        @Override
-                        public void setText(String text) {
-                            valueEt.setText(text);
-                        }
-
-                        @Override
-                        public void revert() {
-                            // Revert to the old value
-                            final String oldValue = (String) valueEt.getTag(R.id.tag_property_old_value);
-                            valueEt.setText(oldValue);
-                        }
-                    });
-
-                    // Save current value to tag
-                    valueEt.setTag(R.id.tag_property_old_value, valueEt.getText().toString());
+                    // Tell the listener to process the vo
+                    mUIEventListener.onValueEdited(vo);
+                    // Reset value
+                    valueEt.resetText(vo.getValue());
                 }
             });
         }
@@ -150,12 +112,6 @@ public class ConfigPropertyListAdapter extends RecyclerView.Adapter<RecyclerView
 
 
     public interface UIEventListener {
-        void onValueEdited(String key, RevertibleEditText valueEt);
-    }
-
-    public interface RevertibleEditText {
-        String getText();
-        void setText(String text);
-        void revert();
+        void onValueEdited(PropertyVO vo);
     }
 }

@@ -23,7 +23,7 @@
             tools:text="Property = "
             />
 
-        <EditText
+        <cn.nekocode.hot.ui.setting.PropertyEditText
             android:id="@+id/valueEt"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

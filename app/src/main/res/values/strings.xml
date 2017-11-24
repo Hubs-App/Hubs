@@ -9,6 +9,7 @@
     <string name="load_more">LOAD MORE</string>
     <string name="reload">RELOAD</string>
     <string name="loading">LOADING…</string>
+    <string name="saving">SAVING…</string>
 
     <string name="setting_category_title_column">Column Setting</string>
     <string name="setting_category_title_browser">Browser Setting</string>
@@ -20,6 +21,8 @@
     <string name="toast_install_column_success">Install success</string>
     <string name="toast_uninstall_column_failed">Uninstall Column failed</string>
     <string name="toast_uninstall_column_success">Uninstall success</string>
+    <string name="toast_save_config_failed">Save config failed</string>
+
     <string name="dialog_checking_column">Checking Column…</string>
     <string name="dialog_ensure_install_column">Are you sure to install this Column [name:\"%1$s\" version \"%2$s\"] ?</string>
     <string name="dialog_ensure_uninstall_column">Are you sure to uninstall this Column [name:\"%1$s\" version \"%2$s\"] ?</string>

@@ -144,9 +144,11 @@ public class ColumnManager extends BaseColumnManager {
                         getFileManager().getColumnDirectory(columnId), COLUMN_USER_CONFIG_PATH);
 
                 // Recreate new user config file
-                do {
-                    userConfig.deleteOnExit();
-                } while (!userConfig.createNewFile());
+                for (int i = 0; i < 3 && !userConfig.delete();) { i ++; }
+                if (!userConfig.createNewFile()) {
+                    emitter.tryOnError(new Exception("Recreate new user config file failed"));
+                    return;
+                }
 
                 // Write to file
                 writer = new PrintWriter(userConfig);

@@ -9,6 +9,7 @@
     <string name="load_more">加载更多</string>
     <string name="reload">重新加载</string>
     <string name="loading">正在加载…</string>
+    <string name="saving">正在保存…</string>
 
     <string name="setting_category_title_column">Column 配置</string>
     <string name="setting_category_title_browser">浏览器配置</string>
@@ -20,6 +21,8 @@
     <string name="toast_install_column_success">安装成功</string>
     <string name="toast_uninstall_column_failed">卸载 Column 失败</string>
     <string name="toast_uninstall_column_success">卸载成功</string>
+    <string name="toast_save_config_failed">保存配置失败</string>
+
     <string name="dialog_checking_column">正在检查 Column…</string>
     <string name="dialog_ensure_install_column">你确定要安装这个 Column [name:\"%1$s\" version \"%2$s\"] 么？</string>
     <string name="dialog_ensure_uninstall_column">你确定要卸载这个 Column [name:\"%1$s\" version \"%2$s\"] 么？</string>
