@@ -65,12 +65,12 @@ dependencies {
     compile "com.uber.autodispose:autodispose-android-archcomponents:$AUTO_DISPOSE_VERSION"
 
     // Network
-    compile 'com.squareup.okhttp3:okhttp:3.8.1'
+    compile 'com.squareup.okhttp3:okhttp:3.9.1'
     compile 'com.squareup.picasso:picasso:2.5.2'
 
     // Others
     compile 'org.jsoup:jsoup:1.10.3'
-    compile "com.github.nekocode:Meepo:0.1.6"
+    compile "com.github.nekocode:Meepo:0.2.0"
     compile 'com.evernote:android-state:1.1.6'
     annotationProcessor 'com.evernote:android-state-processor:1.1.6'
 
