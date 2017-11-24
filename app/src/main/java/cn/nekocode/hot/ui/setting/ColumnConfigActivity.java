@@ -49,6 +49,7 @@ import cn.nekocode.hot.data.model.Column;
 import cn.nekocode.hot.databinding.ActivityColumnConfigBinding;
 import cn.nekocode.hot.manager.base.BaseColumnManager;
 import cn.nekocode.hot.util.DividerItemDecoration;
+import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
@@ -213,8 +214,21 @@ public class ColumnConfigActivity extends BaseActivity implements ConfigProperty
         progressDialog.setCancelable(false);
         progressDialog.show();
 
-        mColumnManager.writeUserConfig(mColumn.getId(), mColumn.getUserConfig())
+        Single.<Column>create(emitter -> {
+            // Process the rest of edited values
+            for (PropertyVO vo : mPropertyVOs) {
+                if (vo.isFoucused()) {
+                    onValueEdited(vo);
+                }
+            }
+
+            emitter.onSuccess(mColumn);
+        })
                 .subscribeOn(Schedulers.io())
+                .flatMapCompletable(column ->
+                        mColumnManager.writeUserConfig(column.getId(), column.getUserConfig())
+                                .subscribeOn(Schedulers.io())
+                )
                 .observeOn(AndroidSchedulers.mainThread())
                 .to(AutoDispose.with(AndroidLifecycleScopeProvider.from(this)).forCompletable())
                 .subscribe(() -> {
