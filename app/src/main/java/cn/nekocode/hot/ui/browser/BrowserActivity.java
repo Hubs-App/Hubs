@@ -221,7 +221,6 @@ public class BrowserActivity extends BaseActivity {
 
             ArrayList<Column> columns;
             String columnId;
-            int index;
             switch (action) {
                 case Constants.ACTION_NOTIFY_COLUMN_UNINSTALLED:
                     columns = intent.getParcelableArrayListExtra(Constants.ARG_COLUMNS);
