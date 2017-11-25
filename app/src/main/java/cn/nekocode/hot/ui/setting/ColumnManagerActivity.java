@@ -19,10 +19,8 @@ package cn.nekocode.hot.ui.setting;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -35,10 +33,10 @@ import com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider;
 import java.util.ArrayList;
 
 import cn.nekocode.hot.ActivityRouter;
-import cn.nekocode.hot.Constants;
 import cn.nekocode.hot.HotApplication;
 import cn.nekocode.hot.R;
 import cn.nekocode.hot.base.BaseActivity;
+import cn.nekocode.hot.broadcast.BroadcastRouter;
 import cn.nekocode.hot.data.model.Column;
 import cn.nekocode.hot.data.model.ColumnPreference;
 import cn.nekocode.hot.databinding.ActivityColumnMangerBinding;
@@ -130,9 +128,7 @@ public class ColumnManagerActivity extends BaseActivity implements ColumnListAda
             }
 
             // Send local broadcast
-            final Intent intent = new Intent(Constants.ACTION_NOTIFY_COLUMN_PREFERENCE_CHANGED);
-            intent.putParcelableArrayListExtra(Constants.ARG_COLUMNS, orderedColumn);
-            LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+            BroadcastRouter.IMPL.tellColumnPreferenceChanged(this, orderedColumn);
         }
     }
 
@@ -219,9 +215,7 @@ public class ColumnManagerActivity extends BaseActivity implements ColumnListAda
                     Toast.makeText(this, R.string.toast_uninstall_column_success, Toast.LENGTH_SHORT).show();
 
                     // Send local broadcast
-                    final Intent intent = new Intent(Constants.ACTION_NOTIFY_COLUMN_UNINSTALLED);
-                    intent.putParcelableArrayListExtra(Constants.ARG_COLUMNS, CommonUtil.toArrayList(column));
-                    LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+                    BroadcastRouter.IMPL.tellColumnUninstalled(this, CommonUtil.toArrayList(column));
 
                 }, throwable -> {
                     progressDialog.dismiss();

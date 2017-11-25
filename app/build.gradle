@@ -70,7 +70,7 @@ dependencies {
 
     // Others
     compile 'org.jsoup:jsoup:1.10.3'
-    compile "com.github.nekocode:Meepo:0.2.0"
+    compile "com.github.nekocode:Meepo:0.2.1"
     compile 'com.evernote:android-state:1.1.6'
     annotationProcessor 'com.evernote:android-state-processor:1.1.6'
 

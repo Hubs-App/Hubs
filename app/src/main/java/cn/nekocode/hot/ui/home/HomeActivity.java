@@ -46,6 +46,7 @@ import cn.nekocode.hot.Constants;
 import cn.nekocode.hot.HotApplication;
 import cn.nekocode.hot.R;
 import cn.nekocode.hot.base.BaseActivity;
+import cn.nekocode.hot.broadcast.BroadcastRouter;
 import cn.nekocode.hot.data.model.Column;
 import cn.nekocode.hot.databinding.ActivityHomeBinding;
 import cn.nekocode.hot.manager.base.BaseColumnManager;
@@ -234,9 +235,7 @@ public class HomeActivity extends BaseActivity {
                     Toast.makeText(HomeActivity.this, R.string.toast_install_column_success, Toast.LENGTH_SHORT).show();
 
                     // Send local broadcast
-                    final Intent intent = new Intent(Constants.ACTION_NOTIFY_COLUMN_INSTALLED);
-                    intent.putParcelableArrayListExtra(Constants.ARG_COLUMNS, CommonUtil.toArrayList(column));
-                    LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+                    BroadcastRouter.IMPL.tellColumnInstalled(this, CommonUtil.toArrayList(column));
 
                 }, throwable -> {
                     progressDialog.dismiss();

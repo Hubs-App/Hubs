@@ -40,18 +40,19 @@ import cn.nekocode.meepo.config.UriConfig;
  */
 public interface BroadcastRouter {
     BroadcastRouter IMPL = new Meepo.Builder()
-            .config(new BroadcastConfig()).build().create(BroadcastRouter.class);
+            .config(new BroadcastConfig()).adapter(new BroadcastCallAdapter())
+            .build().create(BroadcastRouter.class);
 
 
     @TargetAction(Constants.ACTION_NOTIFY_COLUMN_INSTALLED)
-    boolean tellColumnInstalled(Context context, @Bundle(Constants.ARG_COLUMNS) ArrayList<Parcelable> columns);
+    void tellColumnInstalled(Context context, @Bundle(Constants.ARG_COLUMNS) ArrayList<Parcelable> columns);
 
     @TargetAction(Constants.ACTION_NOTIFY_COLUMN_UNINSTALLED)
-    boolean tellColumnUninstalled(Context context, @Bundle(Constants.ARG_COLUMNS) ArrayList<Parcelable> columns);
+    void tellColumnUninstalled(Context context, @Bundle(Constants.ARG_COLUMNS) ArrayList<Parcelable> columns);
 
     @TargetAction(Constants.ACTION_NOTIFY_COLUMN_PREFERENCE_CHANGED)
-    boolean tellColumnPreferenceChanged(Context context, @Bundle(Constants.ARG_COLUMNS) ArrayList<Parcelable> columns);
+    void tellColumnPreferenceChanged(Context context, @Bundle(Constants.ARG_COLUMNS) ArrayList<Column> columns);
 
     @TargetAction(Constants.ACTION_NOTIFY_COLUMN_CONFIG_CHANGED)
-    boolean tellColumnConfigChanged(Context context, @Bundle(Constants.ARG_COLUMNID) String columnId);
+    void tellColumnConfigChanged(Context context, @Bundle(Constants.ARG_COLUMNID) String columnId);
 }
