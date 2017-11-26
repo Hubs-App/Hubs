@@ -45,6 +45,7 @@ import java.util.Map;
 import cn.nekocode.hot.HotApplication;
 import cn.nekocode.hot.R;
 import cn.nekocode.hot.base.BaseActivity;
+import cn.nekocode.hot.broadcast.BroadcastRouter;
 import cn.nekocode.hot.data.model.Column;
 import cn.nekocode.hot.databinding.ActivityColumnConfigBinding;
 import cn.nekocode.hot.manager.base.BaseColumnManager;
@@ -232,6 +233,8 @@ public class ColumnConfigActivity extends BaseActivity implements ConfigProperty
                 .observeOn(AndroidSchedulers.mainThread())
                 .to(AutoDispose.with(AndroidLifecycleScopeProvider.from(this)).forCompletable())
                 .subscribe(() -> {
+                    // Send local broadcast
+                    BroadcastRouter.IMPL.tellColumnConfigChanged(this, mColumn.getId().toString());
                     progressDialog.dismiss();
                     finish();
 

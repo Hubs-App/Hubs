@@ -19,8 +19,13 @@ package cn.nekocode.hot.ui.setting;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -31,8 +36,10 @@ import com.uber.autodispose.AutoDispose;
 import com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 import cn.nekocode.hot.ActivityRouter;
+import cn.nekocode.hot.Constants;
 import cn.nekocode.hot.HotApplication;
 import cn.nekocode.hot.R;
 import cn.nekocode.hot.base.BaseActivity;
@@ -59,6 +66,7 @@ public class ColumnManagerActivity extends BaseActivity implements ColumnListAda
     private ColumnListAdapter mAdapter;
     @State
     public boolean mIsPreferenceChanged = false;
+    private final BroadcastReceiver mBroadcastReceiver = new ColumnManagerBroadcastReceiver();
 
 
     @Override
@@ -95,6 +103,16 @@ public class ColumnManagerActivity extends BaseActivity implements ColumnListAda
         mBinding.recyclerView.setAdapter(mAdapter);
         mBinding.recyclerView.setItemAnimator(null);
         mBinding.recyclerView.addItemDecoration(DividerItemDecoration.obtainDefault(this));
+
+
+        /*
+          Register broadcast receiver
+         */
+        final IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(Constants.ACTION_NOTIFY_COLUMN_CONFIG_CHANGED);
+        LocalBroadcastManager.getInstance(this)
+                .registerReceiver(mBroadcastReceiver, intentFilter);
+        registerReceiver(mBroadcastReceiver, intentFilter);
     }
 
     @Override
@@ -221,5 +239,46 @@ public class ColumnManagerActivity extends BaseActivity implements ColumnListAda
                     progressDialog.dismiss();
                     Toast.makeText(this, R.string.toast_uninstall_column_failed, Toast.LENGTH_SHORT).show();
                 });
+    }
+
+
+    private class ColumnManagerBroadcastReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            final String action = intent.getAction();
+            if (action == null) return;
+
+            String columnId;
+            int index;
+            switch (action) {
+                case Constants.ACTION_NOTIFY_COLUMN_CONFIG_CHANGED:
+                    columnId = intent.getStringExtra(Constants.ARG_COLUMNID);
+                    if (columnId == null) return;
+
+                    index = 0;
+                    boolean finded = false;
+                    for (ColumnPreference preference : mPreferences) {
+                        if (preference.getColumnId().equalsIgnoreCase(columnId)) {
+                            finded = true;
+                            break;
+                        }
+                        index++;
+                    }
+
+                    if (!finded) return;
+                    final int fIndex = index;
+                    mColumnManager.readConfig(UUID.fromString(columnId))
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .to(AutoDispose.with(AndroidLifecycleScopeProvider.from(ColumnManagerActivity.this)).forSingle())
+                            .subscribe(column2 -> {
+                                mPreferences.get(fIndex).setColumn(column2);
+                                mAdapter.notifyItemChanged(fIndex);
+
+                            }, throwable -> {});
+                    break;
+            }
+        }
     }
 }
