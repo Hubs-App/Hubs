@@ -17,6 +17,7 @@
 
 package cn.nekocode.hot.base;
 
+import android.arch.lifecycle.Lifecycle;
 import android.support.v4.app.Fragment;
 
 import com.uber.autodispose.AutoDispose;
@@ -45,7 +46,7 @@ public abstract class BaseLazyLoadFragment extends Fragment {
                 .zipWith(
                         mCanFirstLoad.filter(bool -> bool).firstOrError(),
                         (runnable, bool) -> runnable)
-                .to(AutoDispose.with(AndroidLifecycleScopeProvider.from(this)).forSingle())
+                .to(AutoDispose.with(AndroidLifecycleScopeProvider.from(this, Lifecycle.Event.ON_DESTROY)).forSingle())
                 .subscribe(runnable -> {
                     runnable.run();
                 });
