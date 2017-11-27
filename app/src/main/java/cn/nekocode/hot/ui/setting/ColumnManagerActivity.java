@@ -137,6 +137,10 @@ public class ColumnManagerActivity extends BaseActivity implements ColumnListAda
     protected void onDestroy() {
         super.onDestroy();
 
+        LocalBroadcastManager.getInstance(this)
+                .unregisterReceiver(mBroadcastReceiver);
+        unregisterReceiver(mBroadcastReceiver);
+
         if (mIsPreferenceChanged) {
             final ArrayList<Column> orderedColumn = new ArrayList<>();
             for (ColumnPreference preference : mPreferences) {
