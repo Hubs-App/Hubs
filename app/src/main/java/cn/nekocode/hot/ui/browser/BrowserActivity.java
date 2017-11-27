@@ -22,6 +22,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.databinding.DataBindingUtil;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -34,6 +35,7 @@ import com.evernote.android.state.StateSaver;
 import com.uber.autodispose.AutoDispose;
 import com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -43,8 +45,8 @@ import cn.nekocode.hot.R;
 import cn.nekocode.hot.base.BaseActivity;
 import cn.nekocode.hot.data.model.Column;
 import cn.nekocode.hot.databinding.ActivityBrowserBinding;
-import cn.nekocode.hot.luaj.BrowserLuaBridge;
 import cn.nekocode.hot.manager.base.BaseColumnManager;
+import cn.nekocode.hot.manager.base.BaseFileManager;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
@@ -57,10 +59,12 @@ public class BrowserActivity extends BaseActivity {
     private static final String ARG_URL = "url";
     private static final String SAVED_WEBVIEW = "SAVED_WEBVIEW";
     private ActivityBrowserBinding mBinding;
+    private BaseFileManager mFileManager;
     private BaseColumnManager mColumnManager;
     private final BroadcastReceiver mBroadcastReceiver = new BrowserBroadcastReceiver();
     @Nullable
     private Column mColumn;
+    private File mColumnDir;
 
 
     @Override
@@ -68,6 +72,7 @@ public class BrowserActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         StateSaver.restoreInstanceState(this, savedInstanceState);
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_browser);
+        mFileManager = HotApplication.getDefaultFileManager(this);
         mColumnManager = HotApplication.getDefaultColumnManager(this);
 
         /*
@@ -122,33 +127,6 @@ public class BrowserActivity extends BaseActivity {
         intent.putExtra(ARG_COLUMN, column);
         mColumn = column;
 
-        if (column != null) {
-            final BrowserLuaBridge luaBridge = BrowserLuaBridge.create(this, column);
-            if (luaBridge == null) {
-                mBinding.webView.setCallback(null);
-
-            } else {
-                mBinding.webView.setCallback(new WebViewCallback() {
-                    @Override
-                    public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                        luaBridge.onLoadUrl(url)
-                                .subscribeOn(Schedulers.io())
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .to(AutoDispose.with(
-                                        AndroidLifecycleScopeProvider.from(BrowserActivity.this)).forSingle())
-                                .subscribe(html -> {
-                                    view.loadDataWithBaseURL(url, html, "text/html", "utf-8", null);
-
-                                }, throwable -> {
-                                    showMessageIfInDebug(throwable.getMessage());
-                                });
-
-                        return true;
-                    }
-                });
-            }
-        }
-
         /*
           Get url from intent
          */
@@ -172,7 +150,25 @@ public class BrowserActivity extends BaseActivity {
           Load url
          */
         if (savedInstanceState == null) {
-            mBinding.webView.loadUrl2(url);
+            if (column == null || TextUtils.isEmpty(column.getBrowser())) {
+                mBinding.webView.loadUrl2(url);
+
+            } else {
+                mColumnDir = mFileManager.getColumnDirectory(column.getId());
+                final String browserUrl = Uri.fromFile(new File(mColumnDir, column.getBrowser()))
+                        .buildUpon()
+                        .appendQueryParameter("url", url)
+                        .build()
+                        .toString();
+                mBinding.webView.loadUrl2(browserUrl);
+
+                mBinding.webView.setCallback(new WebViewCallback() {
+                    @Override
+                    public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                        return false;
+                    }
+                });
+            }
 
         } else {
             // Restore webview state
