@@ -22,17 +22,17 @@ package cn.nekocode.hot;
  */
 public interface Constants {
     String ACTION_PREFIX = "cn.nekocode.hot.action.";
+
+    /**
+     * You can run the following command to refresh a column page immediately.
+     * adb shell "am broadcast -a cn.nekocode.hot.action.NOTIFY_COLUMN_INSTALLED -e column_id '$column_id'"
+     */
     String ACTION_NOTIFY_COLUMN_INSTALLED = ACTION_PREFIX + "NOTIFY_COLUMN_INSTALLED";
     String ACTION_NOTIFY_COLUMN_UNINSTALLED = ACTION_PREFIX + "NOTIFY_COLUMN_UNINSTALLED";
     String ACTION_NOTIFY_COLUMN_PREFERENCE_CHANGED = ACTION_PREFIX + "NOTIFY_COLUMN_PREFERENCE_CHANGED";
 
-    /**
-     * You can run the following command to refresh a column page immediately.
-     * adb shell "am broadcast -a cn.nekocode.hot.action.NOTIFY_COLUMN_CONFIG_CHANGED -e column_id '$column_id'"
-     */
-    String ACTION_NOTIFY_COLUMN_CONFIG_CHANGED = ACTION_PREFIX + "NOTIFY_COLUMN_CONFIG_CHANGED";
 
-
+    String ARG_COLUMN = "column";
     String ARG_COLUMNS = "columns";
     String ARG_COLUMNID = "column_id";
 }

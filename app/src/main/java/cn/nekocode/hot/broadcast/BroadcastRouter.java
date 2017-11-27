@@ -45,14 +45,15 @@ public interface BroadcastRouter {
 
 
     @TargetAction(Constants.ACTION_NOTIFY_COLUMN_INSTALLED)
-    void tellColumnInstalled(Context context, @Bundle(Constants.ARG_COLUMNS) ArrayList<Parcelable> columns);
+    void tellColumnInstalled(Context context, @Bundle(Constants.ARG_COLUMNID) String columnId);
+
+    @TargetAction(Constants.ACTION_NOTIFY_COLUMN_INSTALLED)
+    void tellColumnInstalled(Context context, @Bundle(Constants.ARG_COLUMN) Column column);
 
     @TargetAction(Constants.ACTION_NOTIFY_COLUMN_UNINSTALLED)
-    void tellColumnUninstalled(Context context, @Bundle(Constants.ARG_COLUMNS) ArrayList<Parcelable> columns);
+    void tellColumnUninstalled(Context context, @Bundle(Constants.ARG_COLUMNS) ArrayList<Column> columns);
 
     @TargetAction(Constants.ACTION_NOTIFY_COLUMN_PREFERENCE_CHANGED)
     void tellColumnPreferenceChanged(Context context, @Bundle(Constants.ARG_COLUMNS) ArrayList<Column> columns);
 
-    @TargetAction(Constants.ACTION_NOTIFY_COLUMN_CONFIG_CHANGED)
-    void tellColumnConfigChanged(Context context, @Bundle(Constants.ARG_COLUMNID) String columnId);
 }

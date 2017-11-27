@@ -45,6 +45,7 @@ import cn.nekocode.hot.data.model.Column;
 import cn.nekocode.hot.databinding.ActivityBrowserBinding;
 import cn.nekocode.hot.luaj.BrowserLuaBridge;
 import cn.nekocode.hot.manager.base.BaseColumnManager;
+import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
@@ -108,9 +109,8 @@ public class BrowserActivity extends BaseActivity {
           Register broadcast receiver
          */
         final IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(Constants.ACTION_NOTIFY_COLUMN_INSTALLED);
         intentFilter.addAction(Constants.ACTION_NOTIFY_COLUMN_UNINSTALLED);
-        intentFilter.addAction(Constants.ACTION_NOTIFY_COLUMN_PREFERENCE_CHANGED);
-        intentFilter.addAction(Constants.ACTION_NOTIFY_COLUMN_CONFIG_CHANGED);
         LocalBroadcastManager.getInstance(this)
                 .registerReceiver(mBroadcastReceiver, intentFilter);
         registerReceiver(mBroadcastReceiver, intentFilter);
@@ -220,8 +220,34 @@ public class BrowserActivity extends BaseActivity {
             if (action == null) return;
 
             ArrayList<Column> columns;
+            Column column;
             String columnId;
             switch (action) {
+                case Constants.ACTION_NOTIFY_COLUMN_INSTALLED:
+                    column = intent.getParcelableExtra(Constants.ARG_COLUMN);
+                    columnId = intent.getStringExtra(Constants.ARG_COLUMNID);
+                    if (column == null && columnId == null) break;
+                    if (columnId == null) columnId = column.getId().toString();
+
+                    if (mColumn == null || !columnId.equalsIgnoreCase(mColumn.getId().toString())) {
+                        break;
+                    }
+
+                    // Refresh column object and refresh the page
+                    (column != null ? Single.just(column) : mColumnManager.readConfig(UUID.fromString(columnId)))
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .to(AutoDispose.with(AndroidLifecycleScopeProvider.from(BrowserActivity.this)).forSingle())
+                            .subscribe(_column -> {
+                                setupWebView(null, _column);
+
+                            }, throwable -> {
+                                setupWebView(null, null);
+                                showMessageIfInDebug(throwable.getMessage());
+                            });
+
+                    break;
+
                 case Constants.ACTION_NOTIFY_COLUMN_UNINSTALLED:
                     columns = intent.getParcelableArrayListExtra(Constants.ARG_COLUMNS);
                     if (columns == null) return;
@@ -230,41 +256,6 @@ public class BrowserActivity extends BaseActivity {
                         // If this column has been uninstalled, finish the browser page
                         finish();
                     }
-
-                    break;
-
-                case Constants.ACTION_NOTIFY_COLUMN_PREFERENCE_CHANGED:
-                    columns = intent.getParcelableArrayListExtra(Constants.ARG_COLUMNS);
-                    if (columns == null) return;
-
-                    if (!columns.contains(mColumn)) {
-                        // If this column is invisible, finish the browser page
-                        finish();
-                    }
-
-                    break;
-
-                case Constants.ACTION_NOTIFY_COLUMN_CONFIG_CHANGED:
-                    columnId = intent.getStringExtra(Constants.ARG_COLUMNID);
-                    if (columnId == null) return;
-
-                    if (!mColumn.getId().toString().equalsIgnoreCase(columnId)) {
-                        break;
-                    }
-
-                    // Refresh column object and refresh the page
-                    mColumnManager.readConfig(UUID.fromString(columnId))
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .to(AutoDispose.with(AndroidLifecycleScopeProvider.from(BrowserActivity.this)).forSingle())
-                            .subscribe(column -> {
-                                setupWebView(null, column);
-
-                            }, throwable -> {
-                                setupWebView(null, null);
-                                showMessageIfInDebug(throwable.getMessage());
-                            });
-
                     break;
             }
         }

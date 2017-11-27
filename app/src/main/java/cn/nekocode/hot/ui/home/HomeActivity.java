@@ -52,7 +52,8 @@ import cn.nekocode.hot.databinding.ActivityHomeBinding;
 import cn.nekocode.hot.manager.base.BaseColumnManager;
 import cn.nekocode.hot.manager.base.BaseFileManager;
 import cn.nekocode.hot.manager.base.BasePreferenceManager;
-import cn.nekocode.hot.util.CommonUtil;
+import cn.nekocode.hot.util.ColumnUtil;
+import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
@@ -109,7 +110,6 @@ public class HomeActivity extends BaseActivity {
         intentFilter.addAction(Constants.ACTION_NOTIFY_COLUMN_INSTALLED);
         intentFilter.addAction(Constants.ACTION_NOTIFY_COLUMN_UNINSTALLED);
         intentFilter.addAction(Constants.ACTION_NOTIFY_COLUMN_PREFERENCE_CHANGED);
-        intentFilter.addAction(Constants.ACTION_NOTIFY_COLUMN_CONFIG_CHANGED);
         LocalBroadcastManager.getInstance(this)
                 .registerReceiver(mBroadcastReceiver, intentFilter);
         registerReceiver(mBroadcastReceiver, intentFilter);
@@ -235,7 +235,7 @@ public class HomeActivity extends BaseActivity {
                     Toast.makeText(HomeActivity.this, R.string.toast_install_column_success, Toast.LENGTH_SHORT).show();
 
                     // Send local broadcast
-                    BroadcastRouter.IMPL.tellColumnInstalled(this, CommonUtil.toArrayList(column));
+                    BroadcastRouter.IMPL.tellColumnInstalled(this, column);
 
                 }, throwable -> {
                     progressDialog.dismiss();
@@ -274,28 +274,44 @@ public class HomeActivity extends BaseActivity {
             if (action == null) return;
 
             ArrayList<Column> columns;
+            Column column;
             String columnId;
             int index;
             switch (action) {
                 case Constants.ACTION_NOTIFY_COLUMN_INSTALLED:
-                    columns = intent.getParcelableArrayListExtra(Constants.ARG_COLUMNS);
-                    if (columns == null) return;
+                    column = intent.getParcelableExtra(Constants.ARG_COLUMN);
+                    columnId = intent.getStringExtra(Constants.ARG_COLUMNID);
+                    if (column == null && columnId == null) break;
+                    if (columnId == null) columnId = column.getId().toString();
 
-                    for (Column column : columns) {
-                        index = mColumns.indexOf(column);
-                        if (index < 0) {
-                            mColumns.add(column);
-                        } else {
-                            mColumns.set(index, column);
-                            mPagerAdapter.hackRecreateFragment(index);
-                        }
+                    index = ColumnUtil.indexOfColumn(mColumns, columnId);
+                    if (index < 0) {
+                        // If the column is invisible
+                        // FIXME Need to check if the column is invisible
+                        break;
                     }
-                    mPagerAdapter.notifyDataSetChanged();
+
+                    (column != null ? Single.just(column) : mColumnManager.readConfig(UUID.fromString(columnId)))
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .to(AutoDispose.with(AndroidLifecycleScopeProvider.from(HomeActivity.this)).forSingle())
+                            .subscribe(_column -> {
+                                if (index < 0) {
+                                    // Install
+                                    mColumns.add(column);
+                                } else {
+                                    // Reinstall
+                                    mColumns.set(index, column);
+                                    mPagerAdapter.hackRecreateFragment(index);
+                                }
+                                mPagerAdapter.notifyDataSetChanged();
+
+                            }, throwable -> {});
                     break;
 
                 case Constants.ACTION_NOTIFY_COLUMN_UNINSTALLED:
                     columns = intent.getParcelableArrayListExtra(Constants.ARG_COLUMNS);
-                    if (columns == null) return;
+                    if (columns == null) break;
 
                     mColumns.removeAll(columns);
                     mPagerAdapter.notifyDataSetChanged();
@@ -303,44 +319,11 @@ public class HomeActivity extends BaseActivity {
 
                 case Constants.ACTION_NOTIFY_COLUMN_PREFERENCE_CHANGED:
                     columns = intent.getParcelableArrayListExtra(Constants.ARG_COLUMNS);
-                    if (columns == null) return;
+                    if (columns == null) break;
 
                     mColumns.clear();
                     mColumns.addAll(columns);
                     mPagerAdapter.notifyDataSetChanged();
-                    break;
-
-                case Constants.ACTION_NOTIFY_COLUMN_CONFIG_CHANGED:
-                    columnId = intent.getStringExtra(Constants.ARG_COLUMNID);
-                    if (columnId == null) return;
-
-                    index = 0;
-                    boolean finded = false;
-                    for (Column column : mColumns) {
-                        if (column.getId().toString().equalsIgnoreCase(columnId)) {
-                            finded = true;
-                            break;
-                        }
-                        index++;
-                    }
-
-                    // Refresh column object and recreate page
-                    final int fIndex = index;
-                    final boolean fFinded = finded;
-                    mColumnManager.readConfig(UUID.fromString(columnId))
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .to(AutoDispose.with(AndroidLifecycleScopeProvider.from(HomeActivity.this)).forSingle())
-                            .subscribe(column -> {
-                                if (!fFinded) {
-                                    mColumns.add(column);
-                                } else {
-                                    mColumns.set(fIndex, column);
-                                    mPagerAdapter.hackRecreateFragment(fIndex);
-                                }
-                                mPagerAdapter.notifyDataSetChanged();
-
-                            }, throwable -> {});
                     break;
             }
         }

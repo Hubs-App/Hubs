@@ -49,6 +49,7 @@ import cn.nekocode.hot.data.model.ColumnPreference;
 import cn.nekocode.hot.databinding.ActivityColumnMangerBinding;
 import cn.nekocode.hot.manager.base.BaseColumnManager;
 import cn.nekocode.hot.manager.base.BasePreferenceManager;
+import cn.nekocode.hot.util.ColumnUtil;
 import cn.nekocode.hot.util.CommonUtil;
 import cn.nekocode.hot.util.DividerItemDecoration;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -109,7 +110,7 @@ public class ColumnManagerActivity extends BaseActivity implements ColumnListAda
           Register broadcast receiver
          */
         final IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(Constants.ACTION_NOTIFY_COLUMN_CONFIG_CHANGED);
+        intentFilter.addAction(Constants.ACTION_NOTIFY_COLUMN_INSTALLED);
         LocalBroadcastManager.getInstance(this)
                 .registerReceiver(mBroadcastReceiver, intentFilter);
         registerReceiver(mBroadcastReceiver, intentFilter);
@@ -252,31 +253,25 @@ public class ColumnManagerActivity extends BaseActivity implements ColumnListAda
             String columnId;
             int index;
             switch (action) {
-                case Constants.ACTION_NOTIFY_COLUMN_CONFIG_CHANGED:
+                case Constants.ACTION_NOTIFY_COLUMN_INSTALLED:
                     columnId = intent.getStringExtra(Constants.ARG_COLUMNID);
                     if (columnId == null) return;
 
-                    index = 0;
-                    boolean finded = false;
-                    for (ColumnPreference preference : mPreferences) {
-                        if (preference.getColumnId().equalsIgnoreCase(columnId)) {
-                            finded = true;
-                            break;
-                        }
-                        index++;
+                    index = ColumnUtil.indexOfColumnPreference(mPreferences, columnId);
+                    if (index < 0) {
+                        loadColumnPreferences();
+
+                    } else {
+                        mColumnManager.readConfig(UUID.fromString(columnId))
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .to(AutoDispose.with(AndroidLifecycleScopeProvider.from(ColumnManagerActivity.this)).forSingle())
+                                .subscribe(column2 -> {
+                                    mPreferences.get(index).setColumn(column2);
+                                    mAdapter.notifyItemChanged(index);
+
+                                }, throwable -> {});
                     }
-
-                    if (!finded) return;
-                    final int fIndex = index;
-                    mColumnManager.readConfig(UUID.fromString(columnId))
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .to(AutoDispose.with(AndroidLifecycleScopeProvider.from(ColumnManagerActivity.this)).forSingle())
-                            .subscribe(column2 -> {
-                                mPreferences.get(fIndex).setColumn(column2);
-                                mAdapter.notifyItemChanged(fIndex);
-
-                            }, throwable -> {});
                     break;
             }
         }
