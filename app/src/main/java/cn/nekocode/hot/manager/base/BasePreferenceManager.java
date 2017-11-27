@@ -43,6 +43,12 @@ public abstract class BasePreferenceManager {
     public abstract Single<List<ColumnPreference>> loadColumnPreferences(@NonNull List<Column> columns);
 
     /**
+     * Load column preference object
+     */
+    @NonNull
+    public abstract Single<ColumnPreference> loadColumnPreference(@NonNull Column column);
+
+    /**
      * Update column preference objects
      */
     public abstract void updateColumnPreferences(@NonNull ColumnPreference... preferences);

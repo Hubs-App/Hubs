@@ -100,6 +100,47 @@ public class PreferenceManager extends BasePreferenceManager {
         });
     }
 
+    @NonNull
+    @Override
+    public Single<ColumnPreference> loadColumnPreference(@NonNull Column column) {
+        return Single.create(emitter -> {
+            final SQLiteDatabase db = mDBHelper.getReadableDatabase();
+            final Cursor cursor = db.query(PreferenceDBHelper.TABLE_NAME, null, null, null, null, null, null);
+            final int indexOfColumnId = cursor.getColumnIndex("column_id");
+            final int indexOfIsVisible = cursor.getColumnIndex("is_visible");
+            final int indexOfOrder = cursor.getColumnIndex("_order");
+
+            final String id = column.getId().toString();
+            ColumnPreference columnPreference = null;
+            for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+                if (cursor.getString(indexOfColumnId).equalsIgnoreCase(id)) {
+                    columnPreference = new ColumnPreference(
+                            column,
+                            cursor.getInt(indexOfIsVisible) == 1,
+                            cursor.getInt(indexOfOrder)
+                    );
+                    break;
+                }
+            }
+
+            if (columnPreference == null) {
+                columnPreference = new ColumnPreference(
+                        column,
+                        true,
+                        cursor.getColumnCount()
+                );
+            }
+
+            cursor.close();
+            db.close();
+
+            // Save to db
+            updateColumnPreferences(columnPreference);
+
+            emitter.onSuccess(columnPreference);
+        });
+    }
+
     @Override
     public void updateColumnPreferences(@NonNull ColumnPreference... preferences) {
         final SQLiteDatabase db = mDBHelper.getWritableDatabase();
