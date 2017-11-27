@@ -285,23 +285,36 @@ public class HomeActivity extends BaseActivity {
                     if (columnId == null) columnId = column.getId().toString();
 
                     index = ColumnUtil.indexOfColumn(mColumns, columnId);
-                    if (index < 0) {
-                        // If the column is invisible
-                        // FIXME Need to check if the column is invisible
-                        break;
-                    }
 
-                    (column != null ? Single.just(column) : mColumnManager.readConfig(UUID.fromString(columnId)))
-                            .subscribeOn(Schedulers.io())
+                    (column != null ? Single.just(column) :
+                            mColumnManager.readConfig(UUID.fromString(columnId)).subscribeOn(Schedulers.io()))
+                            .flatMap(_column -> {
+                                if (index < 0) {
+                                    // If not found in visible column list
+                                    return mPreferenceManager.loadColumnPreference(_column)
+                                            .subscribeOn(Schedulers.io())
+                                            .flatMap(columnPreference -> {
+                                                if (!columnPreference.isVisible()) {
+                                                    return Single.never();
+                                                } else {
+                                                    return Single.just(_column);
+                                                }
+                                            });
+
+                                } else {
+                                    return Single.just(_column);
+                                }
+                            })
                             .observeOn(AndroidSchedulers.mainThread())
                             .to(AutoDispose.with(AndroidLifecycleScopeProvider.from(HomeActivity.this)).forSingle())
                             .subscribe(_column -> {
                                 if (index < 0) {
                                     // Install
-                                    mColumns.add(column);
+                                    mColumns.add(_column);
+
                                 } else {
                                     // Reinstall
-                                    mColumns.set(index, column);
+                                    mColumns.set(index, _column);
                                     mPagerAdapter.hackRecreateFragment(index);
                                 }
                                 mPagerAdapter.notifyDataSetChanged();
