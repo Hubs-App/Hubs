@@ -1,15 +1,9 @@
-local client = ...
+assert(loadfile("okhttp.lua"))(...)
 
 local Article = luajava.bindClass('cn.nekocode.hot.data.model.Article')
 local ArrayList = luajava.bindClass('java.util.ArrayList')
-local Request = luajava.bindClass('okhttp3.Request')
 local JSONObject = luajava.bindClass('org.json.JSONObject')
 
-function get(url)
-    local request = Request.Builder.new():url(url):build()
-    local response = client:newCall(request):execute()
-    return response:body():string()
-end
 
 function getItems(page)
     local articleList = ArrayList.new()

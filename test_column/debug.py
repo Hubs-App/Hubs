@@ -22,8 +22,7 @@ def get_column_id():
 
 
 def sync_files(column_id):
-    for file_path in os.listdir('.'):
-        run_cmd('adb push ' + file_path + ' ' + COLUMN_ROOT_PATH + '/' + column_id + '/')
+    run_cmd('adb push . ' + COLUMN_ROOT_PATH + '/' + column_id + '/')
 
 
 def broadcast(column_id):
