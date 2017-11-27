@@ -28,7 +28,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.UUID;
 
 import cn.nekocode.hot.HotApplication;
 import cn.nekocode.hot.manager.base.BaseFileManager;
@@ -86,8 +85,8 @@ public class FileManager extends BaseFileManager {
 
     @Override
     @NonNull
-    public File getColumnDirectory(@NonNull UUID columnId) {
-        return new File(getColumnsDirectory().getPath(), columnId.toString());
+    public File getColumnDirectory(@NonNull String columnId) {
+        return new File(getColumnsDirectory().getPath(), columnId);
     }
 
     @Override

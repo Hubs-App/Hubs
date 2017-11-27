@@ -26,8 +26,6 @@ import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.Varargs;
 import org.luaj.vm2.compiler.LuaC;
 
-import java.util.UUID;
-
 /**
  * @author nekocode (nekocode.cn@gmail.com)
  */
@@ -35,7 +33,7 @@ public class Column implements Parcelable {
     public static final String TYPE_ARTICLE = "article";
     public static final String[] SUPPORTED_TYPES = new String[]{TYPE_ARTICLE};
 
-    private UUID id;
+    private String id;
     private String name;
     private String type;
     private String version;
@@ -69,8 +67,8 @@ public class Column implements Parcelable {
             value = pair.arg(2);
             keyStr = key.checkjstring();
             switch (keyStr) {
-                case "UUID":
-                    column.setId(UUID.fromString(value.checkjstring()));
+                case "ID":
+                    column.setId(value.checkjstring().toLowerCase());
                     break;
 
                 case "NAME":
@@ -125,7 +123,7 @@ public class Column implements Parcelable {
      * Set all key-value pairs to lua globals
      */
     public void setAllTo(Globals globals) {
-        globals.set("UUID", id.toString());
+        globals.set("ID", id);
         globals.set("NAME", name);
         globals.set("TYPE", type);
         globals.set("VERSION", version);
@@ -144,11 +142,11 @@ public class Column implements Parcelable {
         }
     }
 
-    public UUID getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -211,7 +209,7 @@ public class Column implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeSerializable(this.id);
+        dest.writeString(this.id);
         dest.writeString(this.name);
         dest.writeString(this.type);
         dest.writeString(this.version);
@@ -225,7 +223,7 @@ public class Column implements Parcelable {
     }
 
     protected Column(Parcel in) {
-        this.id = (UUID) in.readSerializable();
+        this.id = in.readString();
         this.name = in.readString();
         this.type = in.readString();
         this.version = in.readString();
@@ -250,14 +248,14 @@ public class Column implements Parcelable {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof Column) {
-            return id.equals(((Column) obj).getId());
+        if (getId() != null && obj instanceof Column) {
+            return getId().equalsIgnoreCase(((Column) obj).getId());
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return id.hashCode();
+        return getId() != null ? getId().hashCode() : 0;
     }
 }

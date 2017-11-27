@@ -33,7 +33,7 @@ public class ColumnUtil {
         int index = 0;
         boolean finded = false;
         for (Column column : columns) {
-            if (column.getId().toString().equalsIgnoreCase(columnId)) {
+            if (column.getId().equalsIgnoreCase(columnId)) {
                 finded = true;
                 break;
             }

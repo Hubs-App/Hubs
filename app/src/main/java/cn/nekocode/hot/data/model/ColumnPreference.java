@@ -34,7 +34,7 @@ public class ColumnPreference implements Parcelable {
     }
 
     public ColumnPreference(Column column, boolean isVisible, int order) {
-        this(column.getId().toString(), isVisible, order);
+        this(column.getId(), isVisible, order);
         this.column = column;
     }
 

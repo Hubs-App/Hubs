@@ -36,7 +36,6 @@ import com.uber.autodispose.AutoDispose;
 import com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider;
 
 import java.util.ArrayList;
-import java.util.UUID;
 
 import cn.nekocode.hot.ActivityRouter;
 import cn.nekocode.hot.Constants;
@@ -262,7 +261,7 @@ public class ColumnManagerActivity extends BaseActivity implements ColumnListAda
                         loadColumnPreferences();
 
                     } else {
-                        mColumnManager.readConfig(UUID.fromString(columnId))
+                        mColumnManager.readConfig(columnId)
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .to(AutoDispose.with(AndroidLifecycleScopeProvider.from(ColumnManagerActivity.this)).forSingle())

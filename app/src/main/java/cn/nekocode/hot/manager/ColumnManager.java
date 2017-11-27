@@ -33,7 +33,6 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import cn.nekocode.hot.BuildConfig;
 import cn.nekocode.hot.data.model.Column;
@@ -78,7 +77,7 @@ public class ColumnManager extends BaseColumnManager {
 
     @Override
     @NonNull
-    public Single<Column> readConfig(@NonNull UUID columnId) {
+    public Single<Column> readConfig(@NonNull String columnId) {
         return Single.create(emitter -> {
             try {
                 emitter.onSuccess(
@@ -120,7 +119,7 @@ public class ColumnManager extends BaseColumnManager {
         }
     }
 
-    private String readConfigToString(UUID columnId) throws IOException {
+    private String readConfigToString(String columnId) throws IOException {
         final File columnDirectory = getFileManager().getColumnDirectory(columnId);
         // Read default config
         String configStr = readFileToString(new File(columnDirectory, COLUMN_CONFIG_PATH));
@@ -135,7 +134,7 @@ public class ColumnManager extends BaseColumnManager {
     }
 
     @Override
-    public Completable writeUserConfig(@NonNull UUID columnId, @NonNull UserConfig config) {
+    public Completable writeUserConfig(@NonNull String columnId, @NonNull UserConfig config) {
         return Completable.create(emitter -> {
             PrintWriter writer = null;
 
@@ -212,7 +211,7 @@ public class ColumnManager extends BaseColumnManager {
 
     @Override
     @NonNull
-    public Single<Boolean> uninstall(@NonNull UUID columnId) {
+    public Single<Boolean> uninstall(@NonNull String columnId) {
         return Single.create(emitter -> {
             final File columnDir = getFileManager().getColumnDirectory(columnId);
 
@@ -239,7 +238,7 @@ public class ColumnManager extends BaseColumnManager {
     }
 
     @Override
-    public boolean isInstalled(@NonNull UUID columnId) {
+    public boolean isInstalled(@NonNull String columnId) {
         final File columnDir = getFileManager().getColumnDirectory(columnId);
         return columnDir.exists() && new File(columnDir, BuildConfig.COLUMN_CONFIG_PATH).exists();
     }
@@ -262,7 +261,7 @@ public class ColumnManager extends BaseColumnManager {
                     if (child.isDirectory()) {
                         try {
                             column = Column.fromLua(
-                                    readConfigToString(UUID.fromString(child.getName())));
+                                    readConfigToString(child.getName()));
                             columns.add(column);
                         } catch (Exception ignored) {
                             // Just skip this column if load failed

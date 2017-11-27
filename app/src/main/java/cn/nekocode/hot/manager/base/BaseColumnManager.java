@@ -22,7 +22,6 @@ import android.support.annotation.NonNull;
 
 import java.io.File;
 import java.util.List;
-import java.util.UUID;
 
 import cn.nekocode.hot.data.model.Column;
 import cn.nekocode.hot.data.model.UserConfig;
@@ -54,12 +53,12 @@ public abstract class BaseColumnManager {
      * Read config form a installed column
      */
     @NonNull
-    public abstract Single<Column> readConfig(@NonNull UUID columnId);
+    public abstract Single<Column> readConfig(@NonNull String columnId);
 
     /**
      * Write user config to file
      */
-    public abstract Completable writeUserConfig(@NonNull UUID columnId, @NonNull UserConfig config);
+    public abstract Completable writeUserConfig(@NonNull String columnId, @NonNull UserConfig config);
 
     /**
      * Install column
@@ -71,12 +70,12 @@ public abstract class BaseColumnManager {
      * Uninstall column
      */
     @NonNull
-    public abstract Single<Boolean> uninstall(@NonNull UUID columnId);
+    public abstract Single<Boolean> uninstall(@NonNull String columnId);
 
     /**
      * Check if a column is installed
      */
-    public abstract boolean isInstalled(@NonNull UUID columnId);
+    public abstract boolean isInstalled(@NonNull String columnId);
 
     /**
      * Get all installed columns

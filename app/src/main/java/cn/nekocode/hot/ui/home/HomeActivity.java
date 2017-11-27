@@ -38,7 +38,6 @@ import com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.UUID;
 
 import cn.nekocode.hot.ActivityRouter;
 import cn.nekocode.hot.BuildConfig;
@@ -282,12 +281,12 @@ public class HomeActivity extends BaseActivity {
                     column = intent.getParcelableExtra(Constants.ARG_COLUMN);
                     columnId = intent.getStringExtra(Constants.ARG_COLUMNID);
                     if (column == null && columnId == null) break;
-                    if (columnId == null) columnId = column.getId().toString();
+                    if (columnId == null) columnId = column.getId();
 
                     index = ColumnUtil.indexOfColumn(mColumns, columnId);
 
                     (column != null ? Single.just(column) :
-                            mColumnManager.readConfig(UUID.fromString(columnId)).subscribeOn(Schedulers.io()))
+                            mColumnManager.readConfig(columnId).subscribeOn(Schedulers.io()))
                             .flatMap(_column -> {
                                 if (index < 0) {
                                     // If not found in visible column list

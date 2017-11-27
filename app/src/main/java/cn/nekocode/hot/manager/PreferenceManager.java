@@ -61,7 +61,7 @@ public class PreferenceManager extends BasePreferenceManager {
             final ArrayList<ColumnPreference> preferences = new ArrayList<>();
             final HashMap<String, Column> columnHashMap = new HashMap<>();
             for (Column column : columns) {
-                columnHashMap.put(column.getId().toString(), column);
+                columnHashMap.put(column.getId().toLowerCase(), column);
             }
 
             final SQLiteDatabase db = mDBHelper.getReadableDatabase();
@@ -71,7 +71,7 @@ public class PreferenceManager extends BasePreferenceManager {
 
             int order = 0;
             for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
-                final Column column = columnHashMap.remove(cursor.getString(indexOfColumnId));
+                final Column column = columnHashMap.remove(cursor.getString(indexOfColumnId).toLowerCase());
 
                 if (column != null) {
                     preferences.add(new ColumnPreference(
@@ -110,7 +110,7 @@ public class PreferenceManager extends BasePreferenceManager {
             final int indexOfIsVisible = cursor.getColumnIndex("is_visible");
             final int indexOfOrder = cursor.getColumnIndex("_order");
 
-            final String id = column.getId().toString();
+            final String id = column.getId();
             ColumnPreference columnPreference = null;
             for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
                 if (cursor.getString(indexOfColumnId).equalsIgnoreCase(id)) {

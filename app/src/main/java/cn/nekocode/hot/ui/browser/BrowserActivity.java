@@ -37,7 +37,6 @@ import com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.UUID;
 
 import cn.nekocode.hot.Constants;
 import cn.nekocode.hot.HotApplication;
@@ -93,7 +92,7 @@ public class BrowserActivity extends BaseActivity {
             if (intent.getData() != null && !TextUtils.isEmpty(
                     columnId = intent.getData().getQueryParameter("column_id"))) {
 
-                mColumnManager.readConfig(UUID.fromString(columnId))
+                mColumnManager.readConfig(columnId)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .to(AutoDispose.with(AndroidLifecycleScopeProvider.from(this)).forSingle())
@@ -223,14 +222,14 @@ public class BrowserActivity extends BaseActivity {
                     column = intent.getParcelableExtra(Constants.ARG_COLUMN);
                     columnId = intent.getStringExtra(Constants.ARG_COLUMNID);
                     if (column == null && columnId == null) break;
-                    if (columnId == null) columnId = column.getId().toString();
+                    if (columnId == null) columnId = column.getId();
 
-                    if (mColumn == null || !columnId.equalsIgnoreCase(mColumn.getId().toString())) {
+                    if (mColumn == null || !columnId.equalsIgnoreCase(mColumn.getId())) {
                         break;
                     }
 
                     // Refresh column object and refresh the page
-                    (column != null ? Single.just(column) : mColumnManager.readConfig(UUID.fromString(columnId)))
+                    (column != null ? Single.just(column) : mColumnManager.readConfig(columnId))
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
                             .to(AutoDispose.with(AndroidLifecycleScopeProvider.from(BrowserActivity.this)).forSingle())

@@ -22,7 +22,6 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 
 import java.io.File;
-import java.util.UUID;
 
 import io.reactivex.Single;
 
@@ -52,7 +51,7 @@ public abstract class BaseFileManager {
      * Get column directory
      */
     @NonNull
-    public abstract File getColumnDirectory(@NonNull UUID columnId);
+    public abstract File getColumnDirectory(@NonNull String columnId);
 
     /**
      * Get file from a uri

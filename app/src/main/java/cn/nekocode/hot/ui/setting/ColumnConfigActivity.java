@@ -234,7 +234,7 @@ public class ColumnConfigActivity extends BaseActivity implements ConfigProperty
                 .to(AutoDispose.with(AndroidLifecycleScopeProvider.from(this)).forCompletable())
                 .subscribe(() -> {
                     // Send local broadcast
-                    BroadcastRouter.IMPL.tellColumnInstalled(this, mColumn.getId().toString());
+                    BroadcastRouter.IMPL.tellColumnInstalled(this, mColumn.getId());
                     progressDialog.dismiss();
                     finish();
 
