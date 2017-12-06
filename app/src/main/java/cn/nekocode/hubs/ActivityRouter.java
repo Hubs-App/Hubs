@@ -19,9 +19,9 @@ package cn.nekocode.hubs;
 
 import android.content.Context;
 
-import cn.nekocode.hubs.data.model.Column;
+import cn.nekocode.hubs.data.model.Hub;
 import cn.nekocode.hubs.ui.browser.BrowserActivity;
-import cn.nekocode.hubs.ui.setting.ColumnConfigActivity;
+import cn.nekocode.hubs.ui.setting.HubConfigActivity;
 import cn.nekocode.meepo.Meepo;
 import cn.nekocode.meepo.annotation.Bundle;
 import cn.nekocode.meepo.annotation.Query;
@@ -42,17 +42,17 @@ public interface ActivityRouter {
     boolean gotoBrowser(Context context, @Query("url") String url);
 
     @TargetPath("browser")
-    boolean gotoBrowser(Context context, @Query("column_id") String columnId, @Query("url") String url);
+    boolean gotoBrowser(Context context, @Query("hub_id") String hubId, @Query("url") String url);
 
     @TargetClass(BrowserActivity.class)
-    boolean gotoBrowser(Context context, @Bundle("column") Column column, @Bundle("url") String url);
+    boolean gotoBrowser(Context context, @Bundle("hub") Hub hub, @Bundle("url") String url);
 
     @TargetPath("setting")
     boolean gotoSetting(Context context);
 
-    @TargetPath("column_manager")
-    boolean gotoColumnManager(Context context);
+    @TargetPath("hub_manager")
+    boolean gotoHubManager(Context context);
 
-    @TargetClass(ColumnConfigActivity.class)
-    boolean gotoColumnConfig(Context context, @Bundle("column") Column column);
+    @TargetClass(HubConfigActivity.class)
+    boolean gotoHubConfig(Context context, @Bundle("hub") Hub hub);
 }

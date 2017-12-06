@@ -30,21 +30,21 @@ import android.view.ViewGroup;
 import java.util.List;
 
 import cn.nekocode.hubs.R;
-import cn.nekocode.hubs.data.model.ColumnPreference;
-import cn.nekocode.hubs.databinding.ItemColumnBinding;
+import cn.nekocode.hubs.data.model.HubPreference;
+import cn.nekocode.hubs.databinding.ItemHubBinding;
 
 /**
  * @author nekocode (nekocode.cn@gmail.com)
  */
-public class ColumnListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private static final int TYPE_COLUMN = 0;
-    private List<ColumnPreference> mColumnPreferenceList;
+public class HubListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    private static final int TYPE_HUB = 0;
+    private List<HubPreference> mHubPreferenceList;
     private UIEventListener mUIEventListener;
     private final ItemTouchHelper mItemTouchHelper;
 
 
-    public ColumnListAdapter(@NonNull List<ColumnPreference> columnList) {
-        this.mColumnPreferenceList = columnList;
+    public HubListAdapter(@NonNull List<HubPreference> List) {
+        this.mHubPreferenceList = List;
 
         mItemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.Callback() {
             @Override
@@ -58,9 +58,9 @@ public class ColumnListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
                 final int i = viewHolder.getAdapterPosition();
                 final int j = target.getAdapterPosition();
-                final ColumnPreference l = mColumnPreferenceList.get(i);
-                final ColumnPreference r = mColumnPreferenceList.get(j);
-                mColumnPreferenceList.set(i, mColumnPreferenceList.set(j, l));
+                final HubPreference l = mHubPreferenceList.get(i);
+                final HubPreference r = mHubPreferenceList.get(j);
+                mHubPreferenceList.set(i, mHubPreferenceList.set(j, l));
                 l.setOrder(j);
                 r.setOrder(i);
 
@@ -94,10 +94,10 @@ public class ColumnListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView;
         switch (viewType) {
-            case TYPE_COLUMN:
+            case TYPE_HUB:
                 itemView = LayoutInflater.from(parent.getContext()).inflate(
-                        R.layout.item_column, parent, false);
-                return new ColumnViewHolder(itemView);
+                        R.layout.item_hub, parent, false);
+                return new HubViewHolder(itemView);
         }
 
         throw new RuntimeException("Not supported viewtype: " + viewType);
@@ -105,21 +105,21 @@ public class ColumnListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        final ColumnPreference preference = mColumnPreferenceList.get(position);
+        final HubPreference preference = mHubPreferenceList.get(position);
 
-        if (holder instanceof ColumnViewHolder) {
-            ((ColumnViewHolder) holder).bind(preference);
+        if (holder instanceof HubViewHolder) {
+            ((HubViewHolder) holder).bind(preference);
         }
     }
 
     @Override
     public int getItemCount() {
-        return mColumnPreferenceList.size();
+        return mHubPreferenceList.size();
     }
 
     @Override
     public int getItemViewType(int position) {
-        return TYPE_COLUMN;
+        return TYPE_HUB;
     }
 
     @Override
@@ -128,20 +128,20 @@ public class ColumnListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         mItemTouchHelper.attachToRecyclerView(recyclerView);
     }
 
-    private class ColumnViewHolder extends RecyclerView.ViewHolder {
-        private ItemColumnBinding mBinding;
-        private ColumnPreference mPreference;
+    private class HubViewHolder extends RecyclerView.ViewHolder {
+        private ItemHubBinding mBinding;
+        private HubPreference mPreference;
 
 
         @SuppressLint("ClickableViewAccessibility")
-        ColumnViewHolder(View itemView) {
+        HubViewHolder(View itemView) {
             super(itemView);
             mBinding = DataBindingUtil.bind(itemView);
 
             mBinding.reorderBtn.setOnTouchListener((v, event) -> {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
-                        mItemTouchHelper.startDrag(ColumnViewHolder.this);
+                        mItemTouchHelper.startDrag(HubViewHolder.this);
                         return true;
                 }
                 return false;
@@ -171,18 +171,18 @@ public class ColumnListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             });
         }
 
-        void bind(ColumnPreference preference) {
+        void bind(HubPreference preference) {
             mPreference = preference;
-            mBinding.titleTv.setText(preference.getColumn().getName());
-            mBinding.descriptionTv.setText(preference.getColumn().getVersion());
+            mBinding.titleTv.setText(preference.getHub().getName());
+            mBinding.descriptionTv.setText(preference.getHub().getVersion());
             mBinding.visibilityBtn.setText(mPreference.isVisible() ? "Visible" : "Invisible"); // TODO
         }
     }
 
     public interface UIEventListener {
         void onItemsSwapped();
-        void onItemConfigButtonClick(int position, ColumnPreference preference);
-        void onItemVisibilityButtonClick(int position, ColumnPreference preference);
-        void onItemUninstallButtonClick(int position, ColumnPreference preference);
+        void onItemConfigButtonClick(int position, HubPreference preference);
+        void onItemVisibilityButtonClick(int position, HubPreference preference);
+        void onItemUninstallButtonClick(int position, HubPreference preference);
     }
 }

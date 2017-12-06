@@ -24,10 +24,10 @@ import android.support.annotation.NonNull;
 import com.crashlytics.android.Crashlytics;
 
 import cn.nekocode.hubs.manager.FileManager;
-import cn.nekocode.hubs.manager.ColumnManager;
+import cn.nekocode.hubs.manager.HubManager;
 import cn.nekocode.hubs.manager.PreferenceManager;
 import cn.nekocode.hubs.manager.base.BaseFileManager;
-import cn.nekocode.hubs.manager.base.BaseColumnManager;
+import cn.nekocode.hubs.manager.base.BaseHubManager;
 import cn.nekocode.hubs.manager.base.BasePreferenceManager;
 import io.fabric.sdk.android.Fabric;
 import okhttp3.OkHttpClient;
@@ -38,7 +38,7 @@ import okhttp3.OkHttpClient;
 public class HubsApplication extends Application {
     private OkHttpClient mDefaultOkHttpClient;
     private BaseFileManager mDefaultFileManager;
-    private BaseColumnManager mDefaultColumnManager;
+    private BaseHubManager mDefaultHubManager;
     private BasePreferenceManager mDefaultPreferenceManager;
 
 
@@ -55,9 +55,9 @@ public class HubsApplication extends Application {
     }
 
     @NonNull
-    public static BaseColumnManager getDefaultColumnManager(Context context) {
+    public static BaseHubManager getDefaultHubManager(Context context) {
         return ((HubsApplication) (context.getApplicationContext()))
-                .mDefaultColumnManager;
+                .mDefaultHubManager;
     }
 
     @NonNull
@@ -82,7 +82,7 @@ public class HubsApplication extends Application {
           Setup managers
          */
         mDefaultFileManager = new FileManager();
-        mDefaultColumnManager = new ColumnManager(mDefaultFileManager);
+        mDefaultHubManager = new HubManager(mDefaultFileManager);
         mDefaultPreferenceManager = new PreferenceManager(this);
     }
 }

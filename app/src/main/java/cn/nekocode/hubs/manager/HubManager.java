@@ -35,10 +35,10 @@ import java.util.List;
 import java.util.Map;
 
 import cn.nekocode.hubs.BuildConfig;
-import cn.nekocode.hubs.data.model.Column;
+import cn.nekocode.hubs.data.model.Hub;
 import cn.nekocode.hubs.data.model.UserConfig;
 import cn.nekocode.hubs.manager.base.BaseFileManager;
-import cn.nekocode.hubs.manager.base.BaseColumnManager;
+import cn.nekocode.hubs.manager.base.BaseHubManager;
 import cn.nekocode.hubs.util.ZipUtil;
 import io.reactivex.Completable;
 import io.reactivex.Single;
@@ -46,13 +46,13 @@ import io.reactivex.Single;
 /**
  * @author nekocode (nekocode.cn@gmail.com)
  */
-public class ColumnManager extends BaseColumnManager {
-    private static final String COLUMN_CONFIG_PATH = BuildConfig.COLUMN_CONFIG_PATH;
-    private static final String COLUMN_USER_CONFIG_PATH = BuildConfig.COLUMN_USER_CONFIG_PATH;
+public class HubManager extends BaseHubManager {
+    private static final String HUB_CONFIG_PATH = BuildConfig.HUB_CONFIG_PATH;
+    private static final String HUB_USER_CONFIG_PATH = BuildConfig.HUB_USER_CONFIG_PATH;
     private final Globals mGlobals;
 
 
-    public ColumnManager(BaseFileManager fileManager) {
+    public HubManager(BaseFileManager fileManager) {
         super(fileManager);
 
         // Obatain a lua globals for loading configs
@@ -63,11 +63,11 @@ public class ColumnManager extends BaseColumnManager {
 
     @Override
     @NonNull
-    public Single<Column> readConfig(@NonNull File packageFile) {
+    public Single<Hub> readConfig(@NonNull File packageFile) {
         return Single.create(emitter -> {
             try {
                 emitter.onSuccess(
-                        Column.fromLua(ZipUtil.readStringFromZip(packageFile, COLUMN_CONFIG_PATH)));
+                        Hub.fromLua(ZipUtil.readStringFromZip(packageFile, HUB_CONFIG_PATH)));
 
             } catch (Exception e) {
                 emitter.tryOnError(e);
@@ -77,11 +77,11 @@ public class ColumnManager extends BaseColumnManager {
 
     @Override
     @NonNull
-    public Single<Column> readConfig(@NonNull String columnId) {
+    public Single<Hub> readConfig(@NonNull String hubId) {
         return Single.create(emitter -> {
             try {
                 emitter.onSuccess(
-                        Column.fromLua(readConfigToString(columnId)));
+                        Hub.fromLua(readConfigToString(hubId)));
 
             } catch (Exception e) {
                 emitter.tryOnError(e);
@@ -119,12 +119,12 @@ public class ColumnManager extends BaseColumnManager {
         }
     }
 
-    private String readConfigToString(String columnId) throws IOException {
-        final File columnDirectory = getFileManager().getColumnDirectory(columnId);
+    private String readConfigToString(String hubId) throws IOException {
+        final File hubDirectory = getFileManager().getHubDirectory(hubId);
         // Read default config
-        String configStr = readFileToString(new File(columnDirectory, COLUMN_CONFIG_PATH));
+        String configStr = readFileToString(new File(hubDirectory, HUB_CONFIG_PATH));
 
-        final File userConfig = new File(columnDirectory, COLUMN_USER_CONFIG_PATH);
+        final File userConfig = new File(hubDirectory, HUB_USER_CONFIG_PATH);
         if (userConfig.exists()) {
             // Read user config if exists
             configStr += "\n\n" + readFileToString(userConfig);
@@ -134,13 +134,13 @@ public class ColumnManager extends BaseColumnManager {
     }
 
     @Override
-    public Completable writeUserConfig(@NonNull String columnId, @NonNull UserConfig config) {
+    public Completable writeUserConfig(@NonNull String hubId, @NonNull UserConfig config) {
         return Completable.create(emitter -> {
             PrintWriter writer = null;
 
             try {
                 final File userConfig = new File(
-                        getFileManager().getColumnDirectory(columnId), COLUMN_USER_CONFIG_PATH);
+                        getFileManager().getHubDirectory(hubId), HUB_USER_CONFIG_PATH);
 
                 // Recreate new user config file
                 for (int i = 0; i < 3 && !userConfig.delete();) { i ++; }
@@ -185,42 +185,42 @@ public class ColumnManager extends BaseColumnManager {
 
     @Override
     @NonNull
-    public Single<Column> install(@NonNull Context context, @NonNull File packageFile) {
+    public Single<Hub> install(@NonNull Context context, @NonNull File packageFile) {
         return readConfig(packageFile)
                 // Firstly, remove old directory
-                .flatMap(column ->
-                        uninstall(column.getId())
+                .flatMap(hub ->
+                        uninstall(hub.getId())
                                 .map(success -> {
                                     if (!success) {
-                                        throw new Exception("Remove old column directory failed.");
+                                        throw new Exception("Remove old hub directory failed.");
                                     }
-                                    return column;
+                                    return hub;
                                 }))
                 // Unzip package
-                .map(column -> {
-                    final File columnDir = getFileManager().getColumnDirectory(column.getId());
+                .map(hub -> {
+                    final File hubDir = getFileManager().getHubDirectory(hub.getId());
 
-                    if (!columnDir.mkdirs()) {
-                        throw new Exception("Create column directory failed.");
+                    if (!hubDir.mkdirs()) {
+                        throw new Exception("Create hub directory failed.");
                     }
 
-                    ZipUtil.unzipFile(packageFile, columnDir);
-                    return column;
+                    ZipUtil.unzipFile(packageFile, hubDir);
+                    return hub;
                 });
     }
 
     @Override
     @NonNull
-    public Single<Boolean> uninstall(@NonNull String columnId) {
+    public Single<Boolean> uninstall(@NonNull String hubId) {
         return Single.create(emitter -> {
-            final File columnDir = getFileManager().getColumnDirectory(columnId);
+            final File hubDir = getFileManager().getHubDirectory(hubId);
 
-            if (!columnDir.exists()) {
+            if (!hubDir.exists()) {
                 emitter.onSuccess(true);
 
             } else {
                 boolean rlt[] = new boolean[]{true};
-                deleteRecursive(columnDir, rlt);
+                deleteRecursive(hubDir, rlt);
                 emitter.onSuccess(rlt[0]);
             }
         });
@@ -238,38 +238,38 @@ public class ColumnManager extends BaseColumnManager {
     }
 
     @Override
-    public boolean isInstalled(@NonNull String columnId) {
-        final File columnDir = getFileManager().getColumnDirectory(columnId);
-        return columnDir.exists() && new File(columnDir, BuildConfig.COLUMN_CONFIG_PATH).exists();
+    public boolean isInstalled(@NonNull String hubId) {
+        final File hubDir = getFileManager().getHubDirectory(hubId);
+        return hubDir.exists() && new File(hubDir, BuildConfig.HUB_CONFIG_PATH).exists();
     }
 
     @Override
     @NonNull
-    public Single<List<Column>> getAllInstalled() {
+    public Single<List<Hub>> getAllInstalled() {
         return Single.create(emitter -> {
-            final ArrayList<Column> columns = new ArrayList<>();
-            final File columnsDir = getFileManager().getColumnsDirectory();
+            final ArrayList<Hub> hubs = new ArrayList<>();
+            final File hubsDir = getFileManager().getHubsDirectory();
 
-            if (!columnsDir.exists() || !columnsDir.isDirectory()) {
-                emitter.onSuccess(columns);
+            if (!hubsDir.exists() || !hubsDir.isDirectory()) {
+                emitter.onSuccess(hubs);
                 return;
             }
 
             try {
-                Column column;
-                for (File child : columnsDir.listFiles()) {
+                Hub hub;
+                for (File child : hubsDir.listFiles()) {
                     if (child.isDirectory()) {
                         try {
-                            column = Column.fromLua(
+                            hub = Hub.fromLua(
                                     readConfigToString(child.getName()));
-                            columns.add(column);
+                            hubs.add(hub);
                         } catch (Exception ignored) {
-                            // Just skip this column if load failed
+                            // Just skip this hub if load failed
                         }
                     }
                 }
 
-                emitter.onSuccess(columns);
+                emitter.onSuccess(hubs);
 
             } catch (Exception e) {
                 emitter.tryOnError(e);

@@ -2,18 +2,18 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <PreferenceCategory
-        android:key="setting_category_column"
-        android:title="@string/setting_category_title_column"
+        android:key="setting_category_hub"
+        android:title="@string/setting_category_title_hub"
         >
 
         <Preference
-            android:key="column_manager"
-            android:title="@string/setting_column_manager"
+            android:key="hub_manager"
+            android:title="@string/setting_hub_manager"
             >
             <intent
                 android:action="android.intent.action.VIEW"
                 android:targetPackage="cn.nekocode.hubs"
-                android:targetClass="cn.nekocode.hubs.ui.setting.ColumnManagerActivity"
+                android:targetClass="cn.nekocode.hubs.ui.setting.HubManagerActivity"
                 />
         </Preference>
 

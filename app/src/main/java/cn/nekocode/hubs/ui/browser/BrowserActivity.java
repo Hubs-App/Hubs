@@ -42,9 +42,9 @@ import cn.nekocode.hubs.Constants;
 import cn.nekocode.hubs.HubsApplication;
 import cn.nekocode.hubs.R;
 import cn.nekocode.hubs.base.BaseActivity;
-import cn.nekocode.hubs.data.model.Column;
+import cn.nekocode.hubs.data.model.Hub;
 import cn.nekocode.hubs.databinding.ActivityBrowserBinding;
-import cn.nekocode.hubs.manager.base.BaseColumnManager;
+import cn.nekocode.hubs.manager.base.BaseHubManager;
 import cn.nekocode.hubs.manager.base.BaseFileManager;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -54,16 +54,16 @@ import io.reactivex.schedulers.Schedulers;
  * @author nekocode (nekocode.cn@gmail.com)
  */
 public class BrowserActivity extends BaseActivity {
-    private static final String ARG_COLUMN = "column";
+    private static final String ARG_HUB = "hub";
     private static final String ARG_URL = "url";
     private static final String SAVED_WEBVIEW = "SAVED_WEBVIEW";
     private ActivityBrowserBinding mBinding;
     private BaseFileManager mFileManager;
-    private BaseColumnManager mColumnManager;
+    private BaseHubManager mHubManager;
     private final BroadcastReceiver mBroadcastReceiver = new BrowserBroadcastReceiver();
     @Nullable
-    private Column mColumn;
-    private File mColumnDir;
+    private Hub mHub;
+    private File mHubDir;
 
 
     @Override
@@ -72,7 +72,7 @@ public class BrowserActivity extends BaseActivity {
         StateSaver.restoreInstanceState(this, savedInstanceState);
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_browser);
         mFileManager = HubsApplication.getDefaultFileManager(this);
-        mColumnManager = HubsApplication.getDefaultColumnManager(this);
+        mHubManager = HubsApplication.getDefaultHubManager(this);
 
         /*
           Get arguments from intent
@@ -83,21 +83,21 @@ public class BrowserActivity extends BaseActivity {
             return;
         }
 
-        if (intent.hasExtra(ARG_COLUMN)) {
-            mColumn = intent.getParcelableExtra(ARG_COLUMN);
-            setupWebView(savedInstanceState, mColumn);
+        if (intent.hasExtra(ARG_HUB)) {
+            mHub = intent.getParcelableExtra(ARG_HUB);
+            setupWebView(savedInstanceState, mHub);
 
         } else {
-            final String columnId;
+            final String hubId;
             if (intent.getData() != null && !TextUtils.isEmpty(
-                    columnId = intent.getData().getQueryParameter("column_id"))) {
+                    hubId = intent.getData().getQueryParameter("hub_id"))) {
 
-                mColumnManager.readConfig(columnId)
+                mHubManager.readConfig(hubId)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .to(AutoDispose.with(AndroidLifecycleScopeProvider.from(this)).forSingle())
-                        .subscribe(column -> {
-                            setupWebView(savedInstanceState, column);
+                        .subscribe(hub -> {
+                            setupWebView(savedInstanceState, hub);
 
                         }, throwable -> {
                             setupWebView(savedInstanceState, null);
@@ -113,18 +113,18 @@ public class BrowserActivity extends BaseActivity {
           Register broadcast receiver
          */
         final IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(Constants.ACTION_NOTIFY_COLUMN_INSTALLED);
-        intentFilter.addAction(Constants.ACTION_NOTIFY_COLUMN_UNINSTALLED);
+        intentFilter.addAction(Constants.ACTION_NOTIFY_HUB_INSTALLED);
+        intentFilter.addAction(Constants.ACTION_NOTIFY_HUB_UNINSTALLED);
         LocalBroadcastManager.getInstance(this)
                 .registerReceiver(mBroadcastReceiver, intentFilter);
         registerReceiver(mBroadcastReceiver, intentFilter);
     }
 
-    private void setupWebView(Bundle savedInstanceState, Column column) {
+    private void setupWebView(Bundle savedInstanceState, Hub hub) {
         final Intent intent = getIntent();
         // Save to intent
-        intent.putExtra(ARG_COLUMN, column);
-        mColumn = column;
+        intent.putExtra(ARG_HUB, hub);
+        mHub = hub;
 
         /*
           Get url from intent
@@ -149,12 +149,12 @@ public class BrowserActivity extends BaseActivity {
           Load url
          */
         if (savedInstanceState == null) {
-            if (column == null || TextUtils.isEmpty(column.getBrowser())) {
+            if (hub == null || TextUtils.isEmpty(hub.getBrowser())) {
                 mBinding.webView.loadUrl2(url);
 
             } else {
-                mColumnDir = mFileManager.getColumnDirectory(column.getId());
-                final String browserUrl = Uri.fromFile(new File(mColumnDir, column.getBrowser()))
+                mHubDir = mFileManager.getHubDirectory(hub.getId());
+                final String browserUrl = Uri.fromFile(new File(mHubDir, hub.getBrowser()))
                         .buildUpon()
                         .appendQueryParameter("url", url)
                         .build()
@@ -199,7 +199,7 @@ public class BrowserActivity extends BaseActivity {
     }
 
     public void showMessageIfInDebug(@NonNull String message) {
-        if (mColumn != null && mColumn.isDebug()) {
+        if (mHub != null && mHub.isDebug()) {
             Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
         }
     }
@@ -208,33 +208,33 @@ public class BrowserActivity extends BaseActivity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            // If the column has not been assigned, return
-            if (mColumn == null) return;
+            // If the hub has not been assigned, return
+            if (mHub == null) return;
 
             final String action = intent.getAction();
             if (action == null) return;
 
-            ArrayList<Column> columns;
-            Column column;
-            String columnId;
+            ArrayList<Hub> hubs;
+            Hub hub;
+            String hubId;
             switch (action) {
-                case Constants.ACTION_NOTIFY_COLUMN_INSTALLED:
-                    column = intent.getParcelableExtra(Constants.ARG_COLUMN);
-                    columnId = intent.getStringExtra(Constants.ARG_COLUMNID);
-                    if (column == null && columnId == null) break;
-                    if (columnId == null) columnId = column.getId();
+                case Constants.ACTION_NOTIFY_HUB_INSTALLED:
+                    hub = intent.getParcelableExtra(Constants.ARG_HUB);
+                    hubId = intent.getStringExtra(Constants.ARG_HUB_ID);
+                    if (hub == null && hubId == null) break;
+                    if (hubId == null) hubId = hub.getId();
 
-                    if (mColumn == null || !columnId.equalsIgnoreCase(mColumn.getId())) {
+                    if (mHub == null || !hubId.equalsIgnoreCase(mHub.getId())) {
                         break;
                     }
 
-                    // Refresh column object and refresh the page
-                    (column != null ? Single.just(column) : mColumnManager.readConfig(columnId))
+                    // Refresh hub object and refresh the page
+                    (hub != null ? Single.just(hub) : mHubManager.readConfig(hubId))
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
                             .to(AutoDispose.with(AndroidLifecycleScopeProvider.from(BrowserActivity.this)).forSingle())
-                            .subscribe(_column -> {
-                                setupWebView(null, _column);
+                            .subscribe(_hub -> {
+                                setupWebView(null, _hub);
 
                             }, throwable -> {
                                 setupWebView(null, null);
@@ -243,12 +243,12 @@ public class BrowserActivity extends BaseActivity {
 
                     break;
 
-                case Constants.ACTION_NOTIFY_COLUMN_UNINSTALLED:
-                    columns = intent.getParcelableArrayListExtra(Constants.ARG_COLUMNS);
-                    if (columns == null) return;
+                case Constants.ACTION_NOTIFY_HUB_UNINSTALLED:
+                    hubs = intent.getParcelableArrayListExtra(Constants.ARG_HUBS);
+                    if (hubs == null) return;
 
-                    if (columns.contains(mColumn)) {
-                        // If this column has been uninstalled, finish the browser page
+                    if (hubs.contains(mHub)) {
+                        // If this hub has been uninstalled, finish the browser page
                         finish();
                     }
                     break;

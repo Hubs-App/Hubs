@@ -31,7 +31,7 @@ import java.util.ArrayList;
 
 import cn.nekocode.hubs.HubsApplication;
 import cn.nekocode.hubs.data.model.Article;
-import cn.nekocode.hubs.data.model.Column;
+import cn.nekocode.hubs.data.model.Hub;
 import cn.nekocode.hubs.luaj.sandbox.HubsLuaGlobals;
 import io.reactivex.Single;
 import okhttp3.OkHttpClient;
@@ -41,15 +41,15 @@ import okhttp3.OkHttpClient;
  */
 public class EntryLuaBridge {
     private Context mContext;
-    private Column mColumn;
+    private Hub mHub;
     @Nullable
     private Globals mLuaGlobals;
 
 
-    public static EntryLuaBridge create(@NonNull Context context, @NonNull Column column) {
+    public static EntryLuaBridge create(@NonNull Context context, @NonNull Hub hub) {
         final EntryLuaBridge bridge = new EntryLuaBridge();
         bridge.mContext = context;
-        bridge.mColumn = column;
+        bridge.mHub = hub;
         return bridge;
     }
 
@@ -59,14 +59,14 @@ public class EntryLuaBridge {
     @NonNull
     private Globals getGlobals() {
         if (mLuaGlobals == null) {
-            final File columnDir =
-                    HubsApplication.getDefaultFileManager(mContext).getColumnDirectory(mColumn.getId());
-            mLuaGlobals = new HubsLuaGlobals(columnDir);
+            final File hubDir =
+                    HubsApplication.getDefaultFileManager(mContext).getHubDirectory(mHub.getId());
+            mLuaGlobals = new HubsLuaGlobals(hubDir);
 
-            mColumn.setAllTo(mLuaGlobals);
+            mHub.setAllTo(mLuaGlobals);
 
             final OkHttpClient client = HubsApplication.getDefaultOkHttpClient(mContext);
-            mLuaGlobals.loadfile(mColumn.getEntry()).call(CoerceJavaToLua.coerce(client));
+            mLuaGlobals.loadfile(mHub.getEntry()).call(CoerceJavaToLua.coerce(client));
         }
 
         return mLuaGlobals;

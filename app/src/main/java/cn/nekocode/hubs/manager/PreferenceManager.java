@@ -28,8 +28,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import cn.nekocode.hubs.data.model.Column;
-import cn.nekocode.hubs.data.model.ColumnPreference;
+import cn.nekocode.hubs.data.model.Hub;
+import cn.nekocode.hubs.data.model.HubPreference;
 import cn.nekocode.hubs.manager.base.BasePreferenceManager;
 import io.reactivex.Single;
 
@@ -46,36 +46,36 @@ public class PreferenceManager extends BasePreferenceManager {
 
     @Override
     @NonNull
-    public Single<List<Column>> getOrderedVisibleColumns(@NonNull List<Column> columns) {
-        return loadColumnPreferences(columns)
+    public Single<List<Hub>> getOrderedVisibleHubs(@NonNull List<Hub> hubs) {
+        return loadHubPreferences(hubs)
                 .flattenAsObservable(list -> list)
                 .filter(preference -> preference.isVisible())
-                .map(preference -> preference.getColumn())
+                .map(preference -> preference.getHub())
                 .toList();
     }
 
     @Override
     @NonNull
-    public Single<List<ColumnPreference>> loadColumnPreferences(@NonNull List<Column> columns) {
+    public Single<List<HubPreference>> loadHubPreferences(@NonNull List<Hub> hubs) {
         return Single.create(emitter -> {
-            final ArrayList<ColumnPreference> preferences = new ArrayList<>();
-            final HashMap<String, Column> columnHashMap = new HashMap<>();
-            for (Column column : columns) {
-                columnHashMap.put(column.getId().toLowerCase(), column);
+            final ArrayList<HubPreference> preferences = new ArrayList<>();
+            final HashMap<String, Hub> hubHashMap = new HashMap<>();
+            for (Hub hub : hubs) {
+                hubHashMap.put(hub.getId().toLowerCase(), hub);
             }
 
             final SQLiteDatabase db = mDBHelper.getReadableDatabase();
             final Cursor cursor = db.query(PreferenceDBHelper.TABLE_NAME, null, null, null, null, null, "_order ASC");
-            final int indexOfColumnId = cursor.getColumnIndex("column_id");
+            final int indexOfHubId = cursor.getColumnIndex("hub_id");
             final int indexOfIsVisible = cursor.getColumnIndex("is_visible");
 
             int order = 0;
             for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
-                final Column column = columnHashMap.remove(cursor.getString(indexOfColumnId).toLowerCase());
+                final Hub hub = hubHashMap.remove(cursor.getString(indexOfHubId).toLowerCase());
 
-                if (column != null) {
-                    preferences.add(new ColumnPreference(
-                            column,
+                if (hub != null) {
+                    preferences.add(new HubPreference(
+                            hub,
                             cursor.getInt(indexOfIsVisible) == 1,
                             order ++
                     ));
@@ -85,14 +85,14 @@ public class PreferenceManager extends BasePreferenceManager {
             cursor.close();
             db.close();
 
-            // Add rest columns
-            final ArrayList<ColumnPreference> newPreferences = new ArrayList<>();
-            for (Column column : columnHashMap.values()) {
-                newPreferences.add(new ColumnPreference(column, true, order ++));
+            // Add rest hubs
+            final ArrayList<HubPreference> newPreferences = new ArrayList<>();
+            for (Hub hub : hubHashMap.values()) {
+                newPreferences.add(new HubPreference(hub, true, order ++));
             }
             if (newPreferences.size() > 0) {
                 // Save to db
-                updateColumnPreferences(newPreferences.toArray(new ColumnPreference[newPreferences.size()]));
+                updateHubPreferences(newPreferences.toArray(new HubPreference[newPreferences.size()]));
             }
 
             preferences.addAll(newPreferences);
@@ -102,20 +102,20 @@ public class PreferenceManager extends BasePreferenceManager {
 
     @NonNull
     @Override
-    public Single<ColumnPreference> loadColumnPreference(@NonNull Column column) {
+    public Single<HubPreference> loadHubPreference(@NonNull Hub hub) {
         return Single.create(emitter -> {
             final SQLiteDatabase db = mDBHelper.getReadableDatabase();
             final Cursor cursor = db.query(PreferenceDBHelper.TABLE_NAME, null, null, null, null, null, null);
-            final int indexOfColumnId = cursor.getColumnIndex("column_id");
+            final int indexOfHubId = cursor.getColumnIndex("hub_id");
             final int indexOfIsVisible = cursor.getColumnIndex("is_visible");
             final int indexOfOrder = cursor.getColumnIndex("_order");
 
-            final String id = column.getId();
-            ColumnPreference columnPreference = null;
+            final String id = hub.getId();
+            HubPreference hubPreference = null;
             for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
-                if (cursor.getString(indexOfColumnId).equalsIgnoreCase(id)) {
-                    columnPreference = new ColumnPreference(
-                            column,
+                if (cursor.getString(indexOfHubId).equalsIgnoreCase(id)) {
+                    hubPreference = new HubPreference(
+                            hub,
                             cursor.getInt(indexOfIsVisible) == 1,
                             cursor.getInt(indexOfOrder)
                     );
@@ -123,9 +123,9 @@ public class PreferenceManager extends BasePreferenceManager {
                 }
             }
 
-            if (columnPreference == null) {
-                columnPreference = new ColumnPreference(
-                        column,
+            if (hubPreference == null) {
+                hubPreference = new HubPreference(
+                        hub,
                         true,
                         cursor.getColumnCount()
                 );
@@ -135,56 +135,56 @@ public class PreferenceManager extends BasePreferenceManager {
             db.close();
 
             // Save to db
-            updateColumnPreferences(columnPreference);
+            updateHubPreferences(hubPreference);
 
-            emitter.onSuccess(columnPreference);
+            emitter.onSuccess(hubPreference);
         });
     }
 
     @Override
-    public void updateColumnPreferences(@NonNull ColumnPreference... preferences) {
+    public void updateHubPreferences(@NonNull HubPreference... preferences) {
         final SQLiteDatabase db = mDBHelper.getWritableDatabase();
 
-        for (ColumnPreference preference : preferences) {
+        for (HubPreference preference : preferences) {
             final ContentValues values = new ContentValues();
-            values.put("column_id", preference.getColumnId());
+            values.put("hub_id", preference.getHubId());
             values.put("is_visible", preference.isVisible() ? 1 : 0);
             values.put("_order", preference.getOrder());
-            db.replace(PreferenceDBHelper.TABLE_NAME, "column_id", values);
+            db.replace(PreferenceDBHelper.TABLE_NAME, "hub_id", values);
         }
 
         db.close();
     }
 
     @Override
-    public void saveColumnPreferences(@NonNull List<ColumnPreference> preferences) {
+    public void saveHubPreferences(@NonNull List<HubPreference> preferences) {
         final SQLiteDatabase db = mDBHelper.getWritableDatabase();
         db.execSQL("DELETE FROM " + PreferenceDBHelper.TABLE_NAME);
 
-        for (ColumnPreference preference : preferences) {
+        for (HubPreference preference : preferences) {
             final ContentValues values = new ContentValues();
-            values.put("column_id", preference.getColumnId());
+            values.put("hub_id", preference.getHubId());
             values.put("is_visible", preference.isVisible() ? 1 : 0);
             values.put("_order", preference.getOrder());
-            db.insert(PreferenceDBHelper.TABLE_NAME, "column_id", values);
+            db.insert(PreferenceDBHelper.TABLE_NAME, "hub_id", values);
         }
 
         db.close();
     }
 
     @Override
-    public void removeColumnPreferences(@NonNull ColumnPreference... preferences) {
+    public void removeHubPreferences(@NonNull HubPreference... preferences) {
         final SQLiteDatabase db = mDBHelper.getWritableDatabase();
 
-        for (ColumnPreference preference : preferences) {
-            db.delete(PreferenceDBHelper.TABLE_NAME, "column_id=?", new String[] {preference.getColumnId()});
+        for (HubPreference preference : preferences) {
+            db.delete(PreferenceDBHelper.TABLE_NAME, "hub_id=?", new String[] {preference.getHubId()});
         }
 
         db.close();
     }
 
     @Override
-    public void removeAllColumnPreferences() {
+    public void removeAllHubPreferences() {
         final SQLiteDatabase db = mDBHelper.getWritableDatabase();
         db.execSQL("DELETE FROM " + PreferenceDBHelper.TABLE_NAME);
         db.close();
@@ -203,7 +203,7 @@ public class PreferenceManager extends BasePreferenceManager {
         @Override
         public void onCreate(SQLiteDatabase sqLiteDatabase) {
             final String sql = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME +
-                    " (column_id VARCHAR PRIMARY KEY NOT NULL, " +
+                    " (hub_id VARCHAR PRIMARY KEY NOT NULL, " +
                     "is_visible INTEGER NOT NULL, " +
                     "_order INTEGER NOT NULL)";
             sqLiteDatabase.execSQL(sql);

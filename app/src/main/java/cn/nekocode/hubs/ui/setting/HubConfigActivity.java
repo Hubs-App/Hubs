@@ -46,9 +46,9 @@ import cn.nekocode.hubs.HubsApplication;
 import cn.nekocode.hubs.R;
 import cn.nekocode.hubs.base.BaseActivity;
 import cn.nekocode.hubs.broadcast.BroadcastRouter;
-import cn.nekocode.hubs.data.model.Column;
-import cn.nekocode.hubs.databinding.ActivityColumnConfigBinding;
-import cn.nekocode.hubs.manager.base.BaseColumnManager;
+import cn.nekocode.hubs.data.model.Hub;
+import cn.nekocode.hubs.databinding.ActivityHubConfigBinding;
+import cn.nekocode.hubs.manager.base.BaseHubManager;
 import cn.nekocode.hubs.util.DividerItemDecoration;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -57,12 +57,12 @@ import io.reactivex.schedulers.Schedulers;
 /**
  * @author nekocode (nekocode.cn@gmail.com)
  */
-public class ColumnConfigActivity extends BaseActivity implements ConfigPropertyListAdapter.UIEventListener {
+public class HubConfigActivity extends BaseActivity implements ConfigPropertyListAdapter.UIEventListener {
     private Globals mGlobals = new Globals();
-    private BaseColumnManager mColumnManager;
+    private BaseHubManager mHubManager;
     @State
-    public Column mColumn;
-    private ActivityColumnConfigBinding mBinding;
+    public Hub mHub;
+    private ActivityHubConfigBinding mBinding;
     private ConfigPropertyListAdapter mAdapter;
     @State
     public ArrayList<PropertyVO> mPropertyVOs;
@@ -72,24 +72,24 @@ public class ColumnConfigActivity extends BaseActivity implements ConfigProperty
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         StateSaver.restoreInstanceState(this, savedInstanceState);
-        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_column_config);
-        mColumnManager = HubsApplication.getDefaultColumnManager(this);
+        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_hub_config);
+        mHubManager = HubsApplication.getDefaultHubManager(this);
 
         /*
           Data initialize
          */
-        if (mColumn == null) {
-            mColumn = getIntent().getParcelableExtra("column");
+        if (mHub == null) {
+            mHub = getIntent().getParcelableExtra("hub");
             // Add name config
-            mColumn.getUserConfig().put("NAME", mColumn.getName());
+            mHub.getUserConfig().put("NAME", mHub.getName());
 
-            mPropertyVOs = listOf(mColumn);
+            mPropertyVOs = listOf(mHub);
         }
 
         // Setup lua globals
         LoadState.install(mGlobals);
         LuaC.install(mGlobals);
-        mColumn.setAllTo(mGlobals);
+        mHub.setAllTo(mGlobals);
 
         /*
           View initialize
@@ -120,9 +120,9 @@ public class ColumnConfigActivity extends BaseActivity implements ConfigProperty
     /**
      * Convert to sortted view oject list
      */
-    private static ArrayList<PropertyVO> listOf(Column column) {
+    private static ArrayList<PropertyVO> listOf(Hub hub) {
         final ArrayList<PropertyVO> list = new ArrayList<>();
-        for (Map.Entry<String, Object> entry : column.getUserConfig().entrySet()) {
+        for (Map.Entry<String, Object> entry : hub.getUserConfig().entrySet()) {
             final String key = entry.getKey();
             final Object value = entry.getValue();
 
@@ -171,19 +171,19 @@ public class ColumnConfigActivity extends BaseActivity implements ConfigProperty
             if (!rlt.isnil()) {
                 // Legal
                 if (rlt instanceof LuaDouble) {
-                    mColumn.getUserConfig().put(vo.getKey(), rlt.todouble());
+                    mHub.getUserConfig().put(vo.getKey(), rlt.todouble());
                     vo.setValue(String.valueOf(rlt.todouble()));
 
                 } else if (rlt instanceof LuaInteger) {
-                    mColumn.getUserConfig().put(vo.getKey(), rlt.toint());
+                    mHub.getUserConfig().put(vo.getKey(), rlt.toint());
                     vo.setValue(String.valueOf(rlt.toint()));
 
                 } else if (rlt instanceof LuaString) {
-                    mColumn.getUserConfig().put(vo.getKey(), rlt.tojstring());
+                    mHub.getUserConfig().put(vo.getKey(), rlt.tojstring());
                     vo.setValue("\"" + rlt.tojstring() + "\"");
 
                 } else if (rlt instanceof LuaBoolean) {
-                    mColumn.getUserConfig().put(vo.getKey(), rlt.toboolean());
+                    mHub.getUserConfig().put(vo.getKey(), rlt.toboolean());
                     vo.setValue(rlt.toboolean() ? "true" : "false");
 
                 } else {
@@ -215,7 +215,7 @@ public class ColumnConfigActivity extends BaseActivity implements ConfigProperty
         progressDialog.setCancelable(false);
         progressDialog.show();
 
-        Single.<Column>create(emitter -> {
+        Single.<Hub>create(emitter -> {
             // Process the rest of edited values
             for (PropertyVO vo : mPropertyVOs) {
                 if (vo.isFoucused()) {
@@ -223,18 +223,18 @@ public class ColumnConfigActivity extends BaseActivity implements ConfigProperty
                 }
             }
 
-            emitter.onSuccess(mColumn);
+            emitter.onSuccess(mHub);
         })
                 .subscribeOn(Schedulers.io())
-                .flatMapCompletable(column ->
-                        mColumnManager.writeUserConfig(column.getId(), column.getUserConfig())
+                .flatMapCompletable(hub ->
+                        mHubManager.writeUserConfig(hub.getId(), hub.getUserConfig())
                                 .subscribeOn(Schedulers.io())
                 )
                 .observeOn(AndroidSchedulers.mainThread())
                 .to(AutoDispose.with(AndroidLifecycleScopeProvider.from(this)).forCompletable())
                 .subscribe(() -> {
                     // Send local broadcast
-                    BroadcastRouter.IMPL.tellColumnInstalled(this, mColumn.getId());
+                    BroadcastRouter.IMPL.tellHubInstalled(this, mHub.getId());
                     progressDialog.dismiss();
                     finish();
 

@@ -24,15 +24,15 @@ public interface Constants {
     String ACTION_PREFIX = "cn.nekocode.hubs.action.";
 
     /**
-     * You can run the following command to refresh a column page immediately.
-     * adb shell "am broadcast -a cn.nekocode.hubs.action.NOTIFY_COLUMN_INSTALLED -e column_id '$column_id'"
+     * You can run the following command to refresh a hub page immediately.
+     * adb shell "am broadcast -a cn.nekocode.hubs.action.NOTIFY_HUB_INSTALLED -e hub_id '$hub_id'"
      */
-    String ACTION_NOTIFY_COLUMN_INSTALLED = ACTION_PREFIX + "NOTIFY_COLUMN_INSTALLED";
-    String ACTION_NOTIFY_COLUMN_UNINSTALLED = ACTION_PREFIX + "NOTIFY_COLUMN_UNINSTALLED";
-    String ACTION_NOTIFY_COLUMN_PREFERENCE_CHANGED = ACTION_PREFIX + "NOTIFY_COLUMN_PREFERENCE_CHANGED";
+    String ACTION_NOTIFY_HUB_INSTALLED = ACTION_PREFIX + "NOTIFY_HUB_INSTALLED";
+    String ACTION_NOTIFY_HUB_UNINSTALLED = ACTION_PREFIX + "NOTIFY_HUB_UNINSTALLED";
+    String ACTION_NOTIFY_HUB_PREFERENCE_CHANGED = ACTION_PREFIX + "NOTIFY_HUB_PREFERENCE_CHANGED";
 
 
-    String ARG_COLUMN = "column";
-    String ARG_COLUMNS = "columns";
-    String ARG_COLUMNID = "column_id";
+    String ARG_HUB = "hub";
+    String ARG_HUBS = "hubs";
+    String ARG_HUB_ID = "hub_id";
 }

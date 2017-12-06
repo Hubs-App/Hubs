@@ -21,8 +21,8 @@ import android.support.annotation.NonNull;
 
 import java.util.List;
 
-import cn.nekocode.hubs.data.model.Column;
-import cn.nekocode.hubs.data.model.ColumnPreference;
+import cn.nekocode.hubs.data.model.Hub;
+import cn.nekocode.hubs.data.model.HubPreference;
 import io.reactivex.Single;
 
 /**
@@ -31,40 +31,40 @@ import io.reactivex.Single;
 public abstract class BasePreferenceManager {
 
     /**
-     * Get ordered visible columns
+     * Get ordered visible hubs
      */
     @NonNull
-    public abstract Single<List<Column>> getOrderedVisibleColumns(@NonNull List<Column> columns);
+    public abstract Single<List<Hub>> getOrderedVisibleHubs(@NonNull List<Hub> hubs);
 
     /**
-     * Load column preference objects
+     * Load hub preference objects
      */
     @NonNull
-    public abstract Single<List<ColumnPreference>> loadColumnPreferences(@NonNull List<Column> columns);
+    public abstract Single<List<HubPreference>> loadHubPreferences(@NonNull List<Hub> hubs);
 
     /**
-     * Load column preference object
+     * Load hub preference object
      */
     @NonNull
-    public abstract Single<ColumnPreference> loadColumnPreference(@NonNull Column column);
+    public abstract Single<HubPreference> loadHubPreference(@NonNull Hub hub);
 
     /**
-     * Update column preference objects
+     * Update hub preference objects
      */
-    public abstract void updateColumnPreferences(@NonNull ColumnPreference... preferences);
+    public abstract void updateHubPreferences(@NonNull HubPreference... preferences);
 
     /**
-     * Save column preference objects
+     * Save hub preference objects
      */
-    public abstract void saveColumnPreferences(@NonNull List<ColumnPreference> preferences);
+    public abstract void saveHubPreferences(@NonNull List<HubPreference> preferences);
 
     /**
-     * Remove column preference objects
+     * Remove hub preference objects
      */
-    public abstract void removeColumnPreferences(@NonNull ColumnPreference... preferences);
+    public abstract void removeHubPreferences(@NonNull HubPreference... preferences);
 
     /**
-     * Remove all column preference objects
+     * Remove all hub preference objects
      */
-    public abstract void removeAllColumnPreferences();
+    public abstract void removeAllHubPreferences();
 }

@@ -42,16 +42,16 @@ public abstract class BaseFileManager {
     public abstract File getRootDirectory();
 
     /**
-     * Get columns' parent directory
+     * Get hubs' parent directory
      */
     @NonNull
-    public abstract File getColumnsDirectory();
+    public abstract File getHubsDirectory();
 
     /**
-     * Get column directory
+     * Get hub directory
      */
     @NonNull
-    public abstract File getColumnDirectory(@NonNull String columnId);
+    public abstract File getHubDirectory(@NonNull String hubId);
 
     /**
      * Get file from a uri

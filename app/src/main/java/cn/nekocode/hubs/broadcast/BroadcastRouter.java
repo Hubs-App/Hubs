@@ -21,9 +21,8 @@ import android.content.Context;
 
 import java.util.ArrayList;
 
-import cn.nekocode.hubs.BuildConfig;
 import cn.nekocode.hubs.Constants;
-import cn.nekocode.hubs.data.model.Column;
+import cn.nekocode.hubs.data.model.Hub;
 import cn.nekocode.meepo.Meepo;
 import cn.nekocode.meepo.annotation.Bundle;
 import cn.nekocode.meepo.annotation.TargetAction;
@@ -37,16 +36,16 @@ public interface BroadcastRouter {
             .build().create(BroadcastRouter.class);
 
 
-    @TargetAction(Constants.ACTION_NOTIFY_COLUMN_INSTALLED)
-    void tellColumnInstalled(Context context, @Bundle(Constants.ARG_COLUMNID) String columnId);
+    @TargetAction(Constants.ACTION_NOTIFY_HUB_INSTALLED)
+    void tellHubInstalled(Context context, @Bundle(Constants.ARG_HUB_ID) String hubId);
 
-    @TargetAction(Constants.ACTION_NOTIFY_COLUMN_INSTALLED)
-    void tellColumnInstalled(Context context, @Bundle(Constants.ARG_COLUMN) Column column);
+    @TargetAction(Constants.ACTION_NOTIFY_HUB_INSTALLED)
+    void tellHubInstalled(Context context, @Bundle(Constants.ARG_HUB) Hub hub);
 
-    @TargetAction(Constants.ACTION_NOTIFY_COLUMN_UNINSTALLED)
-    void tellColumnUninstalled(Context context, @Bundle(Constants.ARG_COLUMNS) ArrayList<Column> columns);
+    @TargetAction(Constants.ACTION_NOTIFY_HUB_UNINSTALLED)
+    void tellHubUninstalled(Context context, @Bundle(Constants.ARG_HUBS) ArrayList<Hub> hubs);
 
-    @TargetAction(Constants.ACTION_NOTIFY_COLUMN_PREFERENCE_CHANGED)
-    void tellColumnPreferenceChanged(Context context, @Bundle(Constants.ARG_COLUMNS) ArrayList<Column> columns);
+    @TargetAction(Constants.ACTION_NOTIFY_HUB_PREFERENCE_CHANGED)
+    void tellHubPreferenceChanged(Context context, @Bundle(Constants.ARG_HUBS) ArrayList<Hub> hubs);
 
 }

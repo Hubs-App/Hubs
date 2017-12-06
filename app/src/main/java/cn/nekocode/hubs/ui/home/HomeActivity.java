@@ -46,12 +46,12 @@ import cn.nekocode.hubs.HubsApplication;
 import cn.nekocode.hubs.R;
 import cn.nekocode.hubs.base.BaseActivity;
 import cn.nekocode.hubs.broadcast.BroadcastRouter;
-import cn.nekocode.hubs.data.model.Column;
+import cn.nekocode.hubs.data.model.Hub;
 import cn.nekocode.hubs.databinding.ActivityHomeBinding;
-import cn.nekocode.hubs.manager.base.BaseColumnManager;
+import cn.nekocode.hubs.manager.base.BaseHubManager;
 import cn.nekocode.hubs.manager.base.BaseFileManager;
 import cn.nekocode.hubs.manager.base.BasePreferenceManager;
-import cn.nekocode.hubs.util.ColumnUtil;
+import cn.nekocode.hubs.util.HubUtil;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
@@ -63,10 +63,10 @@ public class HomeActivity extends BaseActivity {
     private ActivityHomeBinding mBinding;
 
     @State
-    public ArrayList<Column> mColumns;
-    private ColumnPagerAdapter mPagerAdapter;
+    public ArrayList<Hub> mHubs;
+    private HubPagerAdapter mPagerAdapter;
     private BaseFileManager mFileManager;
-    private BaseColumnManager mColumnManager;
+    private BaseHubManager mHubManager;
     private BasePreferenceManager mPreferenceManager;
     private final BroadcastReceiver mBroadcastReceiver = new HomeBroadcastReceiver();
 
@@ -77,7 +77,7 @@ public class HomeActivity extends BaseActivity {
         StateSaver.restoreInstanceState(this, savedInstanceState);
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_home);
         mFileManager = HubsApplication.getDefaultFileManager(this);
-        mColumnManager = HubsApplication.getDefaultColumnManager(this);
+        mHubManager = HubsApplication.getDefaultHubManager(this);
         mPreferenceManager = HubsApplication.getDefaultPreferenceManager(this);
 
         /*
@@ -89,14 +89,14 @@ public class HomeActivity extends BaseActivity {
         }
 
 
-        if (mColumns == null) {
-            mColumns = new ArrayList<>();
-            loadColumns();
+        if (mHubs == null) {
+            mHubs = new ArrayList<>();
+            loadHubs();
         }
 
         setSupportActionBar(mBinding.toolbar);
 
-        mPagerAdapter = new ColumnPagerAdapter(getSupportFragmentManager(), mColumns);
+        mPagerAdapter = new HubPagerAdapter(getSupportFragmentManager(), mHubs);
         mBinding.viewPager.setAdapter(mPagerAdapter);
         mBinding.tabs.setupWithViewPager(mBinding.viewPager);
 
@@ -106,9 +106,9 @@ public class HomeActivity extends BaseActivity {
           Register broadcast receiver
          */
         final IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(Constants.ACTION_NOTIFY_COLUMN_INSTALLED);
-        intentFilter.addAction(Constants.ACTION_NOTIFY_COLUMN_UNINSTALLED);
-        intentFilter.addAction(Constants.ACTION_NOTIFY_COLUMN_PREFERENCE_CHANGED);
+        intentFilter.addAction(Constants.ACTION_NOTIFY_HUB_INSTALLED);
+        intentFilter.addAction(Constants.ACTION_NOTIFY_HUB_UNINSTALLED);
+        intentFilter.addAction(Constants.ACTION_NOTIFY_HUB_PREFERENCE_CHANGED);
         LocalBroadcastManager.getInstance(this)
                 .registerReceiver(mBroadcastReceiver, intentFilter);
         registerReceiver(mBroadcastReceiver, intentFilter);
@@ -128,26 +128,26 @@ public class HomeActivity extends BaseActivity {
         unregisterReceiver(mBroadcastReceiver);
     }
 
-    private void loadColumns() {
+    private void loadHubs() {
         final ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage(getString(R.string.loading));
         progressDialog.setCancelable(false);
         progressDialog.show();
 
-        mColumnManager.getAllInstalled()
+        mHubManager.getAllInstalled()
                 .subscribeOn(Schedulers.io())
-                .flatMap(columns -> mPreferenceManager.getOrderedVisibleColumns(columns))
+                .flatMap(hubs -> mPreferenceManager.getOrderedVisibleHubs(hubs))
                 .observeOn(AndroidSchedulers.mainThread())
                 .to(AutoDispose.with(AndroidLifecycleScopeProvider.from(this)).forSingle())
-                .subscribe(columns -> {
+                .subscribe(hubs -> {
                     progressDialog.dismiss();
-                    mColumns.clear();
-                    mColumns.addAll(columns);
+                    mHubs.clear();
+                    mHubs.addAll(hubs);
                     mPagerAdapter.notifyDataSetChanged();
 
                 }, throwable -> {
                     progressDialog.dismiss();
-                    Toast.makeText(HomeActivity.this, R.string.toast_load_columns_failed, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(HomeActivity.this, R.string.toast_load_hubs_failed, Toast.LENGTH_SHORT).show();
                 });
     }
 
@@ -159,86 +159,86 @@ public class HomeActivity extends BaseActivity {
         }
 
         final ProgressDialog progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage(getString(R.string.dialog_checking_column));
+        progressDialog.setMessage(getString(R.string.dialog_checking_hub));
         progressDialog.setCancelable(false);
         progressDialog.show();
 
         mFileManager.getFile(this, intent.getData())
                 .flatMap(file ->
-                        mColumnManager.readConfig(file)
-                                .map(column -> Pair.create(file, column))
+                        mHubManager.readConfig(file)
+                                .map(hub -> Pair.create(file, hub))
                 )
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .to(AutoDispose.with(AndroidLifecycleScopeProvider.from(this)).forSingle())
                 .subscribe(pair -> {
-                    final File columnPackgeFile = pair.first;
-                    final Column column = pair.second;
+                    final File hubPackgeFile = pair.first;
+                    final Hub hub = pair.second;
 
-                    if (!mColumnManager.isInstalled(column.getId())) {
-                        showInstallDialog(columnPackgeFile, column, progressDialog);
+                    if (!mHubManager.isInstalled(hub.getId())) {
+                        showInstallDialog(hubPackgeFile, hub, progressDialog);
                     } else {
-                        showReinstallDialog(columnPackgeFile, column, progressDialog);
+                        showReinstallDialog(hubPackgeFile, hub, progressDialog);
                     }
                 }, throwable -> {
                     progressDialog.dismiss();
-                    Toast.makeText(HomeActivity.this, R.string.toast_install_column_failed, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(HomeActivity.this, R.string.toast_install_hub_failed, Toast.LENGTH_SHORT).show();
                 });
     }
 
-    private void showInstallDialog(File columnPackageFile, Column column, final ProgressDialog progressDialog) {
+    private void showInstallDialog(File hubPackageFile, Hub hub, final ProgressDialog progressDialog) {
         progressDialog.dismiss();
         new AlertDialog.Builder(HomeActivity.this)
-                .setMessage(getString(R.string.dialog_ensure_install_column,
-                        column.getName(), column.getVersion()))
+                .setMessage(getString(R.string.dialog_ensure_install_hub,
+                        hub.getName(), hub.getVersion()))
                 .setPositiveButton(R.string.yes, (dialog, which) -> {
-                    installColumn(columnPackageFile, progressDialog);
+                    installHub(hubPackageFile, progressDialog);
                 })
                 .setNegativeButton(R.string.cancel, null)
                 .show();
     }
 
-    private void showReinstallDialog(File columnPackageFile, Column column, final ProgressDialog progressDialog) {
-        mColumnManager.readConfig(column.getId())
+    private void showReinstallDialog(File hubPackageFile, Hub hub, final ProgressDialog progressDialog) {
+        mHubManager.readConfig(hub.getId())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .to(AutoDispose.with(AndroidLifecycleScopeProvider.from(this)).forSingle())
-                .subscribe(installedColumn -> {
+                .subscribe(installedHub -> {
                     progressDialog.dismiss();
                     new AlertDialog.Builder(HomeActivity.this)
-                            .setMessage(getString(R.string.dialog_ensure_reinstall_column,
-                                    installedColumn.getName(), installedColumn.getVersion(), column.getVersion()))
+                            .setMessage(getString(R.string.dialog_ensure_reinstall_hub,
+                                    installedHub.getName(), installedHub.getVersion(), hub.getVersion()))
                             .setPositiveButton(R.string.yes, (dialog, which) -> {
-                                installColumn(columnPackageFile, progressDialog);
+                                installHub(hubPackageFile, progressDialog);
                             })
                             .setNegativeButton(R.string.cancel, null)
                             .show();
 
                 }, throwable -> {
                     progressDialog.dismiss();
-                    Toast.makeText(HomeActivity.this, R.string.toast_install_column_failed, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(HomeActivity.this, R.string.toast_install_hub_failed, Toast.LENGTH_SHORT).show();
                 });
     }
 
-    private void installColumn(File columnPackageFile, final ProgressDialog progressDialog) {
-        progressDialog.setMessage(getString(R.string.dialog_installing_column));
+    private void installHub(File hubPackageFile, final ProgressDialog progressDialog) {
+        progressDialog.setMessage(getString(R.string.dialog_installing_hub));
         progressDialog.setCancelable(false);
         progressDialog.show();
 
-        mColumnManager.install(this, columnPackageFile)
+        mHubManager.install(this, hubPackageFile)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .to(AutoDispose.with(AndroidLifecycleScopeProvider.from(this)).forSingle())
-                .subscribe(column -> {
+                .subscribe(hub -> {
                     progressDialog.dismiss();
-                    Toast.makeText(HomeActivity.this, R.string.toast_install_column_success, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(HomeActivity.this, R.string.toast_install_hub_success, Toast.LENGTH_SHORT).show();
 
                     // Send local broadcast
-                    BroadcastRouter.IMPL.tellColumnInstalled(this, column);
+                    BroadcastRouter.IMPL.tellHubInstalled(this, hub);
 
                 }, throwable -> {
                     progressDialog.dismiss();
-                    Toast.makeText(HomeActivity.this, R.string.toast_install_column_failed, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(HomeActivity.this, R.string.toast_install_hub_failed, Toast.LENGTH_SHORT).show();
                 });
     }
 
@@ -272,48 +272,48 @@ public class HomeActivity extends BaseActivity {
             final String action = intent.getAction();
             if (action == null) return;
 
-            ArrayList<Column> columns;
-            Column column;
-            String columnId;
+            ArrayList<Hub> hubs;
+            Hub hub;
+            String hubId;
             int index;
             switch (action) {
-                case Constants.ACTION_NOTIFY_COLUMN_INSTALLED:
-                    column = intent.getParcelableExtra(Constants.ARG_COLUMN);
-                    columnId = intent.getStringExtra(Constants.ARG_COLUMNID);
-                    if (column == null && columnId == null) break;
-                    if (columnId == null) columnId = column.getId();
+                case Constants.ACTION_NOTIFY_HUB_INSTALLED:
+                    hub = intent.getParcelableExtra(Constants.ARG_HUB);
+                    hubId = intent.getStringExtra(Constants.ARG_HUB_ID);
+                    if (hub == null && hubId == null) break;
+                    if (hubId == null) hubId = hub.getId();
 
-                    index = ColumnUtil.indexOfColumn(mColumns, columnId);
+                    index = HubUtil.indexOfHub(mHubs, hubId);
 
-                    (column != null ? Single.just(column) :
-                            mColumnManager.readConfig(columnId).subscribeOn(Schedulers.io()))
-                            .flatMap(_column -> {
+                    (hub != null ? Single.just(hub) :
+                            mHubManager.readConfig(hubId).subscribeOn(Schedulers.io()))
+                            .flatMap(_hub -> {
                                 if (index < 0) {
-                                    // If not found in visible column list
-                                    return mPreferenceManager.loadColumnPreference(_column)
+                                    // If not found in visible hub list
+                                    return mPreferenceManager.loadHubPreference(_hub)
                                             .subscribeOn(Schedulers.io())
-                                            .flatMap(columnPreference -> {
-                                                if (!columnPreference.isVisible()) {
+                                            .flatMap(hubPreference -> {
+                                                if (!hubPreference.isVisible()) {
                                                     return Single.never();
                                                 } else {
-                                                    return Single.just(_column);
+                                                    return Single.just(_hub);
                                                 }
                                             });
 
                                 } else {
-                                    return Single.just(_column);
+                                    return Single.just(_hub);
                                 }
                             })
                             .observeOn(AndroidSchedulers.mainThread())
                             .to(AutoDispose.with(AndroidLifecycleScopeProvider.from(HomeActivity.this)).forSingle())
-                            .subscribe(_column -> {
+                            .subscribe(_hub -> {
                                 if (index < 0) {
                                     // Install
-                                    mColumns.add(_column);
+                                    mHubs.add(_hub);
 
                                 } else {
                                     // Reinstall
-                                    mColumns.set(index, _column);
+                                    mHubs.set(index, _hub);
                                     mPagerAdapter.hackRecreateFragment(index);
                                 }
                                 mPagerAdapter.notifyDataSetChanged();
@@ -321,20 +321,20 @@ public class HomeActivity extends BaseActivity {
                             }, throwable -> {});
                     break;
 
-                case Constants.ACTION_NOTIFY_COLUMN_UNINSTALLED:
-                    columns = intent.getParcelableArrayListExtra(Constants.ARG_COLUMNS);
-                    if (columns == null) break;
+                case Constants.ACTION_NOTIFY_HUB_UNINSTALLED:
+                    hubs = intent.getParcelableArrayListExtra(Constants.ARG_HUBS);
+                    if (hubs == null) break;
 
-                    mColumns.removeAll(columns);
+                    mHubs.removeAll(hubs);
                     mPagerAdapter.notifyDataSetChanged();
                     break;
 
-                case Constants.ACTION_NOTIFY_COLUMN_PREFERENCE_CHANGED:
-                    columns = intent.getParcelableArrayListExtra(Constants.ARG_COLUMNS);
-                    if (columns == null) break;
+                case Constants.ACTION_NOTIFY_HUB_PREFERENCE_CHANGED:
+                    hubs = intent.getParcelableArrayListExtra(Constants.ARG_HUBS);
+                    if (hubs == null) break;
 
-                    mColumns.clear();
-                    mColumns.addAll(columns);
+                    mHubs.clear();
+                    mHubs.addAll(hubs);
                     mPagerAdapter.notifyDataSetChanged();
                     break;
             }

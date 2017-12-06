@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package cn.nekocode.hubs.ui.column;
+package cn.nekocode.hubs.ui.hub;
 
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
@@ -35,9 +35,9 @@ import java.util.ArrayList;
 
 import cn.nekocode.hubs.ActivityRouter;
 import cn.nekocode.hubs.R;
-import cn.nekocode.hubs.base.BaseColumnFragment;
+import cn.nekocode.hubs.base.BaseHubFragment;
 import cn.nekocode.hubs.data.model.Article;
-import cn.nekocode.hubs.databinding.FragmentArticleColumnBinding;
+import cn.nekocode.hubs.databinding.FragmentArticleHubBinding;
 import cn.nekocode.hubs.luaj.EntryLuaBridge;
 import cn.nekocode.hubs.util.DividerItemDecoration;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -46,8 +46,8 @@ import io.reactivex.schedulers.Schedulers;
 /**
  * @author nekocode (nekocode.cn@gmail.com)
  */
-public class ArticleColumnFragment extends BaseColumnFragment implements SwipeRefreshLayout.OnRefreshListener {
-    private FragmentArticleColumnBinding mBinding;
+public class ArticleHubFragment extends BaseHubFragment implements SwipeRefreshLayout.OnRefreshListener {
+    private FragmentArticleHubBinding mBinding;
     @State
     public ArrayList<Article> mArticleList;
     private BottomItem mBottomItem;
@@ -62,7 +62,7 @@ public class ArticleColumnFragment extends BaseColumnFragment implements SwipeRe
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         StateSaver.restoreInstanceState(this, savedInstanceState);
-        mLuaBridge = EntryLuaBridge.create(getContext(), getColumn());
+        mLuaBridge = EntryLuaBridge.create(getContext(), getHub());
 
         /*
           Data initialize
@@ -89,7 +89,7 @@ public class ArticleColumnFragment extends BaseColumnFragment implements SwipeRe
         mAdapter.setUIEventListener(new ArticleListAdapter.UIEventListener() {
             @Override
             public void onItemClicked(Article article) {
-                ActivityRouter.IMPL.gotoBrowser(getContext(), getColumn(), article.getUrl());
+                ActivityRouter.IMPL.gotoBrowser(getContext(), getHub(), article.getUrl());
             }
 
             @Override
@@ -118,7 +118,7 @@ public class ArticleColumnFragment extends BaseColumnFragment implements SwipeRe
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
 
-        mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_article_column, container, false);
+        mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_article_hub, container, false);
         return mBinding.getRoot();
     }
 

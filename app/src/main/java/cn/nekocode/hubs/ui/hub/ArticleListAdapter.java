@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package cn.nekocode.hubs.ui.column;
+package cn.nekocode.hubs.ui.hub;
 
 import android.databinding.DataBindingUtil;
 import android.support.annotation.NonNull;

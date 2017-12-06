@@ -39,10 +39,10 @@ public abstract class ExFragmentPagerAdapter<T> extends FragmentPagerAdapter {
     protected ArrayList<T> mList;
 
 
-    public ExFragmentPagerAdapter(@NonNull FragmentManager fm, @NonNull ArrayList<T> columns) {
+    public ExFragmentPagerAdapter(@NonNull FragmentManager fm, @NonNull ArrayList<T> hubs) {
         super(fm);
         this.mFragmentManager = fm;
-        this.mList = columns;
+        this.mList = hubs;
     }
 
     @Override

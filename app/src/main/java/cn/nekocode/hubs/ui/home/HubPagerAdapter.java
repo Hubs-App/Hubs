@@ -24,23 +24,23 @@ import android.view.ViewGroup;
 
 import java.util.ArrayList;
 
-import cn.nekocode.hubs.base.BaseColumnFragment;
+import cn.nekocode.hubs.base.BaseHubFragment;
+import cn.nekocode.hubs.data.model.Hub;
 import cn.nekocode.hubs.util.ExFragmentPagerAdapter;
-import cn.nekocode.hubs.data.model.Column;
 
 /**
  * @author nekocode (nekocode.cn@gmail.com)
  */
-public class ColumnPagerAdapter extends ExFragmentPagerAdapter<Column> {
+public class HubPagerAdapter extends ExFragmentPagerAdapter<Hub> {
 
 
-    public ColumnPagerAdapter(@NonNull FragmentManager fm, @NonNull ArrayList<Column> columns) {
-        super(fm, columns);
+    public HubPagerAdapter(@NonNull FragmentManager fm, @NonNull ArrayList<Hub> hubs) {
+        super(fm, hubs);
     }
 
     @Override
     public Fragment getItem(int position) {
-        return BaseColumnFragment.newInstance(mList.get(position));
+        return BaseHubFragment.newInstance(mList.get(position));
     }
 
     @Override
@@ -49,15 +49,15 @@ public class ColumnPagerAdapter extends ExFragmentPagerAdapter<Column> {
     }
 
     @Override
-    public long getItemId(Column data) {
+    public long getItemId(Hub data) {
         return data.hashCode();
     }
 
     @Override
     public void setPrimaryItem(ViewGroup container, int position, Object object) {
         super.setPrimaryItem(container, position, object);
-        if (object instanceof BaseColumnFragment) {
-            ((BaseColumnFragment) object).tryFirstLoad();
+        if (object instanceof BaseHubFragment) {
+            ((BaseHubFragment) object).tryFirstLoad();
         }
     }
 }

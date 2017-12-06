@@ -41,22 +41,22 @@
                 <data
                     android:host="*"
                     android:mimeType="*/*"
-                    android:pathPattern=".*\\.${COLUMN_EXTENSION}"
+                    android:pathPattern=".*\\.${HUB_EXTENSION}"
                     android:scheme="http"/>
                 <data
                     android:host="*"
                     android:mimeType="*/*"
-                    android:pathPattern=".*\\.${COLUMN_EXTENSION}"
+                    android:pathPattern=".*\\.${HUB_EXTENSION}"
                     android:scheme="https"/>
                 <data
                     android:host="*"
                     android:mimeType="*/*"
-                    android:pathPattern=".*\\.${COLUMN_EXTENSION}"
+                    android:pathPattern=".*\\.${HUB_EXTENSION}"
                     android:scheme="content"/>
                 <data
                     android:host="*"
                     android:mimeType="*/*"
-                    android:pathPattern=".*\\.${COLUMN_EXTENSION}"
+                    android:pathPattern=".*\\.${HUB_EXTENSION}"
                     android:scheme="file"/>
             </intent-filter>
         </activity>
@@ -88,22 +88,22 @@
         </activity>
 
         <activity
-            android:name="cn.nekocode.hubs.ui.setting.ColumnManagerActivity"
-            android:label="@string/column_manager">
+            android:name="cn.nekocode.hubs.ui.setting.HubManagerActivity"
+            android:label="@string/hub_manager">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
 
                 <data
                     android:host="${APPLICATION_ID}"
-                    android:path="/column_manager"
+                    android:path="/hub_manager"
                     android:scheme="${SCHEME}"/>
             </intent-filter>
         </activity>
 
         <activity
-            android:name="cn.nekocode.hubs.ui.setting.ColumnConfigActivity"
-            android:label="@string/column_config">
+            android:name="cn.nekocode.hubs.ui.setting.HubConfigActivity"
+            android:label="@string/hub_config">
         </activity>
 
         <meta-data

@@ -42,7 +42,7 @@ import okhttp3.Response;
  */
 public class FileManager extends BaseFileManager {
     private static final String ROOT_DIRECTORY = "HubsApp";
-    private static final String COLUMNS_DIRECTORY = "Column";
+    private static final String HUBS_DIRECTORY = "Hub";
     private static final String SCHEME_FILE = "file";
     private static final String SCHEME_CONTENT = "content";
     private static final String SCHEME_HTTP = "http";
@@ -62,7 +62,7 @@ public class FileManager extends BaseFileManager {
             return false;
         }
 
-        dir = new File(dir, COLUMNS_DIRECTORY);
+        dir = new File(dir, HUBS_DIRECTORY);
         if ((!dir.exists()) && (!dir.mkdir())) {
             return false;
         }
@@ -79,14 +79,14 @@ public class FileManager extends BaseFileManager {
 
     @Override
     @NonNull
-    public File getColumnsDirectory() {
-        return new File(getRootDirectory().getPath(), COLUMNS_DIRECTORY);
+    public File getHubsDirectory() {
+        return new File(getRootDirectory().getPath(), HUBS_DIRECTORY);
     }
 
     @Override
     @NonNull
-    public File getColumnDirectory(@NonNull String columnId) {
-        return new File(getColumnsDirectory().getPath(), columnId);
+    public File getHubDirectory(@NonNull String hubId) {
+        return new File(getHubsDirectory().getPath(), hubId);
     }
 
     @Override

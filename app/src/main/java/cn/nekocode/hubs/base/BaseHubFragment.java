@@ -22,32 +22,32 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.widget.Toast;
 
-import cn.nekocode.hubs.data.model.Column;
-import cn.nekocode.hubs.ui.column.ArticleColumnFragment;
+import cn.nekocode.hubs.data.model.Hub;
+import cn.nekocode.hubs.ui.hub.ArticleHubFragment;
 
 /**
  * @author nekocode (nekocode.cn@gmail.com)
  */
-public abstract class BaseColumnFragment extends BaseLazyLoadFragment {
-    public static final String ARG_COLUMN = "column";
+public abstract class BaseHubFragment extends BaseLazyLoadFragment {
+    public static final String ARG_HUB = "hub";
 
-    private Column mColumn;
+    private Hub mHub;
 
 
     @NonNull
-    public static BaseColumnFragment newInstance(@NonNull Column column) {
-        final String columnType = column.getType();
-        BaseColumnFragment fragment;
+    public static BaseHubFragment newInstance(@NonNull Hub hub) {
+        final String hubType = hub.getType();
+        BaseHubFragment fragment;
 
-        switch (columnType) {
-            case Column.TYPE_ARTICLE:
+        switch (hubType) {
+            case Hub.TYPE_ARTICLE:
             default:
-                fragment = new ArticleColumnFragment();
+                fragment = new ArticleHubFragment();
                 break;
         }
 
         final Bundle args = new Bundle();
-        args.putParcelable(ARG_COLUMN, column);
+        args.putParcelable(ARG_HUB, hub);
         fragment.setArguments(args);
         return fragment;
     }
@@ -55,16 +55,16 @@ public abstract class BaseColumnFragment extends BaseLazyLoadFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mColumn = getArguments().getParcelable(ARG_COLUMN);
-        if (mColumn == null) throw new RuntimeException("Get column from arguments failed.");
+        mHub = getArguments().getParcelable(ARG_HUB);
+        if (mHub == null) throw new RuntimeException("Get hub from arguments failed.");
     }
 
-    public Column getColumn() {
-        return mColumn;
+    public Hub getHub() {
+        return mHub;
     }
 
     public void showMessageIfInDebug(@NonNull String message) {
-        if (mColumn.isDebug()) {
+        if (mHub.isDebug()) {
             Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
         }
     }

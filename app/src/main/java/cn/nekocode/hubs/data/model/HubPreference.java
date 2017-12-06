@@ -23,33 +23,33 @@ import android.os.Parcelable;
 /**
  * @author nekocode (nekocode.cn@gmail.com)
  */
-public class ColumnPreference implements Parcelable {
-    private String columnId;
+public class HubPreference implements Parcelable {
+    private String hubId;
     private boolean isVisible;
     private int order;
-    private Column column;
+    private Hub hub;
 
 
-    public ColumnPreference() {
+    public HubPreference() {
     }
 
-    public ColumnPreference(Column column, boolean isVisible, int order) {
-        this(column.getId(), isVisible, order);
-        this.column = column;
+    public HubPreference(Hub hub, boolean isVisible, int order) {
+        this(hub.getId(), isVisible, order);
+        this.hub = hub;
     }
 
-    public ColumnPreference(String columnId, boolean isVisible, int order) {
-        this.columnId = columnId;
+    public HubPreference(String hubId, boolean isVisible, int order) {
+        this.hubId = hubId;
         this.isVisible = isVisible;
         this.order = order;
     }
 
-    public String getColumnId() {
-        return columnId;
+    public String getHubId() {
+        return hubId;
     }
 
-    public void setColumnId(String columnId) {
-        this.columnId = columnId;
+    public void setHubId(String hubId) {
+        this.hubId = hubId;
     }
 
     public boolean isVisible() {
@@ -68,12 +68,12 @@ public class ColumnPreference implements Parcelable {
         this.order = order;
     }
 
-    public Column getColumn() {
-        return column;
+    public Hub getHub() {
+        return hub;
     }
 
-    public void setColumn(Column column) {
-        this.column = column;
+    public void setHub(Hub hub) {
+        this.hub = hub;
     }
 
     @Override
@@ -83,28 +83,28 @@ public class ColumnPreference implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(this.columnId);
+        dest.writeString(this.hubId);
         dest.writeByte(this.isVisible ? (byte) 1 : (byte) 0);
         dest.writeInt(this.order);
-        dest.writeParcelable(this.column, flags);
+        dest.writeParcelable(this.hub, flags);
     }
 
-    protected ColumnPreference(Parcel in) {
-        this.columnId = in.readString();
+    protected HubPreference(Parcel in) {
+        this.hubId = in.readString();
         this.isVisible = in.readByte() != 0;
         this.order = in.readInt();
-        this.column = in.readParcelable(Column.class.getClassLoader());
+        this.hub = in.readParcelable(Hub.class.getClassLoader());
     }
 
-    public static final Creator<ColumnPreference> CREATOR = new Creator<ColumnPreference>() {
+    public static final Creator<HubPreference> CREATOR = new Creator<HubPreference>() {
         @Override
-        public ColumnPreference createFromParcel(Parcel source) {
-            return new ColumnPreference(source);
+        public HubPreference createFromParcel(Parcel source) {
+            return new HubPreference(source);
         }
 
         @Override
-        public ColumnPreference[] newArray(int size) {
-            return new ColumnPreference[size];
+        public HubPreference[] newArray(int size) {
+            return new HubPreference[size];
         }
     };
 }

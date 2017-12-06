@@ -21,19 +21,19 @@ import android.support.annotation.NonNull;
 
 import java.util.List;
 
-import cn.nekocode.hubs.data.model.Column;
-import cn.nekocode.hubs.data.model.ColumnPreference;
+import cn.nekocode.hubs.data.model.Hub;
+import cn.nekocode.hubs.data.model.HubPreference;
 
 /**
  * @author nekocode (nekocode.cn@gmail.com)
  */
-public class ColumnUtil {
+public class HubUtil {
 
-    public static int indexOfColumn(@NonNull List<Column> columns, @NonNull String columnId) {
+    public static int indexOfHub(@NonNull List<Hub> hubs, @NonNull String hubId) {
         int index = 0;
         boolean finded = false;
-        for (Column column : columns) {
-            if (column.getId().equalsIgnoreCase(columnId)) {
+        for (Hub hub : hubs) {
+            if (hub.getId().equalsIgnoreCase(hubId)) {
                 finded = true;
                 break;
             }
@@ -42,11 +42,11 @@ public class ColumnUtil {
         return finded ? index : -1;
     }
 
-    public static int indexOfColumnPreference(@NonNull List<ColumnPreference> columnPreferences, @NonNull String columnId) {
+    public static int indexOfHubPreference(@NonNull List<HubPreference> hubPreferences, @NonNull String hubId) {
         int index = 0;
         boolean finded = false;
-        for (ColumnPreference columnPreference : columnPreferences) {
-            if (columnPreference.getColumnId().equalsIgnoreCase(columnId)) {
+        for (HubPreference hubPreference : hubPreferences) {
+            if (hubPreference.getHubId().equalsIgnoreCase(hubId)) {
                 finded = true;
                 break;
             }

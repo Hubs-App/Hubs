@@ -43,12 +43,12 @@ import cn.nekocode.hubs.HubsApplication;
 import cn.nekocode.hubs.R;
 import cn.nekocode.hubs.base.BaseActivity;
 import cn.nekocode.hubs.broadcast.BroadcastRouter;
-import cn.nekocode.hubs.data.model.Column;
-import cn.nekocode.hubs.data.model.ColumnPreference;
-import cn.nekocode.hubs.databinding.ActivityColumnMangerBinding;
-import cn.nekocode.hubs.manager.base.BaseColumnManager;
+import cn.nekocode.hubs.data.model.Hub;
+import cn.nekocode.hubs.data.model.HubPreference;
+import cn.nekocode.hubs.databinding.ActivityHubMangerBinding;
+import cn.nekocode.hubs.manager.base.BaseHubManager;
 import cn.nekocode.hubs.manager.base.BasePreferenceManager;
-import cn.nekocode.hubs.util.ColumnUtil;
+import cn.nekocode.hubs.util.HubUtil;
 import cn.nekocode.hubs.util.CommonUtil;
 import cn.nekocode.hubs.util.DividerItemDecoration;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -57,24 +57,24 @@ import io.reactivex.schedulers.Schedulers;
 /**
  * @author nekocode (nekocode.cn@gmail.com)
  */
-public class ColumnManagerActivity extends BaseActivity implements ColumnListAdapter.UIEventListener {
-    private ActivityColumnMangerBinding mBinding;
+public class HubManagerActivity extends BaseActivity implements HubListAdapter.UIEventListener {
+    private ActivityHubMangerBinding mBinding;
     @State
-    public ArrayList<ColumnPreference> mPreferences;
-    private BaseColumnManager mColumnManager;
+    public ArrayList<HubPreference> mPreferences;
+    private BaseHubManager mHubManager;
     private BasePreferenceManager mPreferenceManager;
-    private ColumnListAdapter mAdapter;
+    private HubListAdapter mAdapter;
     @State
     public boolean mIsPreferenceChanged = false;
-    private final BroadcastReceiver mBroadcastReceiver = new ColumnManagerBroadcastReceiver();
+    private final BroadcastReceiver mBroadcastReceiver = new HubManagerBroadcastReceiver();
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         StateSaver.restoreInstanceState(this, savedInstanceState);
-        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_column_manger);
-        mColumnManager = HubsApplication.getDefaultColumnManager(this);
+        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_hub_manger);
+        mHubManager = HubsApplication.getDefaultHubManager(this);
         mPreferenceManager = HubsApplication.getDefaultPreferenceManager(this);
 
         /*
@@ -82,7 +82,7 @@ public class ColumnManagerActivity extends BaseActivity implements ColumnListAda
          */
         if (mPreferences == null) {
             mPreferences = new ArrayList<>();
-            loadColumnPreferences();
+            loadHubPreferences();
         }
 
 
@@ -95,7 +95,7 @@ public class ColumnManagerActivity extends BaseActivity implements ColumnListAda
         }
 
         // Setup the recyclerview
-        mAdapter = new ColumnListAdapter(mPreferences);
+        mAdapter = new HubListAdapter(mPreferences);
         mAdapter.setUIEventListener(this);
 
         mBinding.recyclerView.setLayoutManager(
@@ -109,7 +109,7 @@ public class ColumnManagerActivity extends BaseActivity implements ColumnListAda
           Register broadcast receiver
          */
         final IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(Constants.ACTION_NOTIFY_COLUMN_INSTALLED);
+        intentFilter.addAction(Constants.ACTION_NOTIFY_HUB_INSTALLED);
         LocalBroadcastManager.getInstance(this)
                 .registerReceiver(mBroadcastReceiver, intentFilter);
         registerReceiver(mBroadcastReceiver, intentFilter);
@@ -142,55 +142,55 @@ public class ColumnManagerActivity extends BaseActivity implements ColumnListAda
         unregisterReceiver(mBroadcastReceiver);
 
         if (mIsPreferenceChanged) {
-            final ArrayList<Column> orderedColumn = new ArrayList<>();
-            for (ColumnPreference preference : mPreferences) {
+            final ArrayList<Hub> orderedHub = new ArrayList<>();
+            for (HubPreference preference : mPreferences) {
                 if (preference.isVisible()) {
-                    orderedColumn.add(preference.getColumn());
+                    orderedHub.add(preference.getHub());
                 }
             }
 
             // Send local broadcast
-            BroadcastRouter.IMPL.tellColumnPreferenceChanged(this, orderedColumn);
+            BroadcastRouter.IMPL.tellHubPreferenceChanged(this, orderedHub);
         }
     }
 
     @Override
     public void onItemsSwapped() {
-        mPreferenceManager.saveColumnPreferences(mPreferences);
+        mPreferenceManager.saveHubPreferences(mPreferences);
         mIsPreferenceChanged = true;
     }
 
     @Override
-    public void onItemConfigButtonClick(int position, ColumnPreference preference) {
-        ActivityRouter.IMPL.gotoColumnConfig(this, preference.getColumn());
+    public void onItemConfigButtonClick(int position, HubPreference preference) {
+        ActivityRouter.IMPL.gotoHubConfig(this, preference.getHub());
     }
 
     @Override
-    public void onItemVisibilityButtonClick(int position, ColumnPreference preference) {
-        mPreferenceManager.updateColumnPreferences(preference);
+    public void onItemVisibilityButtonClick(int position, HubPreference preference) {
+        mPreferenceManager.updateHubPreferences(preference);
         mIsPreferenceChanged = true;
     }
 
     @Override
-    public void onItemUninstallButtonClick(int position, ColumnPreference preference) {
-        showUninstallDialog(preference.getColumn(), () -> {
+    public void onItemUninstallButtonClick(int position, HubPreference preference) {
+        showUninstallDialog(preference.getHub(), () -> {
             // When uninstall success
             mPreferences.remove(position);
-            mPreferenceManager.removeColumnPreferences(preference);
+            mPreferenceManager.removeHubPreferences(preference);
             mAdapter.notifyItemRemoved(position);
             mIsPreferenceChanged = true;
         });
     }
 
-    private void loadColumnPreferences() {
+    private void loadHubPreferences() {
         final ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage(getString(R.string.loading));
         progressDialog.setCancelable(false);
         progressDialog.show();
 
-        mColumnManager.getAllInstalled()
+        mHubManager.getAllInstalled()
                 .subscribeOn(Schedulers.io())
-                .flatMap(columns -> mPreferenceManager.loadColumnPreferences(columns))
+                .flatMap(hubs -> mPreferenceManager.loadHubPreferences(hubs))
                 .observeOn(AndroidSchedulers.mainThread())
                 .to(AutoDispose.with(AndroidLifecycleScopeProvider.from(this)).forSingle())
                 .subscribe(preferences -> {
@@ -201,76 +201,76 @@ public class ColumnManagerActivity extends BaseActivity implements ColumnListAda
 
                 }, throwable -> {
                     progressDialog.dismiss();
-                    Toast.makeText(this, R.string.toast_load_columns_failed, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.toast_load_hubs_failed, Toast.LENGTH_SHORT).show();
                 });
     }
 
-    private void showUninstallDialog(Column column, final Runnable successCallback) {
+    private void showUninstallDialog(Hub hub, final Runnable successCallback) {
         new AlertDialog.Builder(this)
-                .setMessage(getString(R.string.dialog_ensure_uninstall_column, column.getName(), column.getVersion()))
+                .setMessage(getString(R.string.dialog_ensure_uninstall_hub, hub.getName(), hub.getVersion()))
                 .setPositiveButton(R.string.yes, (dialog, which) -> {
-                    uninstallColumn(column, successCallback);
+                    uninstallHub(hub, successCallback);
                 })
                 .setNegativeButton(R.string.cancel, null)
                 .show();
     }
 
-    private void uninstallColumn(final Column column, final Runnable successCallback) {
+    private void uninstallHub(final Hub hub, final Runnable successCallback) {
         final ProgressDialog progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage(getString(R.string.dialog_uninstalling_column));
+        progressDialog.setMessage(getString(R.string.dialog_uninstalling_hub));
         progressDialog.setCancelable(false);
         progressDialog.show();
 
-        mColumnManager.uninstall(column.getId())
+        mHubManager.uninstall(hub.getId())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .to(AutoDispose.with(AndroidLifecycleScopeProvider.from(this)).forSingle())
                 .subscribe(isSuccess -> {
                     if (!isSuccess) {
                         progressDialog.dismiss();
-                        Toast.makeText(this, R.string.toast_uninstall_column_failed, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, R.string.toast_uninstall_hub_failed, Toast.LENGTH_SHORT).show();
                         return;
                     }
 
                     successCallback.run();
                     progressDialog.dismiss();
-                    Toast.makeText(this, R.string.toast_uninstall_column_success, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.toast_uninstall_hub_success, Toast.LENGTH_SHORT).show();
 
                     // Send local broadcast
-                    BroadcastRouter.IMPL.tellColumnUninstalled(this, CommonUtil.toArrayList(column));
+                    BroadcastRouter.IMPL.tellHubUninstalled(this, CommonUtil.toArrayList(hub));
 
                 }, throwable -> {
                     progressDialog.dismiss();
-                    Toast.makeText(this, R.string.toast_uninstall_column_failed, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.toast_uninstall_hub_failed, Toast.LENGTH_SHORT).show();
                 });
     }
 
 
-    private class ColumnManagerBroadcastReceiver extends BroadcastReceiver {
+    private class HubManagerBroadcastReceiver extends BroadcastReceiver {
 
         @Override
         public void onReceive(Context context, Intent intent) {
             final String action = intent.getAction();
             if (action == null) return;
 
-            String columnId;
+            String hubId;
             int index;
             switch (action) {
-                case Constants.ACTION_NOTIFY_COLUMN_INSTALLED:
-                    columnId = intent.getStringExtra(Constants.ARG_COLUMNID);
-                    if (columnId == null) return;
+                case Constants.ACTION_NOTIFY_HUB_INSTALLED:
+                    hubId = intent.getStringExtra(Constants.ARG_HUB_ID);
+                    if (hubId == null) return;
 
-                    index = ColumnUtil.indexOfColumnPreference(mPreferences, columnId);
+                    index = HubUtil.indexOfHubPreference(mPreferences, hubId);
                     if (index < 0) {
-                        loadColumnPreferences();
+                        loadHubPreferences();
 
                     } else {
-                        mColumnManager.readConfig(columnId)
+                        mHubManager.readConfig(hubId)
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
-                                .to(AutoDispose.with(AndroidLifecycleScopeProvider.from(ColumnManagerActivity.this)).forSingle())
-                                .subscribe(column2 -> {
-                                    mPreferences.get(index).setColumn(column2);
+                                .to(AutoDispose.with(AndroidLifecycleScopeProvider.from(HubManagerActivity.this)).forSingle())
+                                .subscribe(hub2 -> {
+                                    mPreferences.get(index).setHub(hub2);
                                     mAdapter.notifyItemChanged(index);
 
                                 }, throwable -> {});

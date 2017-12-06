@@ -29,7 +29,7 @@ import org.luaj.vm2.compiler.LuaC;
 /**
  * @author nekocode (nekocode.cn@gmail.com)
  */
-public class Column implements Parcelable {
+public class Hub implements Parcelable {
     public static final String TYPE_ARTICLE = "article";
     public static final String[] SUPPORTED_TYPES = new String[]{TYPE_ARTICLE};
 
@@ -44,15 +44,15 @@ public class Column implements Parcelable {
 
 
     /**
-     * Create column from a lua script text
+     * Create hub from a lua script text
      */
-    public static Column fromLua(String luaText) throws Exception {
+    public static Hub fromLua(String luaText) throws Exception {
         // Obatain a lua globals for loading configs
         final Globals globals = new Globals();
         LoadState.install(globals);
         LuaC.install(globals);
 
-        final Column column = new Column();
+        final Hub hub = new Hub();
         globals.load(luaText).call();
 
         Varargs pair;
@@ -68,11 +68,11 @@ public class Column implements Parcelable {
             keyStr = key.checkjstring();
             switch (keyStr) {
                 case "ID":
-                    column.setId(value.checkjstring().toLowerCase());
+                    hub.setId(value.checkjstring().toLowerCase());
                     break;
 
                 case "NAME":
-                    column.setName(value.checkjstring());
+                    hub.setName(value.checkjstring());
                     break;
 
                 case "TYPE":
@@ -86,37 +86,37 @@ public class Column implements Parcelable {
                     }
 
                     if (isTypeSupported) {
-                        column.setType(type);
+                        hub.setType(type);
                     } else {
-                        throw new Exception("Not supported column type.");
+                        throw new Exception("Not supported hub type.");
                     }
                     break;
 
                 case "VERSION":
-                    column.setVersion(value.checkjstring());
+                    hub.setVersion(value.checkjstring());
                     break;
 
                 case "ENTRY":
-                    column.setEntry(value.checkjstring());
+                    hub.setEntry(value.checkjstring());
                     break;
 
                 case "BROWSER":
-                    column.setBrowser(value.checkjstring());
+                    hub.setBrowser(value.checkjstring());
                     break;
 
                 case "DEBUG":
-                    column.setDebug(value.checkboolean());
+                    hub.setDebug(value.checkboolean());
                     break;
 
                 default:
-                    column.userConfig.put(keyStr, value);
+                    hub.userConfig.put(keyStr, value);
                     break;
             }
         }
 
-        column.checkProperties();
+        hub.checkProperties();
 
-        return column;
+        return hub;
     }
 
     /**
@@ -138,7 +138,7 @@ public class Column implements Parcelable {
      */
     public void checkProperties() throws Exception {
         if (id == null || name == null ||type == null || version == null || entry == null) {
-            throw new Exception("Not all necessary properties in the column have been assigned.");
+            throw new Exception("Not all necessary properties in the hub have been assigned.");
         }
     }
 
@@ -219,10 +219,10 @@ public class Column implements Parcelable {
         dest.writeParcelable(this.userConfig, flags);
     }
 
-    public Column() {
+    public Hub() {
     }
 
-    protected Column(Parcel in) {
+    protected Hub(Parcel in) {
         this.id = in.readString();
         this.name = in.readString();
         this.type = in.readString();
@@ -234,22 +234,22 @@ public class Column implements Parcelable {
         this.userConfig.putAll(in.readParcelable(UserConfig.class.getClassLoader()));
     }
 
-    public static final Creator<Column> CREATOR = new Creator<Column>() {
+    public static final Creator<Hub> CREATOR = new Creator<Hub>() {
         @Override
-        public Column createFromParcel(Parcel source) {
-            return new Column(source);
+        public Hub createFromParcel(Parcel source) {
+            return new Hub(source);
         }
 
         @Override
-        public Column[] newArray(int size) {
-            return new Column[size];
+        public Hub[] newArray(int size) {
+            return new Hub[size];
         }
     };
 
     @Override
     public boolean equals(Object obj) {
-        if (getId() != null && obj instanceof Column) {
-            return getId().equalsIgnoreCase(((Column) obj).getId());
+        if (getId() != null && obj instanceof Hub) {
+            return getId().equalsIgnoreCase(((Hub) obj).getId());
         }
         return false;
     }

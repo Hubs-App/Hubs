@@ -3,7 +3,7 @@
 import os
 from subprocess import Popen, PIPE
 
-COLUMN_ROOT_PATH = '/sdcard/HubsApp/Column'
+HUB_ROOT_PATH = '/sdcard/HubsApp/Hub'
 
 
 def run_cmd(cmd):
@@ -11,7 +11,7 @@ def run_cmd(cmd):
     print(bytes.decode(proc.communicate()[0]).strip())
 
 
-def get_column_id():
+def get_hub_id():
     with open('config.lua', 'r', encoding='utf-8') as src_file:
         for line in src_file.readlines():
             pair = line.split('=')
@@ -21,18 +21,18 @@ def get_column_id():
     return None
 
 
-def sync_files(column_id):
-    run_cmd('adb push . ' + COLUMN_ROOT_PATH + '/' + column_id + '/')
+def sync_files(hub_id):
+    run_cmd('adb push . ' + HUB_ROOT_PATH + '/' + hub_id + '/')
 
 
-def broadcast(column_id):
-    run_cmd('adb shell "am broadcast -a cn.nekocode.hubs.action.NOTIFY_COLUMN_INSTALLED -e column_id \'%s\'"' % column_id)
+def broadcast(hub_id):
+    run_cmd('adb shell "am broadcast -a cn.nekocode.hubs.action.NOTIFY_HUB_INSTALLED -e hub_id \'%s\'"' % hub_id)
 
 
 def main():
-    column_id = get_column_id()
-    sync_files(column_id)
-    broadcast(column_id)
+    hub_id = get_hub_id()
+    sync_files(hub_id)
+    broadcast(hub_id)
 
 
 if __name__ == '__main__':

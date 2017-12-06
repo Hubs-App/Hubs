@@ -23,7 +23,7 @@ import android.support.annotation.NonNull;
 import java.io.File;
 import java.util.List;
 
-import cn.nekocode.hubs.data.model.Column;
+import cn.nekocode.hubs.data.model.Hub;
 import cn.nekocode.hubs.data.model.UserConfig;
 import io.reactivex.Completable;
 import io.reactivex.Single;
@@ -31,11 +31,11 @@ import io.reactivex.Single;
 /**
  * @author nekocode (nekocode.cn@gmail.com)
  */
-public abstract class BaseColumnManager {
+public abstract class BaseHubManager {
     private final BaseFileManager mFileManager;
 
 
-    public BaseColumnManager(BaseFileManager fileManager) {
+    public BaseHubManager(BaseFileManager fileManager) {
         this.mFileManager = fileManager;
     }
 
@@ -44,42 +44,42 @@ public abstract class BaseColumnManager {
     }
 
     /**
-     * Read config form a column package
+     * Read config form a hub package
      */
     @NonNull
-    public abstract Single<Column> readConfig(@NonNull File packageFile);
+    public abstract Single<Hub> readConfig(@NonNull File packageFile);
 
     /**
-     * Read config form a installed column
+     * Read config form a installed hub
      */
     @NonNull
-    public abstract Single<Column> readConfig(@NonNull String columnId);
+    public abstract Single<Hub> readConfig(@NonNull String hubId);
 
     /**
      * Write user config to file
      */
-    public abstract Completable writeUserConfig(@NonNull String columnId, @NonNull UserConfig config);
+    public abstract Completable writeUserConfig(@NonNull String hubId, @NonNull UserConfig config);
 
     /**
-     * Install column
+     * Install hub
      */
     @NonNull
-    public abstract Single<Column> install(@NonNull Context context, @NonNull File packageFile);
+    public abstract Single<Hub> install(@NonNull Context context, @NonNull File packageFile);
 
     /**
-     * Uninstall column
+     * Uninstall hub
      */
     @NonNull
-    public abstract Single<Boolean> uninstall(@NonNull String columnId);
+    public abstract Single<Boolean> uninstall(@NonNull String hubId);
 
     /**
-     * Check if a column is installed
+     * Check if a hub is installed
      */
-    public abstract boolean isInstalled(@NonNull String columnId);
+    public abstract boolean isInstalled(@NonNull String hubId);
 
     /**
-     * Get all installed columns
+     * Get all installed hubs
      */
     @NonNull
-    public abstract Single<List<Column>> getAllInstalled();
+    public abstract Single<List<Hub>> getAllInstalled();
 }

@@ -39,7 +39,7 @@
             app:layout_constraintLeft_toRightOf="@+id/uninstallBtn"
             app:layout_constraintRight_toLeftOf="@+id/configBtn"
             app:layout_constraintTop_toTopOf="@+id/uninstallBtn"
-            tools:text="Column Title"
+            tools:text="Hub Title"
             />
 
         <TextView
@@ -54,7 +54,7 @@
             app:layout_constraintLeft_toLeftOf="@+id/titleTv"
             app:layout_constraintRight_toRightOf="@+id/titleTv"
             app:layout_constraintTop_toBottomOf="@+id/titleTv"
-            tools:text="Column Version"
+            tools:text="Hub Version"
             />
 
         <TextView

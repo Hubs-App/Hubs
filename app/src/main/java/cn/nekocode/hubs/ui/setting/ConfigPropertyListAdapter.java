@@ -58,7 +58,7 @@ public class ConfigPropertyListAdapter extends RecyclerView.Adapter<RecyclerView
             case TYPE_PROPERTY:
                 itemView = LayoutInflater.from(parent.getContext()).inflate(
                         R.layout.item_config_property, parent, false);
-                return new ColumnViewHolder(itemView);
+                return new HubViewHolder(itemView);
         }
 
         throw new RuntimeException("Not supported viewtype: " + viewType);
@@ -66,8 +66,8 @@ public class ConfigPropertyListAdapter extends RecyclerView.Adapter<RecyclerView
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        if (holder instanceof ColumnViewHolder) {
-            ((ColumnViewHolder) holder).bind(mList.get(position));
+        if (holder instanceof HubViewHolder) {
+            ((HubViewHolder) holder).bind(mList.get(position));
         }
     }
 
@@ -81,11 +81,11 @@ public class ConfigPropertyListAdapter extends RecyclerView.Adapter<RecyclerView
         return TYPE_PROPERTY;
     }
 
-    private class ColumnViewHolder extends RecyclerView.ViewHolder {
+    private class HubViewHolder extends RecyclerView.ViewHolder {
         private ItemConfigPropertyBinding mBinding;
 
 
-        ColumnViewHolder(View itemView) {
+        HubViewHolder(View itemView) {
             super(itemView);
 
             mBinding = DataBindingUtil.bind(itemView);

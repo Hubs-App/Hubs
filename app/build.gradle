@@ -13,19 +13,19 @@ android {
         versionName "1.0"
 
         def SCHEME = "hubs"
-        def COLUMN_EXTENSION = "column"
-        def COLUMN_CONFIG_PATH = "config.lua"
-        def COLUMN_USER_CONFIG_PATH = "user_config.lua"
+        def HUB_EXTENSION = "hub"
+        def HUB_CONFIG_PATH = "config.lua"
+        def HUB_USER_CONFIG_PATH = "user_config.lua"
 
         buildConfigField "String", "SCHEME", "\"$SCHEME\""
-        buildConfigField "String", "COLUMN_EXTENSION", "\"$COLUMN_EXTENSION\""
-        buildConfigField "String", "COLUMN_CONFIG_PATH", "\"$COLUMN_CONFIG_PATH\""
-        buildConfigField "String", "COLUMN_USER_CONFIG_PATH", "\"$COLUMN_USER_CONFIG_PATH\""
+        buildConfigField "String", "HUB_EXTENSION", "\"$HUB_EXTENSION\""
+        buildConfigField "String", "HUB_CONFIG_PATH", "\"$HUB_CONFIG_PATH\""
+        buildConfigField "String", "HUB_USER_CONFIG_PATH", "\"$HUB_USER_CONFIG_PATH\""
 
         manifestPlaceholders = [
                 APPLICATION_ID: applicationId,
                 SCHEME: SCHEME,
-                COLUMN_EXTENSION: COLUMN_EXTENSION,
+                HUB_EXTENSION: HUB_EXTENSION,
                 FABRIC_API_KEY: "ef319bcb87dd50b6283644f4e9e4c40ab0b07996",
         ]
     }
