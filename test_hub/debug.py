@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-import os
 from subprocess import Popen, PIPE
+import codecs
 
 HUB_ROOT_PATH = '/sdcard/HubsApp/Hub'
 
@@ -12,7 +12,7 @@ def run_cmd(cmd):
 
 
 def get_hub_id():
-    with open('config.lua', 'r', encoding='utf-8') as src_file:
+    with codecs.open('config.lua', 'r', encoding='utf-8') as src_file:
         for line in src_file.readlines():
             pair = line.split('=')
             if pair[0] == 'ID':
