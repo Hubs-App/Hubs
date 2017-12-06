@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="cn.nekocode.hot">
+          package="cn.nekocode.hubs">
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
     <application
-        android:name=".HotApplication"
+        android:name="cn.nekocode.hubs.HubsApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -15,7 +15,7 @@
         android:theme="@style/AppTheme">
 
         <activity
-            android:name=".ui.home.HomeActivity"
+            android:name="cn.nekocode.hubs.ui.home.HomeActivity"
             android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -61,7 +61,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".ui.browser.BrowserActivity">
+        <activity android:name="cn.nekocode.hubs.ui.browser.BrowserActivity">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
@@ -74,7 +74,7 @@
         </activity>
 
         <activity
-            android:name=".ui.setting.SettingActivity"
+            android:name="cn.nekocode.hubs.ui.setting.SettingActivity"
             android:label="@string/setting">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
@@ -88,7 +88,7 @@
         </activity>
 
         <activity
-            android:name=".ui.setting.ColumnManagerActivity"
+            android:name="cn.nekocode.hubs.ui.setting.ColumnManagerActivity"
             android:label="@string/column_manager">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
@@ -102,7 +102,7 @@
         </activity>
 
         <activity
-            android:name=".ui.setting.ColumnConfigActivity"
+            android:name="cn.nekocode.hubs.ui.setting.ColumnConfigActivity"
             android:label="@string/column_config">
         </activity>
 

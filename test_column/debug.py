@@ -3,7 +3,7 @@
 import os
 from subprocess import Popen, PIPE
 
-COLUMN_ROOT_PATH = '/sdcard/HotApp/Column'
+COLUMN_ROOT_PATH = '/sdcard/HubsApp/Column'
 
 
 def run_cmd(cmd):
@@ -26,7 +26,7 @@ def sync_files(column_id):
 
 
 def broadcast(column_id):
-    run_cmd('adb shell "am broadcast -a cn.nekocode.hot.action.NOTIFY_COLUMN_INSTALLED -e column_id \'%s\'"' % column_id)
+    run_cmd('adb shell "am broadcast -a cn.nekocode.hubs.action.NOTIFY_COLUMN_INSTALLED -e column_id \'%s\'"' % column_id)
 
 
 def main():

@@ -12,8 +12,8 @@
             >
             <intent
                 android:action="android.intent.action.VIEW"
-                android:targetPackage="cn.nekocode.hot"
-                android:targetClass="cn.nekocode.hot.ui.setting.ColumnManagerActivity"
+                android:targetPackage="cn.nekocode.hubs"
+                android:targetClass="cn.nekocode.hubs.ui.setting.ColumnManagerActivity"
                 />
         </Preference>
 

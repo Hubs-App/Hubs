@@ -6,13 +6,13 @@ android {
     buildToolsVersion BUILD_TOOLS_VERSION
 
     defaultConfig {
-        applicationId "cn.nekocode.hot"
+        applicationId "cn.nekocode.hubs"
         minSdkVersion 16
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
 
-        def SCHEME = "hot"
+        def SCHEME = "hubs"
         def COLUMN_EXTENSION = "column"
         def COLUMN_CONFIG_PATH = "config.lua"
         def COLUMN_USER_CONFIG_PATH = "user_config.lua"

@@ -1,6 +1,6 @@
 assert(loadfile("okhttp.lua"))(...)
 
-local Article = luajava.bindClass('cn.nekocode.hot.data.model.Article')
+local Article = luajava.bindClass('cn.nekocode.hubs.data.model.Article')
 local ArrayList = luajava.bindClass('java.util.ArrayList')
 local JSONObject = luajava.bindClass('org.json.JSONObject')
 
