@@ -81,7 +81,7 @@ public class HubsApplication extends Application {
         /*
           Setup managers
          */
-        mDefaultFileManager = new FileManager();
+        mDefaultFileManager = new FileManager(this, mDefaultOkHttpClient);
         mDefaultHubManager = new HubManager(mDefaultFileManager);
         mDefaultPreferenceManager = new PreferenceManager(this);
     }

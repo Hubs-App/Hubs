@@ -20,6 +20,7 @@ package cn.nekocode.hubs.manager;
 import android.content.Context;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 
 import java.io.BufferedInputStream;
@@ -29,7 +30,6 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import cn.nekocode.hubs.HubsApplication;
 import cn.nekocode.hubs.manager.base.BaseFileManager;
 import cn.nekocode.hubs.util.PathUtil;
 import io.reactivex.Single;
@@ -41,24 +41,23 @@ import okhttp3.Response;
  * @author nekocode (nekocode.cn@gmail.com)
  */
 public class FileManager extends BaseFileManager {
-    private static final String ROOT_DIRECTORY = "HubsApp";
     private static final String HUBS_DIRECTORY = "Hub";
     private static final String SCHEME_FILE = "file";
     private static final String SCHEME_CONTENT = "content";
     private static final String SCHEME_HTTP = "http";
     private static final String SCHEME_HTTPS = "https";
+    private final Context mContext;
 
+
+    public FileManager(@NonNull Context context, @NonNull OkHttpClient mHttpClient) {
+        super(mHttpClient);
+        mContext = context;
+    }
 
     @Override
-    public boolean createBaseDirectoriesIfNotExist(@NonNull Context context) {
-        File dir = PathUtil.getExternalStorageDirectory();
-        if (dir == null) {
-            return false;
-        }
-
-        final String rootPath = dir.getPath() + File.separator + ROOT_DIRECTORY;
-        dir = new File(rootPath);
-        if ((!dir.exists()) && (!dir.mkdir())) {
+    public boolean createBaseDirectoriesIfNotExist() {
+        File dir = getRootDirectory();
+        if (dir == null || (!dir.exists() && !dir.mkdir())) {
             return false;
         }
 
@@ -73,8 +72,7 @@ public class FileManager extends BaseFileManager {
     @Override
     @NonNull
     public File getRootDirectory() {
-        final File dir = PathUtil.getExternalStorageDirectory();
-        return new File((dir != null ? dir.getPath() : ""), ROOT_DIRECTORY);
+        return ContextCompat.getDataDir(mContext);
     }
 
     @Override
@@ -91,7 +89,7 @@ public class FileManager extends BaseFileManager {
 
     @Override
     @NonNull
-    public Single<File> getFile(@NonNull Context context, @NonNull Uri uri) {
+    public Single<File> getFile(@NonNull Uri uri) {
         final String scheme = uri.getScheme();
         final boolean isFile = SCHEME_FILE.equalsIgnoreCase(scheme);
         final boolean isContent = SCHEME_CONTENT.equalsIgnoreCase(scheme);
@@ -104,7 +102,7 @@ public class FileManager extends BaseFileManager {
              */
             return Single.create(emitter -> {
                 try {
-                    final String path = isFile ? uri.getPath() : PathUtil.getRealPathFromURI(context, uri);
+                    final String path = isFile ? uri.getPath() : PathUtil.getRealPathFromURI(mContext, uri);
                     if (!TextUtils.isEmpty(path)) {
                         emitter.onSuccess(new File(path));
 
@@ -126,14 +124,13 @@ public class FileManager extends BaseFileManager {
                 OutputStream out = null;
 
                 try {
-                    final OkHttpClient httpClient = HubsApplication.getDefaultOkHttpClient(context);
                     final Request request = new Request.Builder().url(uri.toString()).build();
-                    final Response response = httpClient.newCall(request).execute();
+                    final Response response = getHttpClient().newCall(request).execute();
 
                     if (response.isSuccessful()) {
                         // Write to cache file
                         final File cacheFile =
-                                new File(context.getCacheDir(), PathUtil.getFileNameFromUrl(uri.toString()));
+                                new File(mContext.getCacheDir(), PathUtil.getFileNameFromUrl(uri.toString()));
 
                         in = new BufferedInputStream(response.body().byteStream());
                         out = new BufferedOutputStream(new FileOutputStream(cacheFile));

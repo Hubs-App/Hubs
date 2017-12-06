@@ -17,23 +17,33 @@
 
 package cn.nekocode.hubs.manager.base;
 
-import android.content.Context;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 
 import java.io.File;
 
 import io.reactivex.Single;
+import okhttp3.OkHttpClient;
 
 /**
  * @author nekocode (nekocode.cn@gmail.com)
  */
 public abstract class BaseFileManager {
+    private final OkHttpClient mHttpClient;
+
+
+    public BaseFileManager(@NonNull OkHttpClient mHttpClient) {
+        this.mHttpClient = mHttpClient;
+    }
+
+    public OkHttpClient getHttpClient() {
+        return mHttpClient;
+    }
 
     /**
      * Create some base directories
      */
-    public abstract boolean createBaseDirectoriesIfNotExist(@NonNull Context context);
+    public abstract boolean createBaseDirectoriesIfNotExist();
 
     /**
      * Get root directory
@@ -57,5 +67,5 @@ public abstract class BaseFileManager {
      * Get file from a uri
      */
     @NonNull
-    public abstract Single<File> getFile(@NonNull Context context, @NonNull Uri uri);
+    public abstract Single<File> getFile(@NonNull Uri uri);
 }

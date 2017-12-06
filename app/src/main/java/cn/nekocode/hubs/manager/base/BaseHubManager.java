@@ -35,7 +35,7 @@ public abstract class BaseHubManager {
     private final BaseFileManager mFileManager;
 
 
-    public BaseHubManager(BaseFileManager fileManager) {
+    public BaseHubManager(@NonNull BaseFileManager fileManager) {
         this.mFileManager = fileManager;
     }
 

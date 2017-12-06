@@ -83,7 +83,7 @@ public class HomeActivity extends BaseActivity {
         /*
           Create base directories
          */
-        if (!mFileManager.createBaseDirectoriesIfNotExist(this)) {
+        if (!mFileManager.createBaseDirectoriesIfNotExist()) {
             Toast.makeText(this, R.string.toast_create_directories_failed, Toast.LENGTH_SHORT).show();
             return;
         }
@@ -163,7 +163,7 @@ public class HomeActivity extends BaseActivity {
         progressDialog.setCancelable(false);
         progressDialog.show();
 
-        mFileManager.getFile(this, intent.getData())
+        mFileManager.getFile(intent.getData())
                 .flatMap(file ->
                         mHubManager.readConfig(file)
                                 .map(hub -> Pair.create(file, hub))

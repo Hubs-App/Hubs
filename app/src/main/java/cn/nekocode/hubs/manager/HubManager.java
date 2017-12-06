@@ -20,10 +20,6 @@ package cn.nekocode.hubs.manager;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
-import org.luaj.vm2.Globals;
-import org.luaj.vm2.LoadState;
-import org.luaj.vm2.compiler.LuaC;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -49,16 +45,10 @@ import io.reactivex.Single;
 public class HubManager extends BaseHubManager {
     private static final String HUB_CONFIG_PATH = BuildConfig.HUB_CONFIG_PATH;
     private static final String HUB_USER_CONFIG_PATH = BuildConfig.HUB_USER_CONFIG_PATH;
-    private final Globals mGlobals;
 
 
-    public HubManager(BaseFileManager fileManager) {
+    public HubManager(@NonNull BaseFileManager fileManager) {
         super(fileManager);
-
-        // Obatain a lua globals for loading configs
-        mGlobals = new Globals();
-        LoadState.install(mGlobals);
-        LuaC.install(mGlobals);
     }
 
     @Override
