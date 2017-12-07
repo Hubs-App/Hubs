@@ -3,7 +3,9 @@
 from subprocess import Popen, PIPE
 import codecs
 
-HUB_ROOT_PATH = '/sdcard/HubsApp/Hub'
+APPLICATION_ID = 'cn.nekocode.hubs'
+HUB_ROOT_PATH = 'Hub'
+TMP_PATH = '/data/local/tmp'
 
 
 def run_cmd(cmd):
@@ -22,7 +24,9 @@ def get_hub_id():
 
 
 def sync_files(hub_id):
-    run_cmd('adb push . ' + HUB_ROOT_PATH + '/' + hub_id + '/')
+    tmp_hub_path = TMP_PATH + '/' + hub_id
+    run_cmd('adb push . %s/' % tmp_hub_path)
+    run_cmd('adb shell "run-as %s cp -r %s %s/"' % (APPLICATION_ID, tmp_hub_path, HUB_ROOT_PATH))
 
 
 def broadcast(hub_id):
