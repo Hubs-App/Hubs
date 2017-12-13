@@ -61,6 +61,7 @@ public class BrowserActivity extends BaseActivity {
     private BaseFileManager mFileManager;
     private BaseHubManager mHubManager;
     private final BroadcastReceiver mBroadcastReceiver = new BrowserBroadcastReceiver();
+    private final HubsBridge mJsBridge = new HubsBridge(this);
     @Nullable
     private Hub mHub;
     private File mHubDir;
@@ -121,8 +122,11 @@ public class BrowserActivity extends BaseActivity {
     }
 
     private void setupWebView(Bundle savedInstanceState, Hub hub) {
-        final Intent intent = getIntent();
+        // Add Js Interface
+        mBinding.webView.addJavascriptInterface(mJsBridge, HubsBridge.JS_NAME);
+
         // Save to intent
+        final Intent intent = getIntent();
         intent.putExtra(ARG_HUB, hub);
         mHub = hub;
 
