@@ -35,6 +35,10 @@ import java.io.File;
  */
 public class PathUtil {
 
+    public static boolean isPathSecurity(String path) {
+        return !path.contains("../");
+    }
+
     @Nullable
     public static File getExternalStorageDirectory() {
         if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {

@@ -34,6 +34,8 @@ import org.luaj.vm2.lib.jse.LuajavaLib;
 import java.io.File;
 import java.io.FileInputStream;
 
+import cn.nekocode.hubs.util.PathUtil;
+
 
 /**
  * @author nekocode (nekocode.cn@gmail.com)
@@ -48,7 +50,7 @@ public class HubsLuaGlobals extends Globals {
                 // Skip absolute path
                 return null;
             }
-            if (path.contains("../")) {
+            if (!PathUtil.isPathSecurity(path)) {
                 // Skip insecurity path
                 return null;
             }

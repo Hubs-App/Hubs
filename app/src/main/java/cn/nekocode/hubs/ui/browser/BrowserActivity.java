@@ -28,6 +28,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
+import android.webkit.URLUtil;
 import android.webkit.WebView;
 import android.widget.Toast;
 
@@ -46,6 +47,7 @@ import cn.nekocode.hubs.data.model.Hub;
 import cn.nekocode.hubs.databinding.ActivityBrowserBinding;
 import cn.nekocode.hubs.manager.base.BaseHubManager;
 import cn.nekocode.hubs.manager.base.BaseFileManager;
+import cn.nekocode.hubs.util.PathUtil;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
@@ -153,16 +155,12 @@ public class BrowserActivity extends BaseActivity {
           Load url
          */
         if (savedInstanceState == null) {
-            if (hub == null || TextUtils.isEmpty(hub.getBrowser())) {
+            if (hub == null || URLUtil.isNetworkUrl(url)) {
                 mBinding.webView.loadUrl2(url);
 
-            } else {
+            } else if (URLUtil.isFileUrl(url) && PathUtil.isPathSecurity(url)) {
                 mHubDir = mFileManager.getHubDirectory(hub.getId());
-                final String browserUrl = Uri.fromFile(new File(mHubDir, hub.getBrowser()))
-                        .buildUpon()
-                        .appendQueryParameter("url", url)
-                        .build()
-                        .toString();
+                final String browserUrl = Uri.fromFile(new File(mHubDir, url.substring(7))).toString();
                 mBinding.webView.loadUrl2(browserUrl);
 
                 mBinding.webView.setCallback(new WebViewCallback() {
