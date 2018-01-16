@@ -159,16 +159,20 @@ public class BrowserActivity extends BaseActivity {
                 mBinding.webView.loadUrl2(url);
 
             } else if (URLUtil.isFileUrl(url) && PathUtil.isPathSecurity(url)) {
-                mHubDir = mFileManager.getHubDirectory(hub.getId());
-                final String browserUrl = Uri.fromFile(new File(mHubDir, url.substring(7))).toString();
-                mBinding.webView.loadUrl2(browserUrl);
+                final String path = url.substring(7);
 
-                mBinding.webView.setCallback(new WebViewCallback() {
-                    @Override
-                    public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                        return false;
-                    }
-                });
+                if (!new File(path).isAbsolute()) {
+                    mHubDir = mFileManager.getHubDirectory(hub.getId());
+                    final String browserUrl = Uri.fromFile(new File(mHubDir, path)).toString();
+                    mBinding.webView.loadUrl2(browserUrl);
+
+                    mBinding.webView.setCallback(new WebViewCallback() {
+                        @Override
+                        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                            return false;
+                        }
+                    });
+                }
             }
 
         } else {
