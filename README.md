@@ -34,7 +34,7 @@ In the lua script, you can use the `luajava` lib to access Java class . Check th
 
 You can use the [test_hub/debug.py](test_hub/debug.py) script to install/reinstall a Hub to your mobile without packing it. It means that if you change some code of your Hub on your computer, you can run the script to see the effect immediately on your mobile. Watch the videos below to see how it works.
 
-<img src="image/video.png" width="320" height="180"/> Youtube: [Click Here](https://www.youtube.com/watch?v=piOAlxkK4CQ)    Youku: [Click Here]()
+<img src="image/video.png" width="320" height="180"/> Youtube: [Click Here](https://www.youtube.com/watch?v=piOAlxkK4CQ)    Bilibili: [Click Here](http://www.bilibili.com/video/av18368324/)
 
 ### Packing
 
