@@ -1,12 +1,12 @@
-Hubs is a content hub application on Android. It provides the ability to write custom plugin to crawl artilces, images, or other content from internet.
+Hubs is a content crawler application on Android. It provides apis to crawl web content and display data. So you can use them to make your own crawler plugin (or 3rd party client) for any web service. And the most important thing is that with the help of these apis, you can also block the ads, clean up the content, and relayout the page.
 
 ## Installing Hubs
 
-We call the crawler plugin 'Hub'. You can browse Hubs in our Hub repository. Click the link of Hub on the webpage to install it directly or download it to your mobile to install it manually.
+We call the crawler plugin 'Hub'. You can browse Hubs in our Hub repository. Click the link of Hub on the webpage to install it directly, or download it to your mobile to install it manually.
 
-## Writing a Hub
+## Making a Hub
 
-You can write your own Hub with lua script. We provide a simple [example](test_hub) that crawls articles from the [jandan.net](http://jandan.net/). You can run the [test_hub/debug.py](test_hub/debug.py) script to install it to your client application and see the effect.
+You can make your own Hub with lua script. We provide a simple [example](test_hub) that crawls articles from the [jandan.net](http://jandan.net/). You can run the [test_hub/debug.py](test_hub/debug.py) script to install it to your client application and see the effect.
 
 ### Config script
 
