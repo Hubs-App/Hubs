@@ -1,1 +1,1 @@
-include ':app', ':luaj'
+include ':app', ':lib-luaj'

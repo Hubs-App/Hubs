@@ -1,0 +1,19 @@
+apply plugin: 'java-library'
+
+sourceSets.main.java {
+    srcDirs = [
+            rootProject.file("luaj-source/src/core"),
+            rootProject.file('luaj-source/src/jse')
+    ]
+
+    setIncludes([
+            'org/luaj/vm2/*.java',
+            'org/luaj/vm2/compiler/**/*.java',
+            'org/luaj/vm2/lib/**/*.java'
+    ])
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    compileOnly "com.android.support:support-annotations:$SUPPORT_LIBS_VERSION"
+}

@@ -1,0 +1,3 @@
+[submodule "luaj-source"]
+	path = luaj-source
+	url = git@github.com:Hubs-App/luaj.git
