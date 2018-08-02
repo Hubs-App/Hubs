@@ -39,20 +39,20 @@ public interface ActivityRouter {
 
 
     @Path("browser")
-    boolean gotoBrowser(Context context, @QueryParam("url") String url);
+    void gotoBrowser(Context context, @QueryParam("url") String url);
 
     @Path("browser")
-    boolean gotoBrowser(Context context, @QueryParam("hub_id") String hubId, @QueryParam("url") String url);
+    void gotoBrowser(Context context, @QueryParam("hub_id") String hubId, @QueryParam("url") String url);
 
     @Clazz(BrowserActivity.class)
-    boolean gotoBrowser(Context context, @BundleParam("hub") Hub hub, @BundleParam("url") String url);
+    void gotoBrowser(Context context, @BundleParam("hub") Hub hub, @BundleParam("url") String url);
 
     @Path("setting")
-    boolean gotoSetting(Context context);
+    void gotoSetting(Context context);
 
     @Path("hub_manager")
-    boolean gotoHubManager(Context context);
+    void gotoHubManager(Context context);
 
     @Clazz(HubConfigActivity.class)
-    boolean gotoHubConfig(Context context, @BundleParam("hub") Hub hub);
+    void gotoHubConfig(Context context, @BundleParam("hub") Hub hub);
 }
