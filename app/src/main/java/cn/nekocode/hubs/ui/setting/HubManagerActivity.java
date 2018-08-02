@@ -192,7 +192,7 @@ public class HubManagerActivity extends BaseActivity implements HubListAdapter.U
                 .subscribeOn(Schedulers.io())
                 .flatMap(hubs -> mPreferenceManager.loadHubPreferences(hubs))
                 .observeOn(AndroidSchedulers.mainThread())
-                .to(AutoDispose.with(AndroidLifecycleScopeProvider.from(this)).forSingle())
+                .as(AutoDispose.autoDisposable(AndroidLifecycleScopeProvider.from(this)))
                 .subscribe(preferences -> {
                     progressDialog.dismiss();
                     mPreferences.clear();
@@ -224,7 +224,7 @@ public class HubManagerActivity extends BaseActivity implements HubListAdapter.U
         mHubManager.uninstall(hub.getId())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .to(AutoDispose.with(AndroidLifecycleScopeProvider.from(this)).forSingle())
+                .as(AutoDispose.autoDisposable(AndroidLifecycleScopeProvider.from(this)))
                 .subscribe(isSuccess -> {
                     if (!isSuccess) {
                         progressDialog.dismiss();
@@ -268,7 +268,7 @@ public class HubManagerActivity extends BaseActivity implements HubListAdapter.U
                         mHubManager.readConfig(hubId)
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
-                                .to(AutoDispose.with(AndroidLifecycleScopeProvider.from(HubManagerActivity.this)).forSingle())
+                                .as(AutoDispose.autoDisposable(AndroidLifecycleScopeProvider.from(HubManagerActivity.this)))
                                 .subscribe(hub2 -> {
                                     mPreferences.get(index).setHub(hub2);
                                     mAdapter.notifyItemChanged(index);

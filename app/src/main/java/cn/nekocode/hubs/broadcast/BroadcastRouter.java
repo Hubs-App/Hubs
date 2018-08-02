@@ -24,8 +24,8 @@ import java.util.ArrayList;
 import cn.nekocode.hubs.Constants;
 import cn.nekocode.hubs.data.model.Hub;
 import cn.nekocode.meepo.Meepo;
-import cn.nekocode.meepo.annotation.Bundle;
-import cn.nekocode.meepo.annotation.TargetAction;
+import cn.nekocode.meepo.annotation.Action;
+import cn.nekocode.meepo.annotation.BundleParam;
 
 /**
  * @author nekocode (nekocode.cn@gmail.com)
@@ -36,16 +36,16 @@ public interface BroadcastRouter {
             .build().create(BroadcastRouter.class);
 
 
-    @TargetAction(Constants.ACTION_NOTIFY_HUB_INSTALLED)
-    void tellHubInstalled(Context context, @Bundle(Constants.ARG_HUB_ID) String hubId);
+    @Action(Constants.ACTION_NOTIFY_HUB_INSTALLED)
+    void tellHubInstalled(Context context, @BundleParam(Constants.ARG_HUB_ID) String hubId);
 
-    @TargetAction(Constants.ACTION_NOTIFY_HUB_INSTALLED)
-    void tellHubInstalled(Context context, @Bundle(Constants.ARG_HUB) Hub hub);
+    @Action(Constants.ACTION_NOTIFY_HUB_INSTALLED)
+    void tellHubInstalled(Context context, @BundleParam(Constants.ARG_HUB) Hub hub);
 
-    @TargetAction(Constants.ACTION_NOTIFY_HUB_UNINSTALLED)
-    void tellHubUninstalled(Context context, @Bundle(Constants.ARG_HUBS) ArrayList<Hub> hubs);
+    @Action(Constants.ACTION_NOTIFY_HUB_UNINSTALLED)
+    void tellHubUninstalled(Context context, @BundleParam(Constants.ARG_HUBS) ArrayList<Hub> hubs);
 
-    @TargetAction(Constants.ACTION_NOTIFY_HUB_PREFERENCE_CHANGED)
-    void tellHubPreferenceChanged(Context context, @Bundle(Constants.ARG_HUBS) ArrayList<Hub> hubs);
+    @Action(Constants.ACTION_NOTIFY_HUB_PREFERENCE_CHANGED)
+    void tellHubPreferenceChanged(Context context, @BundleParam(Constants.ARG_HUBS) ArrayList<Hub> hubs);
 
 }

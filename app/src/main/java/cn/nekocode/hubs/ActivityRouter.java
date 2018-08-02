@@ -23,10 +23,10 @@ import cn.nekocode.hubs.data.model.Hub;
 import cn.nekocode.hubs.ui.browser.BrowserActivity;
 import cn.nekocode.hubs.ui.setting.HubConfigActivity;
 import cn.nekocode.meepo.Meepo;
-import cn.nekocode.meepo.annotation.Bundle;
-import cn.nekocode.meepo.annotation.Query;
-import cn.nekocode.meepo.annotation.TargetClass;
-import cn.nekocode.meepo.annotation.TargetPath;
+import cn.nekocode.meepo.annotation.BundleParam;
+import cn.nekocode.meepo.annotation.Clazz;
+import cn.nekocode.meepo.annotation.Path;
+import cn.nekocode.meepo.annotation.QueryParam;
 import cn.nekocode.meepo.config.UriConfig;
 
 /**
@@ -38,21 +38,21 @@ public interface ActivityRouter {
             .build().create(ActivityRouter.class);
 
 
-    @TargetPath("browser")
-    boolean gotoBrowser(Context context, @Query("url") String url);
+    @Path("browser")
+    boolean gotoBrowser(Context context, @QueryParam("url") String url);
 
-    @TargetPath("browser")
-    boolean gotoBrowser(Context context, @Query("hub_id") String hubId, @Query("url") String url);
+    @Path("browser")
+    boolean gotoBrowser(Context context, @QueryParam("hub_id") String hubId, @QueryParam("url") String url);
 
-    @TargetClass(BrowserActivity.class)
-    boolean gotoBrowser(Context context, @Bundle("hub") Hub hub, @Bundle("url") String url);
+    @Clazz(BrowserActivity.class)
+    boolean gotoBrowser(Context context, @BundleParam("hub") Hub hub, @BundleParam("url") String url);
 
-    @TargetPath("setting")
+    @Path("setting")
     boolean gotoSetting(Context context);
 
-    @TargetPath("hub_manager")
+    @Path("hub_manager")
     boolean gotoHubManager(Context context);
 
-    @TargetClass(HubConfigActivity.class)
-    boolean gotoHubConfig(Context context, @Bundle("hub") Hub hub);
+    @Clazz(HubConfigActivity.class)
+    boolean gotoHubConfig(Context context, @BundleParam("hub") Hub hub);
 }

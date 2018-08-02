@@ -231,7 +231,7 @@ public class HubConfigActivity extends BaseActivity implements ConfigPropertyLis
                                 .subscribeOn(Schedulers.io())
                 )
                 .observeOn(AndroidSchedulers.mainThread())
-                .to(AutoDispose.with(AndroidLifecycleScopeProvider.from(this)).forCompletable())
+                .as(AutoDispose.autoDisposable(AndroidLifecycleScopeProvider.from(this)))
                 .subscribe(() -> {
                     // Send local broadcast
                     BroadcastRouter.IMPL.tellHubInstalled(this, mHub.getId());

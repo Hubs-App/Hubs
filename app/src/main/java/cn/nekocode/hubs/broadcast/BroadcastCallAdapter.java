@@ -42,7 +42,7 @@ public class BroadcastCallAdapter implements CallAdapter<Void> {
         }
 
         final Intent intent = new Intent();
-        intent.setAction(method.getTargetAction());
+        intent.setAction(method.getAction());
         intent.putExtras(method.getBundle(args));
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
 

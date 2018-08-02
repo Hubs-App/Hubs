@@ -154,7 +154,7 @@ public class ArticleHubFragment extends BaseHubFragment implements SwipeRefreshL
         mLuaBridge.getArticles(0)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .to(AutoDispose.with(AndroidLifecycleScopeProvider.from(this)).forSingle())
+                .as(AutoDispose.autoDisposable(AndroidLifecycleScopeProvider.from(this)))
                 .subscribe(articles -> {
                     mBottomItem = null;
                     mArticleList.clear();
@@ -194,7 +194,7 @@ public class ArticleHubFragment extends BaseHubFragment implements SwipeRefreshL
         mLuaBridge.getArticles(page)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .to(AutoDispose.with(AndroidLifecycleScopeProvider.from(this)).forSingle())
+                .as(AutoDispose.autoDisposable(AndroidLifecycleScopeProvider.from(this)))
                 .subscribe(articles -> {
                     final int oldSize = mArticleList.size();
                     if (articles.size() > 0) {

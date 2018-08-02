@@ -46,7 +46,7 @@ public abstract class BaseLazyLoadFragment extends Fragment {
                 .zipWith(
                         mCanFirstLoad.filter(bool -> bool).firstOrError(),
                         (runnable, bool) -> runnable)
-                .to(AutoDispose.with(AndroidLifecycleScopeProvider.from(this, Lifecycle.Event.ON_DESTROY)).forSingle())
+                .as(AutoDispose.autoDisposable(AndroidLifecycleScopeProvider.from(this, Lifecycle.Event.ON_DESTROY)))
                 .subscribe(runnable -> {
                     runnable.run();
                 });

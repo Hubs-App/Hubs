@@ -98,7 +98,7 @@ public class BrowserActivity extends BaseActivity {
                 mHubManager.readConfig(hubId)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
-                        .to(AutoDispose.with(AndroidLifecycleScopeProvider.from(this)).forSingle())
+                        .as(AutoDispose.autoDisposable(AndroidLifecycleScopeProvider.from(this)))
                         .subscribe(hub -> {
                             setupWebView(savedInstanceState, hub);
 
@@ -238,7 +238,7 @@ public class BrowserActivity extends BaseActivity {
                     (hub != null ? Single.just(hub) : mHubManager.readConfig(hubId))
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
-                            .to(AutoDispose.with(AndroidLifecycleScopeProvider.from(BrowserActivity.this)).forSingle())
+                            .as(AutoDispose.autoDisposable(AndroidLifecycleScopeProvider.from(BrowserActivity.this)))
                             .subscribe(_hub -> {
                                 setupWebView(null, _hub);
 

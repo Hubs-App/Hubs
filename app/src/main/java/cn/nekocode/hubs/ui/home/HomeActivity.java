@@ -138,7 +138,7 @@ public class HomeActivity extends BaseActivity {
                 .subscribeOn(Schedulers.io())
                 .flatMap(hubs -> mPreferenceManager.getOrderedVisibleHubs(hubs))
                 .observeOn(AndroidSchedulers.mainThread())
-                .to(AutoDispose.with(AndroidLifecycleScopeProvider.from(this)).forSingle())
+                .as(AutoDispose.autoDisposable(AndroidLifecycleScopeProvider.from(this)))
                 .subscribe(hubs -> {
                     progressDialog.dismiss();
                     mHubs.clear();
@@ -170,7 +170,7 @@ public class HomeActivity extends BaseActivity {
                 )
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .to(AutoDispose.with(AndroidLifecycleScopeProvider.from(this)).forSingle())
+                .as(AutoDispose.autoDisposable(AndroidLifecycleScopeProvider.from(this)))
                 .subscribe(pair -> {
                     final File hubPackgeFile = pair.first;
                     final Hub hub = pair.second;
@@ -202,7 +202,7 @@ public class HomeActivity extends BaseActivity {
         mHubManager.readConfig(hub.getId())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .to(AutoDispose.with(AndroidLifecycleScopeProvider.from(this)).forSingle())
+                .as(AutoDispose.autoDisposable(AndroidLifecycleScopeProvider.from(this)))
                 .subscribe(installedHub -> {
                     progressDialog.dismiss();
                     new AlertDialog.Builder(HomeActivity.this)
@@ -228,7 +228,7 @@ public class HomeActivity extends BaseActivity {
         mHubManager.install(this, hubPackageFile)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .to(AutoDispose.with(AndroidLifecycleScopeProvider.from(this)).forSingle())
+                .as(AutoDispose.autoDisposable(AndroidLifecycleScopeProvider.from(this)))
                 .subscribe(hub -> {
                     progressDialog.dismiss();
                     Toast.makeText(HomeActivity.this, R.string.toast_install_hub_success, Toast.LENGTH_SHORT).show();
@@ -305,7 +305,7 @@ public class HomeActivity extends BaseActivity {
                                 }
                             })
                             .observeOn(AndroidSchedulers.mainThread())
-                            .to(AutoDispose.with(AndroidLifecycleScopeProvider.from(HomeActivity.this)).forSingle())
+                            .as(AutoDispose.autoDisposable(AndroidLifecycleScopeProvider.from(HomeActivity.this)))
                             .subscribe(_hub -> {
                                 if (index < 0) {
                                     // Install
